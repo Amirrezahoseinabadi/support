@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پشتیبانی</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -93,33 +94,22 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, onSnapshot, doc, orderBy, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAjBkdCe-kJK2VFfM3lSFyFiFNXElOCPSg",
-            authDomain: "support-app-final.firebaseapp.com",
-            projectId: "support-app-final",
-            storageBucket: "support-app-final.appspot.com",
-            messagingSenderId: "220983533006",
-            appId: "1:220983533006:web:87f404486afb9f6a06df9f",
-            measurementId: "G-BGBGRWW9SV"
-        };
+        // 1. اطلاعات اتصال سوپابیس شما
+        const SUPABASE_URL = 'https://zguqvdisadlhvswsnlyy.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpndXF2ZGlzYWRsaHZzd3NubHl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MTY0MjIsImV4cCI6MjA3MTI5MjQyMn0.f9EgX9-FCJt4cEVqLCf1ZmaOm30rNioKxenRpFsTmak';
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const { createClient } = supabase;
+        const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let telegramUserId = null;
         let currentTicketId = null;
-        let unsubscribeTickets = null;
-        let unsubscribeConversation = null;
-        let unsubscribeTicketStatus = null;
+        let ticketsSubscription = null;
+        let messagesSubscription = null;
         let hasOpenTicket = false;
-        let isSubmitting = false; 
+        let isSubmitting = false;
 
         const loadingView = document.getElementById('loading-view');
         const errorView = document.getElementById('error-view');
-        const loadingSpinner = document.getElementById('loading-spinner');
         const mainAppContainer = document.getElementById('main-app-container');
         const views = { ticketsList: document.getElementById('tickets-list-view'), newTicket: document.getElementById('new-ticket-view'), conversation: document.getElementById('conversation-view') };
         const navButtons = { ticketsList: document.getElementById('nav-tickets-list'), newTicket: document.getElementById('nav-new-ticket') };
@@ -131,7 +121,6 @@
         const submitNewTicketBtn = document.getElementById('submit-new-ticket-btn');
         const conversationContainer = document.getElementById('conversation-container');
         const replyForm = document.getElementById('reply-form');
-        const replyBox = document.getElementById('reply-box');
         const closedTicketMessage = document.getElementById('closed-ticket-message');
         const backToTicketsBtn = document.getElementById('back-to-tickets');
 
@@ -143,7 +132,7 @@
             mainAppContainer.classList.remove('hidden');
             mainAppContainer.classList.add('flex');
             showView('ticketsList');
-            fetchAndRenderTickets();
+            listenToTickets();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -157,7 +146,7 @@
                     startApp("12345-test-user"); 
                 }
             } catch (error) {
-                loadingSpinner.classList.add('hidden');
+                loadingView.classList.add('hidden');
                 errorView.classList.remove('hidden');
                 console.error("Authentication failed:", error);
             }
@@ -184,22 +173,37 @@
             if (viewName === 'conversation') headerTitle.textContent = 'گفتگو';
         }
 
-        function fetchAndRenderTickets() {
+        async function renderTickets(tickets) {
+             hasOpenTicket = tickets.some(ticket => ['open', 'answered', 'in-progress'].includes(ticket.status));
+            if (tickets.length === 0) {
+                ticketsContainer.innerHTML = '';
+                noTicketsMessage.classList.remove('hidden');
+            } else {
+                noTicketsMessage.classList.add('hidden');
+                const sortedTickets = tickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                const ticketsHtml = sortedTickets.map(ticket => renderTicket(ticket)).join('');
+                ticketsContainer.innerHTML = ticketsHtml;
+                document.querySelectorAll('.ticket-card').forEach(card => { card.addEventListener('click', () => openConversation(card.dataset.id)); });
+            }
+        }
+
+        function listenToTickets() {
             if (!telegramUserId) return;
-            if (unsubscribeTickets) unsubscribeTickets();
-            const ticketsRef = collection(db, 'tickets');
-            const q = query(ticketsRef, where("telegramId", "==", telegramUserId));
-            unsubscribeTickets = onSnapshot(q, (querySnapshot) => {
-                hasOpenTicket = querySnapshot.docs.some(doc => ['open', 'answered', 'in-progress'].includes(doc.data().status));
-                if (querySnapshot.empty) {
-                    ticketsContainer.innerHTML = '';
-                    noTicketsMessage.classList.remove('hidden');
-                } else {
-                    noTicketsMessage.classList.add('hidden');
-                    const ticketsHtml = querySnapshot.docs.sort((a, b) => b.data().createdAt?.toMillis() - a.data().createdAt?.toMillis()).map(doc => renderTicket(doc.id, doc.data())).join('');
-                    ticketsContainer.innerHTML = ticketsHtml;
-                    document.querySelectorAll('.ticket-card').forEach(card => { card.addEventListener('click', () => openConversation(card.dataset.id)); });
-                }
+            if (ticketsSubscription) ticketsSubscription.unsubscribe();
+            
+            ticketsSubscription = db
+                .channel('public:tickets')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'tickets', filter: `telegram_id=eq.${telegramUserId}` }, async payload => {
+                    const { data, error } = await db.from('tickets').select().eq('telegram_id', telegramUserId);
+                    if (error) console.error(error);
+                    else renderTickets(data);
+                })
+                .subscribe();
+            
+            // Initial fetch
+            db.from('tickets').select().eq('telegram_id', telegramUserId).then(({ data, error }) => {
+                if (error) console.error(error);
+                else renderTickets(data);
             });
         }
         
@@ -213,13 +217,13 @@
             return statuses[status] || { text: 'نامشخص', className: 'status-closed' };
         }
 
-        function renderTicket(id, data) {
+        function renderTicket(data) {
             const status = getStatusInfo(data.status);
-            const creationDate = data.createdAt ? data.createdAt.toDate().toLocaleString('fa-IR', { dateStyle: 'short', timeStyle: 'short' }) : 'لحظاتی پیش';
+            const creationDate = new Date(data.created_at).toLocaleString('fa-IR', { dateStyle: 'short', timeStyle: 'short' });
             const departmentName = departmentMap[data.department] || 'نامشخص';
             const highlightClass = data.status === 'answered' ? 'ticket-answered-highlight' : '';
             
-            return `<div class="ticket-card bg-[#3E386B] p-4 rounded-lg shadow-lg cursor-pointer ${highlightClass}" data-id="${id}">
+            return `<div class="ticket-card bg-[#3E386B] p-4 rounded-lg shadow-lg cursor-pointer ${highlightClass}" data-id="${data.id}">
                         <div class="flex justify-between items-start">
                             <p class="font-bold text-md">${data.subject}</p>
                             <span class="status-badge flex-shrink-0 ${status.className}">${status.text}</span>
@@ -231,38 +235,46 @@
                     </div>`;
         }
         
-        function openConversation(ticketId) {
+        async function openConversation(ticketId) {
             currentTicketId = ticketId;
-            if (unsubscribeConversation) unsubscribeConversation();
-            if (unsubscribeTicketStatus) unsubscribeTicketStatus();
+            if (messagesSubscription) messagesSubscription.unsubscribe();
 
-            unsubscribeTicketStatus = onSnapshot(doc(db, 'tickets', ticketId), (doc) => {
-                if (doc.exists()) {
-                    const ticketData = doc.data();
-                    if (ticketData.status === 'closed') {
-                        replyForm.classList.add('hidden');
-                        closedTicketMessage.classList.remove('hidden');
-                    } else {
-                        replyForm.classList.remove('hidden');
-                        closedTicketMessage.classList.add('hidden');
-                    }
-                }
-            });
+            const { data: ticketData, error } = await db.from('tickets').select('status').eq('id', ticketId).single();
+            if (error) return console.error(error);
 
-            const messagesRef = collection(db, 'tickets', ticketId, 'messages');
-            const q = query(messagesRef, orderBy("timestamp"));
-            unsubscribeConversation = onSnapshot(q, (querySnapshot) => {
-                const messagesHtml = querySnapshot.docs.map(doc => renderMessage(doc.data())).join('');
-                conversationContainer.innerHTML = messagesHtml;
+            if (ticketData.status === 'closed') {
+                replyForm.classList.add('hidden');
+                closedTicketMessage.classList.remove('hidden');
+            } else {
+                replyForm.classList.remove('hidden');
+                closedTicketMessage.classList.add('hidden');
+            }
+
+            const renderMessages = (messages) => {
+                const sortedMessages = messages.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+                conversationContainer.innerHTML = sortedMessages.map(msg => renderMessage(msg)).join('');
                 setTimeout(() => { document.getElementById('app-container').scrollTop = document.getElementById('app-container').scrollHeight; }, 100);
-            });
+            };
+
+            messagesSubscription = db
+                .channel(`public:messages:ticket_id=eq.${ticketId}`)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `ticket_id=eq.${ticketId}` }, async payload => {
+                     const { data, error } = await db.from('messages').select().eq('ticket_id', ticketId);
+                     if (data) renderMessages(data);
+                })
+                .subscribe();
+
+            const { data, error: msgError } = await db.from('messages').select().eq('ticket_id', ticketId);
+            if (msgError) console.error(msgError);
+            else renderMessages(data);
+
             showView('conversation');
         }
 
         function renderMessage(data) {
             const messageClass = data.sender === 'user' ? 'message-user' : 'message-admin';
             const containerClass = data.sender === 'user' ? 'self-end' : 'self-start';
-            const time = data.timestamp ? data.timestamp.toDate().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'}) : '';
+            const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
             return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md"><div class="p-3 ${messageClass}"><p class="whitespace-pre-wrap text-sm">${data.text}</p></div><span class="text-xs text-gray-400 mt-1 px-2 ${containerClass}">${time}</span></div>`;
         }
 
@@ -272,8 +284,7 @@
         });
         cancelNewTicketBtn.addEventListener('click', () => showView('ticketsList'));
         backToTicketsBtn.addEventListener('click', () => {
-            if (unsubscribeConversation) unsubscribeConversation();
-            if (unsubscribeTicketStatus) unsubscribeTicketStatus();
+            if (messagesSubscription) messagesSubscription.unsubscribe();
             currentTicketId = null;
             showView('ticketsList');
         });
@@ -303,22 +314,22 @@
             }
 
             try {
-                const ticketData = { 
-                    telegramId: telegramUserId, 
+                const { data: ticketData, error: ticketError } = await db.from('tickets').insert([{ 
+                    telegram_id: telegramUserId, 
                     subject: subject, 
-                    department: department, 
-                    status: 'open', 
-                    createdAt: serverTimestamp(), 
-                    updatedAt: serverTimestamp() 
-                };
-                const ticketDocRef = await addDoc(collection(db, 'tickets'), ticketData);
-                
-                const messageData = { 
+                    department: department,
+                    status: 'open'
+                }]).select().single();
+
+                if (ticketError) throw ticketError;
+
+                const { error: messageError } = await db.from('messages').insert([{ 
                     sender: 'user', 
                     text: message, 
-                    timestamp: serverTimestamp() 
-                };
-                await addDoc(collection(db, 'tickets', ticketDocRef.id, 'messages'), messageData);
+                    ticket_id: ticketData.id
+                }]);
+
+                if (messageError) throw messageError;
                 
                 newTicketForm.reset();
                 showNotification(`تیکت شما با موفقیت ثبت شد.`, 'success');
@@ -345,17 +356,24 @@
             handleNewTicketSubmit();
         });
 
-
         replyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentTicketId) return;
             const replyInput = document.getElementById('reply-message');
             const messageText = replyInput.value.trim();
             if (messageText === '') return;
+
             try {
-                const ticketRef = doc(db, 'tickets', currentTicketId);
-                await addDoc(collection(ticketRef, 'messages'), { sender: 'user', text: messageText, timestamp: serverTimestamp() });
-                await updateDoc(ticketRef, { status: 'open', updatedAt: serverTimestamp() });
+                const { error: messageError } = await db.from('messages').insert([{ 
+                    sender: 'user', 
+                    text: messageText, 
+                    ticket_id: currentTicketId 
+                }]);
+                if (messageError) throw messageError;
+
+                const { error: ticketError } = await db.from('tickets').update({ status: 'open', updated_at: new Date() }).eq('id', currentTicketId);
+                if (ticketError) throw ticketError;
+
                 replyForm.reset();
             } catch (error) {
                 console.error("Error sending reply: ", error);

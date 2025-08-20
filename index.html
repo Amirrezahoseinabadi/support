@@ -278,6 +278,10 @@
         newTicketForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitButton = newTicketForm.querySelector('button[type="submit"]');
+            
+            // Prevent multiple submissions
+            if (submitButton.disabled) return;
+
             submitButton.disabled = true;
             submitButton.textContent = 'در حال ارسال...';
 
@@ -302,15 +306,20 @@
                     text: formData.get('message'), 
                     timestamp: serverTimestamp() 
                 });
+                
                 newTicketForm.reset();
                 showNotification(`تیکت شما با موفقیت ثبت شد.`, 'success');
                 showView('ticketsList');
+
             } catch (error) {
                 console.error("Error creating new ticket: ", error);
                 showNotification("خطا در ایجاد تیکت.", 'error');
             } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = 'ارسال';
+                // Re-enable button only if the user is still on the page (i.e., an error occurred)
+                if (views.newTicket.classList.contains('hidden') === false) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'ارسال';
+                }
             }
         });
 

@@ -100,17 +100,16 @@
         <p id="notification-message"></p>
     </div>
 
-    <!-- Welcome/Registration View -->
-    <div id="welcome-view" class="flex flex-col items-center justify-center h-full text-center p-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-purple-300 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 012-2h4a2 2 0 012 2v1m-4 0h4m-2 11h2a2 2 0 002-2v-6a2 2 0 00-2-2h-2a2 2 0 00-2 2v6a2 2 0 002 2z" />
+    <!-- Error View (for non-Telegram access) -->
+    <div id="error-view" class="hidden flex-col items-center justify-center h-full text-center p-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-red-300 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <h1 class="text-2xl font-bold text-white mb-2">به پنل پشتیبانی خوش آمدید</h1>
-        <p class="text-gray-300 mb-8 max-w-sm">برای ارسال و پیگیری تیکت‌ها، لطفاً ابتدا شناسه کاربری خود را در سیستم ثبت کنید.</p>
-        <button id="register-id-btn" class="btn-primary text-lg px-8 py-3">ثبت شناسه و ورود به پنل</button>
+        <h1 class="text-2xl font-bold text-white mb-2">خطا در دسترسی</h1>
+        <p class="text-gray-300 max-w-sm">برای استفاده از پنل پشتیبانی، لطفاً این صفحه را از طریق ربات تلگرام باز کنید.</p>
     </div>
 
-    <!-- Main App Container (Initially Hidden) -->
+    <!-- Main App Container -->
     <div id="main-app-container" class="hidden h-full flex flex-col">
         <main id="app-container" class="flex-grow overflow-y-auto">
             <header class="p-4 text-center text-white text-lg font-bold shadow-md" style="background-color: #3E386B;">
@@ -190,9 +189,8 @@
         let hasOpenTicket = false;
 
         // --- DOM Elements ---
-        const welcomeView = document.getElementById('welcome-view');
+        const errorView = document.getElementById('error-view');
         const mainAppContainer = document.getElementById('main-app-container');
-        const registerIdBtn = document.getElementById('register-id-btn');
         const views = { ticketsList: document.getElementById('tickets-list-view'), newTicket: document.getElementById('new-ticket-view'), conversation: document.getElementById('conversation-view') };
         const navButtons = { ticketsList: document.getElementById('nav-tickets-list'), newTicket: document.getElementById('nav-new-ticket') };
         const headerTitle = document.getElementById('header-title');
@@ -213,38 +211,29 @@
         // --- Main App Logic ---
         function startApp(currentUserId) {
             userId = currentUserId;
-            welcomeView.classList.add('hidden');
             mainAppContainer.classList.remove('hidden');
             showView('ticketsList');
             fetchAndRenderTickets();
         }
 
-        // --- Event Listener for Registration ---
-        registerIdBtn.addEventListener('click', () => {
-            try {
-                const tg = window.Telegram.WebApp;
-                tg.ready();
-                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    const telegramUserId = tg.initDataUnsafe.user.id.toString();
-                    localStorage.setItem('telegramUserId', telegramUserId);
-                    startApp(telegramUserId);
-                } else {
-                    showNotification("اطلاعات کاربری تلگرام یافت نشد. لطفاً از داخل تلگرام وارد شوید.", "error");
-                }
-            } catch (error) {
-                showNotification("خطا در اتصال به تلگرام.", "error");
-                console.error("Could not initialize Telegram Web App.", error);
-            }
-        });
-
         // --- Initial Check on Page Load ---
         document.addEventListener('DOMContentLoaded', () => {
-            const storedUserId = localStorage.getItem('telegramUserId');
-            if (storedUserId) {
-                startApp(storedUserId);
-            } else {
-                welcomeView.classList.remove('hidden');
+            try {
+                const tg = window.Telegram.WebApp;
+                tg.ready(); // Inform Telegram the app is ready
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+                    const telegramUserId = tg.initDataUnsafe.user.id.toString();
+                    startApp(telegramUserId);
+                } else {
+                    // Show error if user data is not available
+                    mainAppContainer.classList.add('hidden');
+                    errorView.classList.remove('hidden');
+                }
+            } catch (error) {
+                // Show error if Telegram script fails (e.g., in a normal browser)
                 mainAppContainer.classList.add('hidden');
+                errorView.classList.remove('hidden');
+                console.error("Could not initialize Telegram Web App.", error);
             }
         });
 

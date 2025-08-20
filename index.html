@@ -100,7 +100,7 @@
             apiKey: "AIzaSyB7sMBYNZT0Brk411-vNUy1JE_BV6gXsXo",
             authDomain: "support-bot-app.firebaseapp.com",
             projectId: "support-bot-app",
-            storageBucket: "support-bot-app.appspot.com",
+            storageBucket: "support-bot-app.firebasestorage.app",
             messagingSenderId: "444176603708",
             appId: "1:444176603708:web:a3b5938737a8752b824139",
             measurementId: "G-MWZ1PSNVVV"
@@ -115,6 +115,7 @@
         let unsubscribeConversation = null;
         let unsubscribeTicketStatus = null;
         let hasOpenTicket = false;
+        let isSubmitting = false; 
 
         const loadingView = document.getElementById('loading-view');
         const errorView = document.getElementById('error-view');
@@ -278,7 +279,7 @@
         });
 
         const handleNewTicketSubmit = async () => {
-             if (submitNewTicketBtn.disabled) return;
+            if (isSubmitting) return;
 
             const subject = document.getElementById('subject').value.trim();
             const message = document.getElementById('message').value.trim();
@@ -289,11 +290,13 @@
                 return;
             }
 
+            isSubmitting = true;
             submitNewTicketBtn.disabled = true;
             submitNewTicketBtn.textContent = 'در حال ارسال...';
 
             if (!telegramUserId) {
                 showNotification("خطا: احراز هویت ناموفق بود.", "error");
+                isSubmitting = false;
                 submitNewTicketBtn.disabled = false;
                 submitNewTicketBtn.textContent = 'ارسال';
                 return;
@@ -322,6 +325,7 @@
                 
                 setTimeout(() => {
                     showView('ticketsList');
+                    isSubmitting = false;
                     submitNewTicketBtn.disabled = false;
                     submitNewTicketBtn.textContent = 'ارسال';
                 }, 1000);
@@ -329,12 +333,17 @@
             } catch (error) {
                 console.error("Error creating new ticket: ", error);
                 showNotification("خطا در ایجاد تیکت.", 'error');
+                isSubmitting = false;
                 submitNewTicketBtn.disabled = false;
                 submitNewTicketBtn.textContent = 'ارسال';
             }
         };
         
         submitNewTicketBtn.addEventListener('click', handleNewTicketSubmit);
+        submitNewTicketBtn.addEventListener('touchend', (e) => {
+            e.preventDefault(); 
+            handleNewTicketSubmit();
+        });
 
 
         replyForm.addEventListener('submit', async (e) => {

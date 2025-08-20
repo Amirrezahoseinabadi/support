@@ -279,9 +279,18 @@
             showView('ticketsList');
         });
 
-        submitNewTicketBtn.addEventListener('click', async () => {
-             // Prevent multiple submissions
+        submitNewTicketBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
             if (submitNewTicketBtn.disabled) return;
+
+            const subject = document.getElementById('subject').value.trim();
+            const message = document.getElementById('message').value.trim();
+            const department = document.getElementById('department').value;
+
+            if (!subject || !message) {
+                showNotification("لطفا تمام فیلدها را پر کنید.", "warning");
+                return;
+            }
 
             submitNewTicketBtn.disabled = true;
             submitNewTicketBtn.textContent = 'در حال ارسال...';
@@ -291,17 +300,6 @@
                 submitNewTicketBtn.disabled = false;
                 submitNewTicketBtn.textContent = 'ارسال';
                 return;
-            }
-            // Manually get form data
-            const subject = document.getElementById('subject').value;
-            const message = document.getElementById('message').value;
-            const department = document.getElementById('department').value;
-
-            if (!subject.trim() || !message.trim()) {
-                 showNotification("لطفا تمام فیلدها را پر کنید.", "warning");
-                 submitNewTicketBtn.disabled = false;
-                 submitNewTicketBtn.textContent = 'ارسال';
-                 return;
             }
 
             try {
@@ -321,17 +319,16 @@
                 
                 newTicketForm.reset();
                 showNotification(`تیکت شما با موفقیت ثبت شد.`, 'success');
-                showView('ticketsList');
+                
+                setTimeout(() => {
+                    showView('ticketsList');
+                }, 500);
 
             } catch (error) {
                 console.error("Error creating new ticket: ", error);
                 showNotification("خطا در ایجاد تیکت.", 'error');
-            } finally {
-                // Re-enable button only if an error occurred and user is still on the form page
-                if (!views.newTicket.classList.contains('hidden')) {
-                    submitNewTicketBtn.disabled = false;
-                    submitNewTicketBtn.textContent = 'ارسال';
-                }
+                submitNewTicketBtn.disabled = false;
+                submitNewTicketBtn.textContent = 'ارسال';
             }
         });
 

@@ -1,387 +1,396 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پشتیبانی</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Vazirmatn', sans-serif; background-color: #302B5A; color: #E0E0E0; }
-        .nav-bar { background-color: #FFFFFF; color: #302B5A; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
-        .nav-button { transition: all 0.2s ease-in-out; }
-        .nav-button.active { color: #7C3AED; transform: scale(1.1); }
-        .form-input, .form-select, .form-textarea { background-color: transparent; border: 1px solid #9A94C0; color: #FFFFFF; border-radius: 0.5rem; padding: 0.75rem; width: 100%; font-size: 0.9rem; }
-        .form-input::placeholder, .form-textarea::placeholder { color: #9A94C0; }
-        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #A78BFA; }
-        .btn-primary { background-color: #7C3AED; color: white; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 500; font-size: 0.9rem; transition: background-color 0.2s; }
-        .btn-primary:disabled { background-color: #5b21b6; cursor: not-allowed; }
-        .btn-secondary { background-color: transparent; border: 1px solid #9A94C0; color: #E0E0E0; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 500; font-size: 0.9rem; }
-        .status-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 500; }
-        .status-open { background-color: #dcfce7; color: #166534; }
-        .status-in-progress { background-color: #fef3c7; color: #92400e; }
-        .status-answered { background-color: #e5e7eb; color: #374151; }
-        .status-closed { background-color: #fee2e2; color: #991b1b; }
-        .message-user { background-color: #7C3AED; color: white; border-radius: 1rem 1rem 0 1rem; }
-        .message-admin { background-color: #6B7280; color: white; border-radius: 1rem 1rem 1rem 0; }
-        .notification-success { background-color: #10B981; }
-        .notification-warning { background-color: #F59E0B; }
-        .notification-error { background-color: #EF4444; }
-        .ticket-answered-highlight {
-            border: 1px solid #7C3AED;
-            box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پشتیبانی</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Vazirmatn', sans-serif; background-color: #302B5A; color: #E0E0E0; }
+        .nav-bar { background-color: #FFFFFF; color: #302B5A; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        .nav-button { transition: all 0.2s ease-in-out; }
+        .nav-button.active { color: #7C3AED; transform: scale(1.1); }
+        .form-input, .form-select, .form-textarea { background-color: transparent; border: 1px solid #9A94C0; color: #FFFFFF; border-radius: 0.5rem; padding: 0.75rem; width: 100%; font-size: 0.9rem; }
+        .form-input::placeholder, .form-textarea::placeholder { color: #9A94C0; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #A78BFA; }
+        .btn-primary { background-color: #7C3AED; color: white; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 500; font-size: 0.9rem; transition: background-color 0.2s; }
+        .btn-primary:disabled { background-color: #5b21b6; cursor: not-allowed; }
+        .btn-secondary { background-color: transparent; border: 1px solid #9A94C0; color: #E0E0E0; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 500; font-size: 0.9rem; }
+        .status-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 500; }
+        .status-open { background-color: #dcfce7; color: #166534; }
+        .status-in-progress { background-color: #fef3c7; color: #92400e; }
+        .status-answered { background-color: #e5e7eb; color: #374151; }
+        .status-closed { background-color: #fee2e2; color: #991b1b; }
+        .message-user { background-color: #7C3AED; color: white; border-radius: 1rem 1rem 0 1rem; }
+        .message-admin { background-color: #6B7280; color: white; border-radius: 1rem 1rem 1rem 0; }
+        .notification-success { background-color: #10B981; }
+        .notification-warning { background-color: #F59E0B; }
+        .notification-error { background-color: #EF4444; }
+        .ticket-answered-highlight {
+            border: 1px solid #7C3AED;
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+        }
+    </style>
 </head>
 <body class="flex flex-col h-screen">
 
-    <div id="notification-popup" class="fixed top-0 left-1/2 -translate-x-1/2 -translate-y-full w-11/12 max-w-md p-4 rounded-b-lg shadow-lg text-white text-center transition-transform duration-300 ease-in-out z-50">
-        <p id="notification-message"></p>
-    </div>
+    <div id="notification-popup" class="fixed top-0 left-1/2 -translate-x-1/2 -translate-y-full w-11/12 max-w-md p-4 rounded-b-lg shadow-lg text-white text-center transition-transform duration-300 ease-in-out z-50">
+        <p id="notification-message"></p>
+    </div>
 
-    <div id="loading-view" class="flex flex-col items-center justify-center h-full text-center p-4">
-        <div id="loading-spinner">
-              <svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-             <p class="mt-4 text-white text-sm">در حال احراز هویت...</p>
-        </div>
-        <div id="error-view" class="hidden">
-             <h1 class="text-xl font-bold text-white mb-2">خطا در دسترسی</h1>
-             <p class="text-gray-300 max-w-sm text-sm">برای استفاده از پشتیبانی، لطفاً این صفحه را از طریق ربات تلگرام باز کنید.</p>
-        </div>
-    </div>
+    <div id="loading-view" class="flex flex-col items-center justify-center h-full text-center p-4">
+        <div id="loading-spinner">
+              <svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+             <p class="mt-4 text-white text-sm">در حال احراز هویت...</p>
+        </div>
+        <div id="error-view" class="hidden">
+             <h1 class="text-xl font-bold text-white mb-2">خطا در دسترسی</h1>
+             <p class="text-gray-300 max-w-sm text-sm">برای استفاده از پشتیبانی، لطفاً این صفحه را از طریق ربات تلگرام باز کنید.</p>
+        </div>
+    </div>
 
-    <div id="main-app-container" class="hidden h-full flex flex-col">
-        <main id="app-container" class="flex-grow overflow-y-auto">
-            <header class="p-4 text-center text-white text-lg font-bold shadow-md" style="background-color: #3E386B;">
-                <h1 id="header-title">تیکت‌ها</h1>
-            </header>
-            <div id="tickets-list-view" class="p-4">
-                <div id="tickets-container" class="space-y-3"></div>
-                <div id="no-tickets-message" class="hidden text-center text-gray-400 mt-16">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    <p class="mt-4 text-lg">تیکت ندارید!</p>
-                </div>
-            </div>
-            <div id="new-ticket-view" class="p-4 hidden">
-                <form id="new-ticket-form" class="space-y-4">
-                    <div><label for="department" class="block mb-2 text-sm font-medium">دپارتمان</label><select id="department" name="department" class="form-select"><option value="general">سوالات متفرقه</option><option value="technical">پشتیبانی فنی</option><option value="sales">بخش فروش</option></select></div>
-                    <div><label for="subject" class="block mb-2 text-sm font-medium">موضوع</label><input type="text" id="subject" name="subject" class="form-input" placeholder="موضوع تیکت خود را وارد کنید" required></div>
-                    <div><label for="message" class="block mb-2 text-sm font-medium">متن پیام</label><textarea id="message" name="message" rows="6" class="form-textarea" placeholder="مشکل یا سوال خود را با جزئیات کامل بنویسید..." required></textarea></div>
-                    <div class="flex justify-between items-center pt-2">
-                        <button type="button" id="submit-new-ticket-btn" class="btn-primary">ارسال</button>
-                        <button type="button" id="cancel-new-ticket" class="btn-secondary">لغو</button>
-                    </div>
-                </form>
-            </div>
-            <div id="conversation-view" class="p-4 hidden">
-                 <button id="back-to-tickets" class="mb-4 text-sm text-gray-300 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-180 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>بازگشت</button>
-                <div id="conversation-container" class="space-y-4 pb-20"></div>
-                 <div id="reply-box" class="fixed bottom-[80px] right-0 left-0 p-4" style="background-color: #4C467E;">
-                    <form id="reply-form" class="flex items-center space-x-2 space-x-reverse">
-                        <input type="text" id="reply-message" class="form-input flex-grow" placeholder="پاسخ..." required>
-                        <button type="submit" class="btn-primary p-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg></button>
-                    </form>
-                    <div id="closed-ticket-message" class="hidden text-center text-gray-300 text-sm py-2">این تیکت توسط پشتیبانی بسته شده است.</div>
-                </div>
-            </div>
-        </main>
-        <nav class="nav-bar h-[80px] flex items-center justify-around">
-            <button id="nav-tickets-list" class="nav-button active flex flex-col items-center space-y-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg><span class="text-xs">تیکت‌ها</span></button>
-            <button id="nav-new-ticket" class="nav-button flex flex-col items-center space-y-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="text-xs">تیکت جدید</span></button>
-        </nav>
-    </div>
+    <div id="main-app-container" class="hidden h-full flex flex-col">
+        <main id="app-container" class="flex-grow overflow-y-auto">
+            <header class="p-4 text-center text-white text-lg font-bold shadow-md" style="background-color: #3E386B;">
+                <h1 id="header-title">تیکت‌ها</h1>
+            </header>
+            <div id="tickets-list-view" class="p-4">
+                <div id="tickets-container" class="space-y-3"></div>
+                <div id="no-tickets-message" class="hidden text-center text-gray-400 mt-16">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    <p class="mt-4 text-lg">تیکت ندارید!</p>
+                </div>
+            </div>
+            <div id="new-ticket-view" class="p-4 hidden">
+                <form id="new-ticket-form" class="space-y-4">
+                    <div><label for="department" class="block mb-2 text-sm font-medium">دپارتمان</label><select id="department" name="department" class="form-select"><option value="general">سوالات متفرقه</option><option value="technical">پشتیبانی فنی</option><option value="sales">بخش فروش</option></select></div>
+                    <div><label for="subject" class="block mb-2 text-sm font-medium">موضوع</label><input type="text" id="subject" name="subject" class="form-input" placeholder="موضوع تیکت خود را وارد کنید" required></div>
+                    <div><label for="message" class="block mb-2 text-sm font-medium">متن پیام</label><textarea id="message" name="message" rows="6" class="form-textarea" placeholder="مشکل یا سوال خود را با جزئیات کامل بنویسید..." required></textarea></div>
+                    <div class="flex justify-between items-center pt-2">
+                        <button type="button" id="submit-new-ticket-btn" class="btn-primary">ارسال</button>
+                        <button type="button" id="cancel-new-ticket" class="btn-secondary">لغو</button>
+                    </div>
+                </form>
+            </div>
+            <div id="conversation-view" class="p-4 hidden">
+                 <button id="back-to-tickets" class="mb-4 text-sm text-gray-300 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-180 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>بازگشت</button>
+                <div id="conversation-container" class="space-y-4 pb-20"></div>
+                 <div id="reply-box" class="fixed bottom-[80px] right-0 left-0 p-4" style="background-color: #4C467E;">
+                    <form id="reply-form" class="flex items-center space-x-2 space-x-reverse">
+                        <input type="text" id="reply-message" class="form-input flex-grow" placeholder="پاسخ..." required>
+                        <button type="submit" class="btn-primary p-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg></button>
+                    </form>
+                    <div id="closed-ticket-message" class="hidden text-center text-gray-300 text-sm py-2">این تیکت توسط پشتیبانی بسته شده است.</div>
+                </div>
+            </div>
+        </main>
+        <nav class="nav-bar h-[80px] flex items-center justify-around">
+            <button id="nav-tickets-list" class="nav-button active flex flex-col items-center space-y-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg><span class="text-xs">تیکت‌ها</span></button>
+            <button id="nav-new-ticket" class="nav-button flex flex-col items-center space-y-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="text-xs">تیکت جدید</span></button>
+        </nav>
+    </div>
 
-    <script type="module">
-        // 1. آدرس ورکر خود را اینجا وارد کنید
-        const WORKER_URL = 'https://support-api-worker.amiruserbot7.workers.dev'; // <<< آدرس ورکر را اینجا قرار دهید
+    <script type="module">
+        // 1. آدرس ورکر خود را اینجا وارد کنید
+        const WORKER_URL = 'https://support-api-worker.amiruserbot7.workers.dev'; // <<< آدرس ورکر را اینجا قرار دهید
 
-        // 2. اطلاعات اتصال سوپابیس (برای خواندن اطلاعات)
-        const SUPABASE_URL = 'https://zguqvdisadlhvswsnlyy.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpndXF2ZGlzYWRsaHZzd3NubHl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MTY0MjIsImV4cCI6MjA3MTI5MjQyMn0.f9EgX9-FCJt4cEVqLCf1ZmaOm30rNioKxenRpFsTmak';
+        // 2. اطلاعات اتصال سوپابیس (برای خواندن اطلاعات)
+        const SUPABASE_URL = 'https://zguqvdisadlhvswsnlyy.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpndXF2ZGlzYWRsaHZzd3NubHl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MTY0MjIsImV4cCI6MjA3MTI5MjQyMn0.f9EgX9-FCJt4cEVqLCf1ZmaOm30rNioKxenRpFsTmak';
 
-        const { createClient } = supabase;
-        const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const { createClient } = supabase;
+        const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let telegramUserId = null;
-        let currentTicketId = null;
-        let ticketsSubscription = null;
-        let messagesSubscription = null;
-        let hasOpenTicket = false;
-        let isSubmitting = false;
+        let telegramUserId = null;
+        let currentTicketId = null;
+        let ticketsSubscription = null;
+        let messagesSubscription = null;
+        let hasOpenTicket = false;
+        let isSubmitting = false;
 
-        const loadingView = document.getElementById('loading-view');
-        const errorView = document.getElementById('error-view');
-        const mainAppContainer = document.getElementById('main-app-container');
-        const views = { ticketsList: document.getElementById('tickets-list-view'), newTicket: document.getElementById('new-ticket-view'), conversation: document.getElementById('conversation-view') };
-        const navButtons = { ticketsList: document.getElementById('nav-tickets-list'), newTicket: document.getElementById('nav-new-ticket') };
-        const headerTitle = document.getElementById('header-title');
-        const ticketsContainer = document.getElementById('tickets-container');
-        const noTicketsMessage = document.getElementById('no-tickets-message');
-        const newTicketForm = document.getElementById('new-ticket-form');
-        const cancelNewTicketBtn = document.getElementById('cancel-new-ticket');
-        const submitNewTicketBtn = document.getElementById('submit-new-ticket-btn');
-        const conversationContainer = document.getElementById('conversation-container');
-        const replyForm = document.getElementById('reply-form');
-        const closedTicketMessage = document.getElementById('closed-ticket-message');
-        const backToTicketsBtn = document.getElementById('back-to-tickets');
+        const loadingView = document.getElementById('loading-view');
+        const errorView = document.getElementById('error-view');
+        const mainAppContainer = document.getElementById('main-app-container');
+        const views = { ticketsList: document.getElementById('tickets-list-view'), newTicket: document.getElementById('new-ticket-view'), conversation: document.getElementById('conversation-view') };
+        const navButtons = { ticketsList: document.getElementById('nav-tickets-list'), newTicket: document.getElementById('nav-new-ticket') };
+        const headerTitle = document.getElementById('header-title');
+        const ticketsContainer = document.getElementById('tickets-container');
+        const noTicketsMessage = document.getElementById('no-tickets-message');
+        const newTicketForm = document.getElementById('new-ticket-form');
+        const cancelNewTicketBtn = document.getElementById('cancel-new-ticket');
+        const submitNewTicketBtn = document.getElementById('submit-new-ticket-btn');
+        const conversationContainer = document.getElementById('conversation-container');
+        const replyForm = document.getElementById('reply-form');
+        const closedTicketMessage = document.getElementById('closed-ticket-message');
+        const backToTicketsBtn = document.getElementById('back-to-tickets');
 
-        const departmentMap = { general: 'سوالات متفرقه', technical: 'پشتیبانی فنی', sales: 'بخش فروش' };
+        const departmentMap = { general: 'سوالات متفرقه', technical: 'پشتیبانی فنی', sales: 'بخش فروش' };
 
-        function startApp(userId) {
-            telegramUserId = userId;
-            loadingView.classList.add('hidden');
-            mainAppContainer.classList.remove('hidden');
-            mainAppContainer.classList.add('flex');
-            showView('ticketsList');
-            listenToTickets();
-        }
+        function startApp(userId) {
+            telegramUserId = userId;
+            loadingView.classList.add('hidden');
+            mainAppContainer.classList.remove('hidden');
+            mainAppContainer.classList.add('flex');
+            showView('ticketsList');
+            listenToTickets();
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            try {
-                const tg = window.Telegram.WebApp;
-                tg.ready();
-                if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
-                    startApp(tg.initDataUnsafe.user.id.toString());
-                } else {
-                    console.log("Telegram user data not found, running in test mode.");
-                    startApp("12345-test-user"); 
-                }
-            } catch (error) {
-                loadingView.classList.add('hidden');
-                errorView.classList.remove('hidden');
-                console.error("Authentication failed:", error);
-            }
-        });
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const tg = window.Telegram.WebApp;
+                tg.ready();
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+                    startApp(tg.initDataUnsafe.user.id.toString());
+                } else {
+                    console.log("Telegram user data not found, running in test mode.");
+                    startApp("12345-test-user"); 
+                }
+            } catch (error) {
+                loadingView.classList.add('hidden');
+                errorView.classList.remove('hidden');
+                console.error("Authentication failed:", error);
+            }
+        });
 
-        function showNotification(message, type = 'success') {
-            const popup = document.getElementById('notification-popup');
-            const messageP = document.getElementById('notification-message');
-            popup.className = 'fixed top-0 left-1/2 -translate-x-1/2 -translate-y-full w-11/12 max-w-md p-4 rounded-b-lg shadow-lg text-white text-center transition-transform duration-300 ease-in-out z-50';
-            popup.classList.add(`notification-${type}`);
-            messageP.textContent = message;
-            popup.style.transform = 'translate(-50%, 10px)';
-            setTimeout(() => { popup.style.transform = 'translate(-50%, -100%)'; }, 4000);
-        }
+        function showNotification(message, type = 'success') {
+            const popup = document.getElementById('notification-popup');
+            const messageP = document.getElementById('notification-message');
+            popup.className = 'fixed top-0 left-1/2 -translate-x-1/2 -translate-y-full w-11/12 max-w-md p-4 rounded-b-lg shadow-lg text-white text-center transition-transform duration-300 ease-in-out z-50';
+            popup.classList.add(`notification-${type}`);
+            messageP.textContent = message;
+            popup.style.transform = 'translate(-50%, 10px)';
+            setTimeout(() => { popup.style.transform = 'translate(-50%, -100%)'; }, 4000);
+        }
 
-        function showView(viewName) {
-            Object.values(views).forEach(view => view.classList.add('hidden'));
-            if (views[viewName]) views[viewName].classList.remove('hidden');
-            Object.values(navButtons).forEach(btn => btn.classList.remove('active'));
-            if (navButtons[viewName]) navButtons[viewName].classList.add('active');
-            
-            if (viewName === 'ticketsList') headerTitle.textContent = 'تیکت‌ها';
-            if (viewName === 'newTicket') headerTitle.textContent = 'تیکت جدید';
-            if (viewName === 'conversation') headerTitle.textContent = 'گفتگو';
-        }
+        function showView(viewName) {
+            Object.values(views).forEach(view => view.classList.add('hidden'));
+            if (views[viewName]) views[viewName].classList.remove('hidden');
+            Object.values(navButtons).forEach(btn => btn.classList.remove('active'));
+            if (navButtons[viewName]) navButtons[viewName].classList.add('active');
+            
+            if (viewName === 'ticketsList') headerTitle.textContent = 'تیکت‌ها';
+            if (viewName === 'newTicket') headerTitle.textContent = 'تیکت جدید';
+            if (viewName === 'conversation') headerTitle.textContent = 'گفتگو';
+        }
 
-        async function renderTickets(tickets) {
-             hasOpenTicket = tickets.some(ticket => ['open', 'answered', 'in-progress'].includes(ticket.status));
-            if (tickets.length === 0) {
-                ticketsContainer.innerHTML = '';
-                noTicketsMessage.classList.remove('hidden');
-            } else {
-                noTicketsMessage.classList.add('hidden');
-                const sortedTickets = tickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                const ticketsHtml = sortedTickets.map(ticket => renderTicket(ticket)).join('');
-                ticketsContainer.innerHTML = ticketsHtml;
-                document.querySelectorAll('.ticket-card').forEach(card => { card.addEventListener('click', () => openConversation(card.dataset.id)); });
-            }
-        }
+        async function renderTickets(tickets) {
+             hasOpenTicket = tickets.some(ticket => ['open', 'answered', 'in-progress'].includes(ticket.status));
+            if (tickets.length === 0) {
+                ticketsContainer.innerHTML = '';
+                noTicketsMessage.classList.remove('hidden');
+            } else {
+                noTicketsMessage.classList.add('hidden');
+                const sortedTickets = tickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                const ticketsHtml = sortedTickets.map(ticket => renderTicket(ticket)).join('');
+                ticketsContainer.innerHTML = ticketsHtml;
+                document.querySelectorAll('.ticket-card').forEach(card => { card.addEventListener('click', () => openConversation(card.dataset.id)); });
+            }
+        }
 
-        function listenToTickets() {
-            if (!telegramUserId) return;
-            if (ticketsSubscription) ticketsSubscription.unsubscribe();
-            
-            ticketsSubscription = db
-                .channel('public:tickets')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'tickets', filter: `telegram_id=eq.${telegramUserId}` }, async payload => {
-                    const { data, error } = await db.from('tickets').select().eq('telegram_id', telegramUserId);
-                    if (error) console.error(error);
-                    else renderTickets(data);
-                })
-                .subscribe();
-            
-            db.from('tickets').select().eq('telegram_id', telegramUserId).then(({ data, error }) => {
-                if (error) console.error(error);
-                else renderTickets(data);
-            });
-        }
-        
-        function getStatusInfo(status) {
-            const statuses = { 
-                open: { text: 'باز', className: 'status-open' }, 
-                answered: { text: 'پاسخ داده شد', className: 'status-answered' }, 
-                'in-progress': { text: 'درحال بررسی', className: 'status-in-progress' },
-                closed: { text: 'بسته شده', className: 'status-closed' } 
-            };
-            return statuses[status] || { text: 'نامشخص', className: 'status-closed' };
-        }
+        function listenToTickets() {
+            if (!telegramUserId) return;
+            if (ticketsSubscription) ticketsSubscription.unsubscribe();
+            
+            ticketsSubscription = db
+                .channel('public:tickets')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'tickets', filter: `telegram_id=eq.${telegramUserId}` }, async payload => {
+                    const { data, error } = await db.from('tickets').select().eq('telegram_id', telegramUserId);
+                    if (error) console.error(error);
+                    else renderTickets(data);
+                })
+                .subscribe();
+            
+            db.from('tickets').select().eq('telegram_id', telegramUserId).then(({ data, error }) => {
+                if (error) console.error(error);
+                else renderTickets(data);
+            });
+        }
+        
+        function getStatusInfo(status) {
+            const statuses = { 
+                open: { text: 'باز', className: 'status-open' }, 
+                answered: { text: 'پاسخ داده شد', className: 'status-answered' }, 
+                'in-progress': { text: 'درحال بررسی', className: 'status-in-progress' },
+                closed: { text: 'بسته شده', className: 'status-closed' } 
+            };
+            return statuses[status] || { text: 'نامشخص', className: 'status-closed' };
+        }
 
-        function renderTicket(data) {
-            const status = getStatusInfo(data.status);
-            const creationDate = new Date(data.created_at).toLocaleString('fa-IR', { dateStyle: 'short', timeStyle: 'short' });
-            const departmentName = departmentMap[data.department] || 'نامشخص';
-            const highlightClass = data.status === 'answered' ? 'ticket-answered-highlight' : '';
-            
-            return `<div class="ticket-card bg-[#3E386B] p-4 rounded-lg shadow-lg cursor-pointer ${highlightClass}" data-id="${data.id}">
-                        <div class="flex justify-between items-start">
-                            <p class="font-bold text-md">${data.subject}</p>
-                            <span class="status-badge flex-shrink-0 ${status.className}">${status.text}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-xs text-gray-400 mt-4 pt-2 border-t border-gray-600">
-                            <span>${departmentName}</span>
-                            <span>${creationDate}</span>
-                        </div>
-                    </div>`;
-        }
-        
-        async function openConversation(ticketId) {
-            currentTicketId = ticketId;
-            if (messagesSubscription) messagesSubscription.unsubscribe();
+        function renderTicket(data) {
+            const status = getStatusInfo(data.status);
+            const creationDate = new Date(data.created_at).toLocaleString('fa-IR', { dateStyle: 'short', timeStyle: 'short' });
+            const departmentName = departmentMap[data.department] || 'نامشخص';
+            const highlightClass = data.status === 'answered' ? 'ticket-answered-highlight' : '';
+            
+            return `<div class="ticket-card bg-[#3E386B] p-4 rounded-lg shadow-lg cursor-pointer ${highlightClass}" data-id="${data.id}">
+                        <div class="flex justify-between items-start">
+                            <p class="font-bold text-md">${data.subject}</p>
+                            <span class="status-badge flex-shrink-0 ${status.className}">${status.text}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs text-gray-400 mt-4 pt-2 border-t border-gray-600">
+                            <span>${departmentName}</span>
+                            <span>${creationDate}</span>
+                        </div>
+                    </div>`;
+        }
+        
+        async function openConversation(ticketId) {
+            currentTicketId = ticketId;
+            if (messagesSubscription) messagesSubscription.unsubscribe();
 
-            const { data: ticketData, error } = await db.from('tickets').select('status').eq('id', ticketId).single();
-            if (error) return console.error(error);
+            const { data: ticketData, error } = await db.from('tickets').select('status').eq('id', ticketId).single();
+            if (error) return console.error(error);
 
-            if (ticketData.status === 'closed') {
-                replyForm.classList.add('hidden');
-                closedTicketMessage.classList.remove('hidden');
-            } else {
-                replyForm.classList.remove('hidden');
-                closedTicketMessage.classList.add('hidden');
-            }
+            if (ticketData.status === 'closed') {
+                replyForm.classList.add('hidden');
+                closedTicketMessage.classList.remove('hidden');
+            } else {
+                replyForm.classList.remove('hidden');
+                closedTicketMessage.classList.add('hidden');
+            }
 
-            const renderMessages = (messages) => {
-                const sortedMessages = messages.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-                conversationContainer.innerHTML = sortedMessages.map(msg => renderMessage(msg)).join('');
-                setTimeout(() => { document.getElementById('app-container').scrollTop = document.getElementById('app-container').scrollHeight; }, 100);
-            };
+            const renderMessages = (messages) => {
+                const sortedMessages = messages.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+                conversationContainer.innerHTML = sortedMessages.map(msg => renderMessage(msg)).join('');
+                setTimeout(() => { document.getElementById('app-container').scrollTop = document.getElementById('app-container').scrollHeight; }, 100);
+            };
 
-            messagesSubscription = db
-                .channel(`public:messages:ticket_id=eq.${ticketId}`)
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `ticket_id=eq.${ticketId}` }, async payload => {
-                     const { data, error } = await db.from('messages').select().eq('ticket_id', ticketId);
-                     if (data) renderMessages(data);
-                })
-                .subscribe();
+            messagesSubscription = db
+                .channel(`public:messages:ticket_id=eq.${ticketId}`)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `ticket_id=eq.${ticketId}` }, async payload => {
+                     const { data, error } = await db.from('messages').select().eq('ticket_id', ticketId);
+                     if (data) renderMessages(data);
+                })
+                .subscribe();
 
-            const { data, error: msgError } = await db.from('messages').select().eq('ticket_id', ticketId);
-            if (msgError) console.error(msgError);
-            else renderMessages(data);
+            const { data, error: msgError } = await db.from('messages').select().eq('ticket_id', ticketId);
+            if (msgError) console.error(msgError);
+            else renderMessages(data);
 
-            showView('conversation');
-        }
+            showView('conversation');
+        }
 
-        function renderMessage(data) {
-            const messageClass = data.sender === 'user' ? 'message-user' : 'message-admin';
-            const containerClass = data.sender === 'user' ? 'self-end' : 'self-start';
-            const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
-            return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md"><div class="p-3 ${messageClass}"><p class="whitespace-pre-wrap text-sm">${data.text}</p></div><span class="text-xs text-gray-400 mt-1 px-2 ${containerClass}">${time}</span></div>`;
-        }
+        function renderMessage(data) {
+            const messageClass = data.sender === 'user' ? 'message-user' : 'message-admin';
+            const containerClass = data.sender === 'user' ? 'self-end' : 'self-start';
+            const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
+            return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md"><div class="p-3 ${messageClass}"><p class="whitespace-pre-wrap text-sm">${data.text}</p></div><span class="text-xs text-gray-400 mt-1 px-2 ${containerClass}">${time}</span></div>`;
+        }
 
-        navButtons.ticketsList.addEventListener('click', () => showView('ticketsList'));
-        navButtons.newTicket.addEventListener('click', () => {
-            if (hasOpenTicket) { showNotification('شما یک تیکت باز دارید. پس از بسته شدن آن می‌توانید تیکت جدیدی ایجاد کنید.', 'warning'); } else { showView('newTicket'); }
-        });
-        cancelNewTicketBtn.addEventListener('click', () => showView('ticketsList'));
-        backToTicketsBtn.addEventListener('click', () => {
-            if (messagesSubscription) messagesSubscription.unsubscribe();
-            currentTicketId = null;
-            showView('ticketsList');
-        });
+        navButtons.ticketsList.addEventListener('click', () => showView('ticketsList'));
+        navButtons.newTicket.addEventListener('click', () => {
+            if (hasOpenTicket) { showNotification('شما یک تیکت باز دارید. پس از بسته شدن آن می‌توانید تیکت جدیدی ایجاد کنید.', 'warning'); } else { showView('newTicket'); }
+        });
+        cancelNewTicketBtn.addEventListener('click', () => showView('ticketsList'));
+        backToTicketsBtn.addEventListener('click', () => {
+            if (messagesSubscription) messagesSubscription.unsubscribe();
+            currentTicketId = null;
+            showView('ticketsList');
+        });
 
-        const handleNewTicketSubmit = async () => {
-            if (isSubmitting) return;
+        const handleNewTicketSubmit = async () => {
+            if (isSubmitting) return;
 
-            const subject = document.getElementById('subject').value.trim();
-            const message = document.getElementById('message').value.trim();
-            const department = document.getElementById('department').value;
+            const subject = document.getElementById('subject').value.trim();
+            const message = document.getElementById('message').value.trim();
+            const department = document.getElementById('department').value;
 
-            if (!subject || !message) {
-                showNotification("لطفا تمام فیلدها را پر کنید.", "warning");
-                return;
-            }
+            if (!subject || !message) {
+                showNotification("لطفا تمام فیلدها را پر کنید.", "warning");
+                return;
+            }
 
-            isSubmitting = true;
-            submitNewTicketBtn.disabled = true;
-            submitNewTicketBtn.textContent = 'در حال ارسال...';
+            isSubmitting = true;
+            submitNewTicketBtn.disabled = true;
+            submitNewTicketBtn.textContent = 'در حال ارسال...';
 
-            if (!telegramUserId) {
-                showNotification("خطا: احراز هویت ناموفق بود.", "error");
-                isSubmitting = false;
-                submitNewTicketBtn.disabled = false;
-                submitNewTicketBtn.textContent = 'ارسال';
-                return;
-            }
+            if (!telegramUserId) {
+                showNotification("خطا: احراز هویت ناموفق بود.", "error");
+                isSubmitting = false;
+                submitNewTicketBtn.disabled = false;
+                submitNewTicketBtn.textContent = 'ارسال';
+                return;
+            }
 
-            try {
-                const response = await fetch(`${WORKER_URL}/tickets`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        telegram_id: telegramUserId,
-                        subject: subject,
-                        department: department,
-                        message: message,
-                    }),
-                });
+            try {
+                const response = await fetch(`${WORKER_URL}/tickets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: telegramUserId,
+                        subject: subject,
+                        department: department,
+                        message: message,
+                    }),
+                });
 
-                const result = await response.json();
+                const result = await response.json();
 
-                if (!response.ok || !result.success) {
-                    throw new Error(result.error || 'خطایی در سرور رخ داد.');
-                }
-                
-                newTicketForm.reset();
-                showNotification(`تیکت شما با موفقیت ثبت شد.`, 'success');
-                
-                setTimeout(() => {
-                    showView('ticketsList');
-                    isSubmitting = false;
-                    submitNewTicketBtn.disabled = false;
-                    submitNewTicketBtn.textContent = 'ارسال';
-                }, 1000);
+                if (!response.ok || !result.success) {
+                    throw new Error(result.error || 'خطایی در سرور رخ داد.');
+                }
+                
+                newTicketForm.reset();
+                showNotification(`تیکت شما با موفقیت ثبت شد.`, 'success');
+                
+                setTimeout(() => {
+                    showView('ticketsList');
+                    isSubmitting = false;
+                    submitNewTicketBtn.disabled = false;
+                    submitNewTicketBtn.textContent = 'ارسال';
+                }, 1000);
 
-            } catch (error) {
-                console.error("Error creating new ticket via worker: ", error);
-                showNotification("خطا در ایجاد تیکت.", 'error');
-                isSubmitting = false;
-                submitNewTicketBtn.disabled = false;
-                submitNewTicketBtn.textContent = 'ارسال';
-            }
-        };
-        
-        submitNewTicketBtn.addEventListener('click', handleNewTicketSubmit);
-        submitNewTicketBtn.addEventListener('touchend', (e) => {
-            e.preventDefault(); 
-            handleNewTicketSubmit();
-        });
+            } catch (error) {
+                console.error("Error creating new ticket via worker: ", error);
+                showNotification("خطا در ایجاد تیکت.", 'error');
+                isSubmitting = false;
+                submitNewTicketBtn.disabled = false;
+                submitNewTicketBtn.textContent = 'ارسال';
+            }
+        };
+        
+        submitNewTicketBtn.addEventListener('click', handleNewTicketSubmit);
+        submitNewTicketBtn.addEventListener('touchend', (e) => {
+            e.preventDefault(); 
+            handleNewTicketSubmit();
+        });
 
-        replyForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentTicketId) return;
-            const replyInput = document.getElementById('reply-message');
-            const messageText = replyInput.value.trim();
-            if (messageText === '') return;
+        replyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentTicketId) return;
+            const replyInput = document.getElementById('reply-message');
+            const messageText = replyInput.value.trim();
+            if (messageText === '') return;
 
-            try {
-                const { error: messageError } = await db.from('messages').insert([{ 
-                    sender: 'user', 
-                    text: messageText, 
-                    ticket_id: currentTicketId 
-                }]);
-                if (messageError) throw messageError;
+            try {
+                // Send the message to the worker to handle the insertion
+                const response = await fetch(`${WORKER_URL}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ticket_id: currentTicketId,
+                        sender: 'user',
+                        text: messageText,
+                    }),
+                });
+                
+                const result = await response.json();
 
-                const { error: ticketError } = await db.from('tickets').update({ status: 'open', updated_at: new Date() }).eq('id', currentTicketId);
-                if (ticketError) throw ticketError;
+                if (!response.ok || !result.success) {
+                    throw new Error(result.error || 'خطایی در سرور رخ داد.');
+                }
 
-                replyForm.reset();
-            } catch (error) {
-                console.error("Error sending reply: ", error);
-                showNotification("خطا در ارسال پاسخ.", 'error');
-            }
-        });
-    </script>
+                replyInput.value = '';
+                showNotification('پاسخ شما با موفقیت ارسال شد.', 'success');
+
+            } catch (error) {
+                console.error("Error sending reply via worker: ", error);
+                showNotification("خطا در ارسال پاسخ.", 'error');
+            }
+        });
+    </script>
 </body>
 </html>

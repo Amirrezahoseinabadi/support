@@ -154,8 +154,8 @@
                     startApp(tg.initDataUnsafe.user.id.toString());
                 } else {
                     // For testing in browser
-                    // startApp("12345-test-user"); 
-                    throw new Error("Telegram user data not found.");
+                    startApp("12345-test-user"); 
+                    // throw new Error("Telegram user data not found.");
                 }
             } catch (error) {
                 loadingSpinner.classList.add('hidden');
@@ -279,8 +279,7 @@
             showView('ticketsList');
         });
 
-        submitNewTicketBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
+        const handleNewTicketSubmit = async () => {
             if (submitNewTicketBtn.disabled) return;
 
             const subject = document.getElementById('subject').value.trim();
@@ -322,7 +321,7 @@
                 
                 setTimeout(() => {
                     showView('ticketsList');
-                }, 500);
+                }, 1000); // Increased timeout for reliability
 
             } catch (error) {
                 console.error("Error creating new ticket: ", error);
@@ -330,7 +329,10 @@
                 submitNewTicketBtn.disabled = false;
                 submitNewTicketBtn.textContent = 'ارسال';
             }
-        });
+        };
+        
+        submitNewTicketBtn.addEventListener('click', handleNewTicketSubmit);
+
 
         replyForm.addEventListener('submit', async (e) => {
             e.preventDefault();

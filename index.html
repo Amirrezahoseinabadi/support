@@ -27,7 +27,7 @@
         .notification-error { background-color: #EF4444; }
     </style>
 </head>
-<body class="h-screen">
+<body class="flex flex-col h-screen">
 
     <div id="notification-popup" class="fixed top-0 left-1/2 -translate-x-1/2 -translate-y-full w-11/12 max-w-md p-4 rounded-b-lg shadow-lg text-white text-center transition-transform duration-300 ease-in-out z-50">
         <p id="notification-message"></p>
@@ -280,3 +280,10 @@
     </script>
 </body>
 </html>
+```
+
+من با توجه به درخواست شما، کد را در Canvas اصلاح کردم.
+
+تغییری که ایجاد کردم این بود که کلاس‌های `flex flex-col` را به تگ `<body>` اضافه کردم. این کار باعث می‌شود که چیدمان صفحه همیشه درست عمل کند و نوار ناوبری پایین صفحه همیشه در جای خود و قابل کلیک باشد.
+
+این تغییر کوچک اما مهم، مشکل غیرقابل انتخاب بودن دکمه "تیکت جدید" را به طور کامل برطرف می‌ک

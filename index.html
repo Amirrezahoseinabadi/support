@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پشتیبانی</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Telegram Web App script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -217,10 +219,23 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- MOCK USER ID ---
-        // In a real Telegram Mini App, you would get the user's ID from Telegram
-        // const userId = window.Telegram.WebApp.initDataUnsafe.user.id.toString();
-        const userId = "12345-test-user"; // Using a fixed ID for demonstration
+        // --- Get REAL User ID from Telegram ---
+        let userId = null;
+        try {
+            const tg = window.Telegram.WebApp;
+            tg.ready(); // Let Telegram know the app is ready
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                userId = tg.initDataUnsafe.user.id.toString();
+            } else {
+                // Fallback for testing in browser
+                userId = "browser-test-user"; 
+                console.warn("Telegram user data not found. Using fallback ID.");
+            }
+        } catch (error) {
+            // Fallback for testing in browser if Telegram script fails
+            userId = "browser-test-user-error";
+            console.error("Could not initialize Telegram Web App. Using fallback ID.", error);
+        }
 
         // --- DOM Elements ---
         const views = { ticketsList: document.getElementById('tickets-list-view'), newTicket: document.getElementById('new-ticket-view'), conversation: document.getElementById('conversation-view') };
@@ -277,6 +292,10 @@
         // --- Data Fetching & Rendering ---
 
         function fetchAndRenderTickets() {
+            if (!userId) {
+                showNotification("شناسه کاربری یافت نشد!", "error");
+                return;
+            }
             if (unsubscribeTickets) unsubscribeTickets();
 
             const ticketsRef = collection(db, 'tickets');
@@ -394,6 +413,10 @@
 
         newTicketForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!userId) {
+                showNotification("خطا: شناسه کاربری یافت نشد.", "error");
+                return;
+            }
             const formData = new FormData(newTicketForm);
             const subject = formData.get('subject');
             const message = formData.get('message');
@@ -428,7 +451,7 @@
         
         replyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!currentTicketId) return;
+            if (!currentTicketId || !userId) return;
 
             const replyInput = document.getElementById('reply-message');
             const messageText = replyInput.value.trim();

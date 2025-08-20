@@ -18,15 +18,20 @@
         .btn-primary { background-color: #7C3AED; color: white; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 500; font-size: 0.9rem; }
         .btn-secondary { background-color: transparent; border: 1px solid #9A94C0; color: #E0E0E0; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 500; font-size: 0.9rem; }
         .status-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 500; }
-        .status-open { background-color: #FBBF24; color: #78350F; }
-        .status-in-progress { background-color: #bae6fd; color: #0c4a6e; }
-        .status-answered { background-color: #34D399; color: #064E3B; }
-        .status-closed { background-color: #6B7280; color: #F9FAFB; }
+        .status-open { background-color: #dcfce7; color: #166534; }
+        .status-in-progress { background-color: #fef3c7; color: #92400e; }
+        .status-answered { background-color: #e5e7eb; color: #374151; }
+        .status-closed { background-color: #fee2e2; color: #991b1b; }
         .message-user { background-color: #7C3AED; color: white; border-radius: 1rem 1rem 0 1rem; }
         .message-admin { background-color: #6B7280; color: white; border-radius: 1rem 1rem 1rem 0; }
         .notification-success { background-color: #10B981; }
         .notification-warning { background-color: #F59E0B; }
         .notification-error { background-color: #EF4444; }
+        /* Style for answered tickets */
+        .ticket-answered-highlight {
+            border: 1px solid #7C3AED;
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -69,11 +74,12 @@
             <div id="conversation-view" class="p-4 hidden">
                  <button id="back-to-tickets" class="mb-4 text-sm text-gray-300 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-180 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>بازگشت</button>
                 <div id="conversation-container" class="space-y-4 pb-20"></div>
-                 <div class="fixed bottom-[80px] right-0 left-0 p-4" style="background-color: #4C467E;">
+                 <div id="reply-box" class="fixed bottom-[80px] right-0 left-0 p-4" style="background-color: #4C467E;">
                     <form id="reply-form" class="flex items-center space-x-2 space-x-reverse">
                         <input type="text" id="reply-message" class="form-input flex-grow" placeholder="پاسخ..." required>
                         <button type="submit" class="btn-primary p-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg></button>
                     </form>
+                    <div id="closed-ticket-message" class="hidden text-center text-gray-300 text-sm py-2">این تیکت توسط پشتیبانی بسته شده است.</div>
                 </div>
             </div>
         </main>
@@ -104,6 +110,7 @@
         let currentTicketId = null;
         let unsubscribeTickets = null;
         let unsubscribeConversation = null;
+        let unsubscribeTicketStatus = null;
         let hasOpenTicket = false;
 
         const loadingView = document.getElementById('loading-view');
@@ -119,6 +126,8 @@
         const cancelNewTicketBtn = document.getElementById('cancel-new-ticket');
         const conversationContainer = document.getElementById('conversation-container');
         const replyForm = document.getElementById('reply-form');
+        const replyBox = document.getElementById('reply-box');
+        const closedTicketMessage = document.getElementById('closed-ticket-message');
         const backToTicketsBtn = document.getElementById('back-to-tickets');
 
         const departmentMap = { general: 'سوالات متفرقه', technical: 'پشتیبانی فنی', sales: 'بخش فروش' };
@@ -175,7 +184,7 @@
             const ticketsRef = collection(db, 'tickets');
             const q = query(ticketsRef, where("telegramId", "==", telegramUserId));
             unsubscribeTickets = onSnapshot(q, (querySnapshot) => {
-                hasOpenTicket = querySnapshot.docs.some(doc => doc.data().status === 'open' || doc.data().status === 'answered' || doc.data().status === 'in-progress');
+                hasOpenTicket = querySnapshot.docs.some(doc => ['open', 'answered', 'in-progress'].includes(doc.data().status));
                 if (querySnapshot.empty) {
                     ticketsContainer.innerHTML = '';
                     noTicketsMessage.classList.remove('hidden');
@@ -202,12 +211,39 @@
             const status = getStatusInfo(data.status);
             const creationDate = data.createdAt ? data.createdAt.toDate().toLocaleString('fa-IR', { dateStyle: 'short', timeStyle: 'short' }) : 'لحظاتی پیش';
             const departmentName = departmentMap[data.department] || 'نامشخص';
-            return `<div class="ticket-card bg-[#3E386B] p-4 rounded-lg shadow-lg cursor-pointer" data-id="${id}"><div class="flex justify-between items-start"><p class="font-bold text-md">${data.subject}</p><span class="status-badge flex-shrink-0 ${status.className}">${status.text}</span></div><div class="flex justify-between items-center text-xs text-gray-400 mt-4 pt-2 border-t border-gray-600"><span>${departmentName}</span><span>${creationDate}</span></div></div>`;
+            const highlightClass = data.status === 'answered' ? 'ticket-answered-highlight' : '';
+            
+            return `<div class="ticket-card bg-[#3E386B] p-4 rounded-lg shadow-lg cursor-pointer ${highlightClass}" data-id="${id}">
+                        <div class="flex justify-between items-start">
+                            <p class="font-bold text-md">${data.subject}</p>
+                            <span class="status-badge flex-shrink-0 ${status.className}">${status.text}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs text-gray-400 mt-4 pt-2 border-t border-gray-600">
+                            <span>${departmentName}</span>
+                            <span>${creationDate}</span>
+                        </div>
+                    </div>`;
         }
         
         function openConversation(ticketId) {
             currentTicketId = ticketId;
             if (unsubscribeConversation) unsubscribeConversation();
+            if (unsubscribeTicketStatus) unsubscribeTicketStatus();
+
+            // Listen for ticket status changes to disable/enable reply form
+            unsubscribeTicketStatus = onSnapshot(doc(db, 'tickets', ticketId), (doc) => {
+                if (doc.exists()) {
+                    const ticketData = doc.data();
+                    if (ticketData.status === 'closed') {
+                        replyForm.classList.add('hidden');
+                        closedTicketMessage.classList.remove('hidden');
+                    } else {
+                        replyForm.classList.remove('hidden');
+                        closedTicketMessage.classList.add('hidden');
+                    }
+                }
+            });
+
             const messagesRef = collection(db, 'tickets', ticketId, 'messages');
             const q = query(messagesRef, orderBy("timestamp"));
             unsubscribeConversation = onSnapshot(q, (querySnapshot) => {
@@ -232,9 +268,11 @@
         cancelNewTicketBtn.addEventListener('click', () => showView('ticketsList'));
         backToTicketsBtn.addEventListener('click', () => {
             if (unsubscribeConversation) unsubscribeConversation();
+            if (unsubscribeTicketStatus) unsubscribeTicketStatus();
             currentTicketId = null;
             showView('ticketsList');
         });
+
         newTicketForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!telegramUserId) { showNotification("خطا: احراز هویت ناموفق بود.", "error"); return; }
@@ -254,13 +292,14 @@
                     timestamp: serverTimestamp() 
                 });
                 newTicketForm.reset();
-                showView('ticketsList');
                 showNotification(`تیکت شما با موفقیت ثبت شد.`, 'success');
+                showView('ticketsList'); // Go back to the list after submission
             } catch (error) {
                 console.error("Error creating new ticket: ", error);
                 showNotification("خطا در ایجاد تیکت.", 'error');
             }
         });
+
         replyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentTicketId) return;

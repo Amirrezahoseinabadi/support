@@ -33,15 +33,9 @@
         <p id="notification-message"></p>
     </div>
 
-    <div id="loading-view" class="flex flex-col items-center justify-center h-full text-center p-4">
-        <div id="loading-spinner">
-             <svg class="animate-spin h-12 w-12 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <p class="mt-4 text-white">در حال احراز هویت...</p>
-        </div>
-        <div id="error-view" class="hidden">
-            <h1 class="text-2xl font-bold text-white mb-2">خطا در دسترسی</h1>
-            <p class="text-gray-300 max-w-sm">برای استفاده از پنل پشتیبانی، لطفاً این صفحه را از طریق ربات تلگرام باز کنید.</p>
-        </div>
+    <div id="error-view" class="hidden flex-col items-center justify-center h-full text-center p-4">
+        <h1 class="text-2xl font-bold text-white mb-2">خطا در دسترسی</h1>
+        <p class="text-gray-300 max-w-sm">برای استفاده از پنل پشتیبانی، لطفاً این صفحه را از طریق ربات تلگرام باز کنید.</p>
     </div>
 
     <div id="main-app-container" class="hidden h-full flex flex-col">
@@ -83,7 +77,6 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, where, onSnapshot, doc, orderBy, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         
         const firebaseConfig = {
@@ -98,18 +91,14 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
 
-        let authUid = null;
-        let telegramUserId = null;
+        let userId = null;
         let currentTicketId = null;
         let unsubscribeTickets = null;
         let unsubscribeConversation = null;
         let hasOpenTicket = false;
 
-        const loadingView = document.getElementById('loading-view');
         const errorView = document.getElementById('error-view');
-        const loadingSpinner = document.getElementById('loading-spinner');
         const mainAppContainer = document.getElementById('main-app-container');
         const views = { ticketsList: document.getElementById('tickets-list-view'), newTicket: document.getElementById('new-ticket-view'), conversation: document.getElementById('conversation-view') };
         const navButtons = { ticketsList: document.getElementById('nav-tickets-list'), newTicket: document.getElementById('nav-new-ticket') };
@@ -124,41 +113,23 @@
 
         const departmentMap = { general: 'سوالات متفرقه', technical: 'پشتیبانی فنی', sales: 'بخش فروش' };
 
-        function startApp(uid) {
-            authUid = uid;
-            loadingView.classList.add('hidden');
-            mainAppContainer.classList.remove('hidden');
-            showView('ticketsList');
-            fetchAndRenderTickets();
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             try {
                 const tg = window.Telegram.WebApp;
                 tg.ready();
                 if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    telegramUserId = tg.initDataUnsafe.user.id.toString();
+                    userId = tg.initDataUnsafe.user.id.toString();
+                    mainAppContainer.classList.remove('hidden');
+                    showView('ticketsList');
+                    fetchAndRenderTickets();
                 } else {
                     throw new Error("Telegram user data not found.");
                 }
             } catch (error) {
-                loadingSpinner.classList.add('hidden');
+                mainAppContainer.classList.add('hidden');
                 errorView.classList.remove('hidden');
                 console.error("Not running in Telegram or script failed.", error);
-                return;
             }
-
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    startApp(user.uid);
-                } else {
-                    signInAnonymously(auth).catch((error) => {
-                        console.error("Anonymous sign-in failed:", error);
-                        loadingSpinner.classList.add('hidden');
-                        errorView.classList.remove('hidden');
-                    });
-                }
-            });
         });
 
         function showNotification(message, type = 'success') {
@@ -182,10 +153,10 @@
         }
 
         function fetchAndRenderTickets() {
-            if (!authUid) return;
+            if (!userId) return;
             if (unsubscribeTickets) unsubscribeTickets();
             const ticketsRef = collection(db, 'tickets');
-            const q = query(ticketsRef, where("userId", "==", authUid));
+            const q = query(ticketsRef, where("userId", "==", userId));
             unsubscribeTickets = onSnapshot(q, (querySnapshot) => {
                 hasOpenTicket = false;
                 querySnapshot.forEach(doc => { if (doc.data().status === 'open') hasOpenTicket = true; });
@@ -245,13 +216,13 @@
         });
         newTicketForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!authUid) { showNotification("خطا: احراز هویت ناموفق بود.", "error"); return; }
+            if (!userId) { showNotification("خطا: شناسه کاربری یافت نشد.", "error"); return; }
             const formData = new FormData(newTicketForm);
             const subject = formData.get('subject');
             const message = formData.get('message');
             const department = formData.get('department');
             try {
-                const ticketDocRef = await addDoc(collection(db, 'tickets'), { userId: authUid, telegramId: telegramUserId, subject: subject, department: department, status: 'open', createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+                const ticketDocRef = await addDoc(collection(db, 'tickets'), { userId: userId, subject: subject, department: department, status: 'open', createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
                 await addDoc(collection(db, 'tickets', ticketDocRef.id, 'messages'), { sender: 'user', text: message, timestamp: serverTimestamp() });
                 newTicketForm.reset();
                 showView('ticketsList');
@@ -263,7 +234,7 @@
         });
         replyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!currentTicketId || !authUid) return;
+            if (!currentTicketId || !userId) return;
             const replyInput = document.getElementById('reply-message');
             const messageText = replyInput.value.trim();
             if (messageText === '') return;

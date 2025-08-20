@@ -69,7 +69,10 @@
                     <div><label for="department" class="block mb-2 text-sm font-medium">دپارتمان</label><select id="department" name="department" class="form-select"><option value="general">سوالات متفرقه</option><option value="technical">پشتیبانی فنی</option><option value="sales">بخش فروش</option></select></div>
                     <div><label for="subject" class="block mb-2 text-sm font-medium">موضوع</label><input type="text" id="subject" name="subject" class="form-input" placeholder="موضوع تیکت خود را وارد کنید" required></div>
                     <div><label for="message" class="block mb-2 text-sm font-medium">متن پیام</label><textarea id="message" name="message" rows="6" class="form-textarea" placeholder="مشکل یا سوال خود را با جزئیات کامل بنویسید..." required></textarea></div>
-                    <div class="flex justify-between items-center pt-2"><button type="submit" class="btn-primary">ارسال</button><button type="button" id="cancel-new-ticket" class="btn-secondary">لغو</button></div>
+                    <div class="flex justify-between items-center pt-2">
+                        <button type="button" id="submit-new-ticket-btn" class="btn-primary">ارسال</button>
+                        <button type="button" id="cancel-new-ticket" class="btn-secondary">لغو</button>
+                    </div>
                 </form>
             </div>
             <div id="conversation-view" class="p-4 hidden">
@@ -125,6 +128,7 @@
         const noTicketsMessage = document.getElementById('no-tickets-message');
         const newTicketForm = document.getElementById('new-ticket-form');
         const cancelNewTicketBtn = document.getElementById('cancel-new-ticket');
+        const submitNewTicketBtn = document.getElementById('submit-new-ticket-btn');
         const conversationContainer = document.getElementById('conversation-container');
         const replyForm = document.getElementById('reply-form');
         const replyBox = document.getElementById('reply-box');
@@ -275,35 +279,43 @@
             showView('ticketsList');
         });
 
-        newTicketForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitButton = newTicketForm.querySelector('button[type="submit"]');
-            
-            // Prevent multiple submissions
-            if (submitButton.disabled) return;
+        submitNewTicketBtn.addEventListener('click', async () => {
+             // Prevent multiple submissions
+            if (submitNewTicketBtn.disabled) return;
 
-            submitButton.disabled = true;
-            submitButton.textContent = 'در حال ارسال...';
+            submitNewTicketBtn.disabled = true;
+            submitNewTicketBtn.textContent = 'در حال ارسال...';
 
             if (!telegramUserId) {
                 showNotification("خطا: احراز هویت ناموفق بود.", "error");
-                submitButton.disabled = false;
-                submitButton.textContent = 'ارسال';
+                submitNewTicketBtn.disabled = false;
+                submitNewTicketBtn.textContent = 'ارسال';
                 return;
             }
-            const formData = new FormData(newTicketForm);
+            // Manually get form data
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+            const department = document.getElementById('department').value;
+
+            if (!subject.trim() || !message.trim()) {
+                 showNotification("لطفا تمام فیلدها را پر کنید.", "warning");
+                 submitNewTicketBtn.disabled = false;
+                 submitNewTicketBtn.textContent = 'ارسال';
+                 return;
+            }
+
             try {
                 const ticketDocRef = await addDoc(collection(db, 'tickets'), { 
                     telegramId: telegramUserId, 
-                    subject: formData.get('subject'), 
-                    department: formData.get('department'), 
+                    subject: subject, 
+                    department: department, 
                     status: 'open', 
                     createdAt: serverTimestamp(), 
                     updatedAt: serverTimestamp() 
                 });
                 await addDoc(collection(db, 'tickets', ticketDocRef.id, 'messages'), { 
                     sender: 'user', 
-                    text: formData.get('message'), 
+                    text: message, 
                     timestamp: serverTimestamp() 
                 });
                 
@@ -315,10 +327,10 @@
                 console.error("Error creating new ticket: ", error);
                 showNotification("خطا در ایجاد تیکت.", 'error');
             } finally {
-                // Re-enable button only if the user is still on the page (i.e., an error occurred)
-                if (views.newTicket.classList.contains('hidden') === false) {
-                    submitButton.disabled = false;
-                    submitButton.textContent = 'ارسال';
+                // Re-enable button only if an error occurred and user is still on the form page
+                if (!views.newTicket.classList.contains('hidden')) {
+                    submitNewTicketBtn.disabled = false;
+                    submitNewTicketBtn.textContent = 'ارسال';
                 }
             }
         });

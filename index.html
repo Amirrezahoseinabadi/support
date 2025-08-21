@@ -96,7 +96,6 @@
 
         const loadingView = document.getElementById('loading-view');
         const mainAppContainer = document.getElementById('main-app-container');
-        const mainContent = document.getElementById('main-content');
         const ticketsListView = document.getElementById('tickets-list-view');
         const newTicketView = document.getElementById('new-ticket-view');
         const conversationView = document.getElementById('conversation-view');
@@ -155,9 +154,14 @@
                 if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
                     startApp(tg.initDataUnsafe.user);
                 } else {
+                    // Fallback for testing in a regular browser
+                    console.warn("Telegram user data not found. Using mock user.");
                     startApp({id: "12345-test-user", first_name: "تست", last_name: "کاربر"}); 
                 }
-            } catch (error) { console.error("Authentication failed:", error); }
+            } catch (error) { 
+                console.error("Could not initialize Telegram Web App:", error);
+                showModal('خطای راه‌اندازی', 'امکان برقراری ارتباط با تلگرام وجود ندارد. لطفا از داخل تلگرام این صفحه را باز کنید.', true);
+            }
         });
 
         function showView(viewName) {
@@ -180,15 +184,20 @@
             if (!telegramUserId) return;
             try {
                 const response = await fetch(`${WORKER_URL}/tickets?telegram_id=${telegramUserId}`);
+                if (!response.ok) {
+                    const errorResult = await response.json().catch(() => ({ error: 'خطای ناشناخته در سرور' }));
+                    throw new Error(errorResult.error || 'خطا در دریافت تیکت‌ها');
+                }
                 const result = await response.json();
                 if (result.success) {
                     allTicketsData = result.data ? Object.keys(result.data).map(key => ({ id: key, ...result.data[key] })) : [];
                     renderTickets(allTicketsData);
                 } else {
-                    console.error("Failed to fetch tickets:", result.error);
+                    throw new Error(result.error || "پاسخ ناموفق از سرور");
                 }
             } catch (error) {
                 console.error("Error fetching tickets via worker:", error);
+                showNotification(`خطا در دریافت تیکت‌ها: ${error.message}`, false);
             }
         }
 
@@ -199,18 +208,23 @@
         }
         
         async function deleteTicket(ticketId) {
-            if (confirm('آیا از حذف این تیکت مطمئن هستید؟')) {
+            // Replaced confirm with a custom modal if needed, for now it's standard
+            if (window.confirm('آیا از حذف این تیکت مطمئن هستید؟')) {
                 try {
                     const response = await fetch(`${WORKER_URL}/tickets?ticket_id=${ticketId}`, { method: 'DELETE' });
+                     if (!response.ok) {
+                        const errorResult = await response.json();
+                        throw new Error(errorResult.error || 'خطا در حذف تیکت');
+                    }
                     const result = await response.json();
                     if (result.success) {
                         showNotification('تیکت با موفقیت حذف شد.');
-                        fetchTickets();
+                        fetchTickets(); // Refresh the list
                     } else {
                         throw new Error(result.error);
                     }
                 } catch (error) {
-                    showNotification('حذف تیکت با خطا مواجه شد.', false);
+                    showNotification(`حذف تیکت با خطا مواجه شد: ${error.message}`, false);
                     console.error("Error deleting ticket:", error);
                 }
             }
@@ -258,7 +272,7 @@
             const containerClass = isUser ? 'self-end' : 'self-start';
             const nameAlign = isUser ? 'text-right' : 'text-left';
             const nameColor = isUser ? 'text-purple-300' : 'text-gray-400';
-            const senderName = isUser ? telegramUserName : departmentMap[currentTicketData.department];
+            const senderName = isUser ? telegramUserName : (currentTicketData ? departmentMap[currentTicketData.department] : 'پشتیبانی');
             const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
             
             return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md">
@@ -271,6 +285,11 @@
         function openConversation(ticketId) {
             currentTicketId = ticketId;
             currentTicketData = allTicketsData.find(t => t.id === ticketId);
+            if (!currentTicketData) {
+                console.error("Could not find ticket data for ID:", ticketId);
+                showNotification("خطا: اطلاعات تیکت یافت نشد.", false);
+                return;
+            }
             
             conversationView.classList.remove('hidden');
             conversationView.classList.add('flex');
@@ -284,6 +303,7 @@
             if (!ticketId) return;
             try {
                 const response = await fetch(`${WORKER_URL}/messages?ticket_id=${ticketId}`);
+                if (!response.ok) throw new Error("خطا در دریافت پیام‌ها");
                 const result = await response.json();
                 if (result.success) {
                     const messagesData = result.data;
@@ -295,6 +315,7 @@
                 }
             } catch (error) {
                 console.error("Error fetching messages:", error);
+                showNotification(error.message, false);
             }
         }
 
@@ -310,6 +331,8 @@
             setTimeout(() => {
                 conversationView.classList.add('hidden');
                 conversationView.classList.remove('flex');
+                currentTicketId = null;
+                currentTicketData = null;
             }, 300);
         }
 
@@ -318,7 +341,10 @@
             const subject = document.getElementById('subject').value.trim();
             const message = document.getElementById('message').value.trim();
             const department = document.getElementById('department').value;
-            if (!subject || !message) return;
+            if (!subject || !message) {
+                showNotification("لطفا موضوع و متن پیام را وارد کنید.", false);
+                return;
+            }
 
             isSubmitting = true;
             submitNewTicketBtn.disabled = true;
@@ -330,12 +356,16 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ telegram_id: telegramUserId, user_name: telegramUserName, subject, department, message }),
                 });
-                if (!response.ok) throw new Error('خطا در ارسال تیکت');
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'خطا در ارسال تیکت');
+                }
                 newTicketForm.reset();
                 showNotification('تیکت شما با موفقیت ارسال شد.');
+                fetchTickets(); // Refresh tickets list
                 setTimeout(() => showView('ticketsList'), 500);
             } catch (error) {
-                showNotification('ارسال تیکت با خطا مواجه شد.', false);
+                showNotification(`ارسال تیکت با خطا مواجه شد: ${error.message}`, false);
                 console.error("Error creating ticket:", error);
             } finally {
                 isSubmitting = false;
@@ -354,23 +384,37 @@
             }
         });
         backToTicketsBtn.addEventListener('click', closeConversation);
+        newTicketForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleNewTicketSubmit();
+        });
         submitNewTicketBtn.addEventListener('click', handleNewTicketSubmit);
         
         replyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const messageText = replyMessageInput.value.trim();
             if (messageText === '' || !currentTicketId) return;
+            const originalButtonContent = e.target.querySelector('button').innerHTML;
+            e.target.querySelector('button').disabled = true;
 
             try {
-                await fetch(`${WORKER_URL}/messages`, {
+                const response = await fetch(`${WORKER_URL}/messages`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ticket_id: currentTicketId, sender: 'user', text: messageText }),
                 });
+                 if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'خطا در ارسال پیام');
+                }
                 replyMessageInput.value = '';
-                fetchMessages(currentTicketId); // Immediately fetch new messages
+                await fetchMessages(currentTicketId); // Immediately fetch new messages
             } catch (error) {
                 console.error("Error sending message:", error);
+                showNotification(error.message, false);
+            } finally {
+                e.target.querySelector('button').disabled = false;
+                e.target.querySelector('button').innerHTML = originalButtonContent;
             }
         });
     </script>

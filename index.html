@@ -102,7 +102,11 @@
             <div id="modal-icon" class="mx-auto mb-4"></div>
             <h3 id="modal-title" class="text-lg font-bold mb-2 text-white"></h3>
             <p id="modal-message" class="text-gray-300 mb-6"></p>
-            <button id="modal-close-btn" class="bg-purple-600 text-white px-6 py-2 rounded-md w-full">باشه</button>
+            <div class="mt-6 flex justify-end gap-3">
+                <button id="modal-close-btn" class="bg-purple-600 text-white px-6 py-2 rounded-md w-full">باشه</button>
+                <button id="modal-cancel-btn" class="bg-gray-500 text-white px-6 py-2 rounded-md hidden">لغو</button>
+                <button id="modal-confirm-btn" class="bg-red-600 text-white px-6 py-2 rounded-md hidden">حذف</button>
+            </div>
         </div>
     </div>
     
@@ -138,6 +142,12 @@
         const conversationHeader = document.getElementById('conversation-header');
         const replyForm = document.getElementById('reply-form');
         const replyMessageInput = document.getElementById('reply-message');
+        
+        // Modal elements
+        const customModal = document.getElementById('custom-modal');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const modalCancelBtn = document.getElementById('modal-cancel-btn');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
 
         const departmentMap = { 
             technical: 'واحد فنی', 
@@ -157,19 +167,50 @@
             }, 3000);
         }
 
-        function showModal(title, message, isError = false) {
+        function closeModal() {
+            customModal.classList.add('hidden');
+            customModal.classList.remove('flex');
+        }
+
+        function showModal(title, message, options = {}) {
+            const { isError = false, onConfirm } = options;
+            
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
             const icon = isError ? `<svg class="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>` : `<svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
             document.getElementById('modal-icon').innerHTML = icon;
-            document.getElementById('custom-modal').classList.remove('hidden');
-            document.getElementById('custom-modal').classList.add('flex');
+
+            if (onConfirm && typeof onConfirm === 'function') {
+                // Confirmation mode
+                modalCloseBtn.classList.add('hidden');
+                modalCancelBtn.classList.remove('hidden');
+                modalConfirmBtn.classList.remove('hidden');
+
+                // Use a one-time listener for the confirm action
+                const confirmHandler = () => {
+                    onConfirm();
+                    closeModal();
+                };
+                modalConfirmBtn.addEventListener('click', confirmHandler, { once: true });
+                
+                // Also remove the confirm listener if cancel is clicked
+                modalCancelBtn.addEventListener('click', () => {
+                    modalConfirmBtn.removeEventListener('click', confirmHandler);
+                }, { once: true });
+
+            } else {
+                // Info mode
+                modalCloseBtn.classList.remove('hidden');
+                modalCancelBtn.classList.add('hidden');
+                modalConfirmBtn.classList.add('hidden');
+            }
+
+            customModal.classList.remove('hidden');
+            customModal.classList.add('flex');
         }
 
-        document.getElementById('modal-close-btn').addEventListener('click', () => {
-            document.getElementById('custom-modal').classList.add('hidden');
-            document.getElementById('custom-modal').classList.remove('flex');
-        });
+        modalCloseBtn.addEventListener('click', closeModal);
+        modalCancelBtn.addEventListener('click', closeModal);
 
         function startApp(user) {
             telegramUserId = user.id.toString();
@@ -188,13 +229,12 @@
                 if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
                     startApp(tg.initDataUnsafe.user);
                 } else {
-                    // Fallback for testing in a regular browser
                     console.warn("Telegram user data not found. Using mock user.");
                     startApp({id: "12345-test-user", first_name: "تست", last_name: "کاربر"}); 
                 }
             } catch (error) { 
                 console.error("Could not initialize Telegram Web App:", error);
-                showModal('خطای راه‌اندازی', 'امکان برقراری ارتباط با تلگرام وجود ندارد. لطفا از داخل تلگرام این صفحه را باز کنید.', true);
+                showModal('خطای راه‌اندازی', 'امکان برقراری ارتباط با تلگرام وجود ندارد. لطفا از داخل تلگرام این صفحه را باز کنید.', { isError: true });
             }
         });
 
@@ -232,7 +272,6 @@
             } catch (error) {
                 console.error("Error fetching tickets via worker:", error);
                 showNotification(`خطا در دریافت تیکت‌ها: ${error.message}`, false);
-                // Hide loader on error as well
                 ticketsLoadingPlaceholder.classList.add('hidden');
             }
         }
@@ -244,30 +283,35 @@
         }
         
         async function deleteTicket(ticketId) {
-            // Replaced confirm with a custom modal if needed, for now it's standard
-            if (window.confirm('آیا از حذف این تیکت مطمئن هستید؟')) {
-                try {
-                    const response = await fetch(`${WORKER_URL}/tickets?ticket_id=${ticketId}`, { method: 'DELETE' });
-                     if (!response.ok) {
-                        const errorResult = await response.json();
-                        throw new Error(errorResult.error || 'خطا در حذف تیکت');
+            showModal(
+                'حذف تیکت',
+                'آیا از حذف این تیکت مطمئن هستید؟ این عمل غیرقابل بازگشت است.',
+                {
+                    isError: true,
+                    onConfirm: async () => {
+                        try {
+                            const response = await fetch(`${WORKER_URL}/tickets?ticket_id=${ticketId}`, { method: 'DELETE' });
+                             if (!response.ok) {
+                                const errorResult = await response.json();
+                                throw new Error(errorResult.error || 'خطا در حذف تیکت');
+                            }
+                            const result = await response.json();
+                            if (result.success) {
+                                showNotification('تیکت با موفقیت حذف شد.');
+                                fetchTickets(); // Refresh the list
+                            } else {
+                                throw new Error(result.error);
+                            }
+                        } catch (error) {
+                            showNotification(`حذف تیکت با خطا مواجه شد: ${error.message}`, false);
+                            console.error("Error deleting ticket:", error);
+                        }
                     }
-                    const result = await response.json();
-                    if (result.success) {
-                        showNotification('تیکت با موفقیت حذف شد.');
-                        fetchTickets(); // Refresh the list
-                    } else {
-                        throw new Error(result.error);
-                    }
-                } catch (error) {
-                    showNotification(`حذف تیکت با خطا مواجه شد: ${error.message}`, false);
-                    console.error("Error deleting ticket:", error);
                 }
-            }
+            );
         }
 
         function renderTickets(tickets) {
-            // Hide the loading placeholder once we have the data
             ticketsLoadingPlaceholder.classList.add('hidden');
 
             hasOpenTicket = tickets.some(ticket => ['open', 'in-progress', 'answered'].includes(ticket.status));
@@ -277,7 +321,10 @@
             } else {
                 noTicketsMessage.classList.add('hidden');
                 const sortedTickets = tickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                ticketsContainer.innerHTML = sortedTickets.map(renderTicket).join('');
+                // Clear container before rendering new tickets to avoid duplicates
+                ticketsContainer.innerHTML = '';
+                // Append tickets
+                ticketsContainer.insertAdjacentHTML('beforeend', sortedTickets.map(renderTicket).join(''));
                 document.querySelectorAll('.ticket-card').forEach(card => { card.addEventListener('click', () => openConversation(card.dataset.id)); });
                 document.querySelectorAll('.delete-ticket-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); deleteTicket(btn.dataset.id); }); });
             }
@@ -417,7 +464,7 @@
         navButtons.ticketsList.addEventListener('click', () => showView('ticketsList'));
         navButtons.newTicket.addEventListener('click', () => {
             if (hasOpenTicket) { 
-                showModal('امکان ایجاد تیکت جدید وجود ندارد', 'شما در حال حاضر یک تیکت باز دارید. لطفا تا زمان بسته شدن آن توسط پشتیبانی منتظر بمانید.', true);
+                showModal('امکان ایجاد تیکت جدید وجود ندارد', 'شما در حال حاضر یک تیکت باز دارید. لطفا تا زمان بسته شدن آن توسط پشتیبانی منتظر بمانید.', { isError: true });
             } else { 
                 showView('newTicket'); 
             }

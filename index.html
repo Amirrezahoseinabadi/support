@@ -15,22 +15,28 @@
         .nav-bar { background-color: #FFFFFF; color: #302B5A; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
         .nav-button.active { color: #7C3AED; }
         .form-input, .form-select, .form-textarea { background-color: transparent; border: 1px solid #9A94C0; color: #FFFFFF; border-radius: 0.5rem; padding: 0.75rem; width: 100%; }
+        
+        /* Telegram-like message bubbles */
         .message-user { background-color: #7C3AED; color: white; border-radius: 1rem 1rem 0 1rem; }
-        .message-admin { background-color: #6B7280; color: white; border-radius: 1rem 1rem 1rem 0; }
+        .message-admin { background-color: #4a4a6a; color: white; border-radius: 1rem 1rem 1rem 0; }
+        .sender-name { font-size: 0.8rem; font-weight: 500; margin-bottom: 0.25rem; padding: 0 0.5rem; }
+
         .ticket-answered-highlight { border: 1px solid #7C3AED; box-shadow: 0 0 10px rgba(124, 58, 237, 0.5); }
         .rating-star:hover, .rating-star.selected { color: #f59e0b; }
     </style>
 </head>
 <body class="flex flex-col h-screen">
 
+    <!-- Loading View -->
     <div id="loading-view" class="flex flex-col items-center justify-center h-full text-center p-4">
         <svg class="animate-spin h-10 w-10 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         <p class="mt-4 text-white text-sm">در حال احراز هویت...</p>
     </div>
 
+    <!-- Main App Container -->
     <div id="main-app-container" class="hidden h-full flex flex-col">
         <main id="app-container" class="flex-grow overflow-y-auto">
-            <header class="p-4 text-center text-white text-lg font-bold shadow-md" style="background-color: #3E386B;">
+            <header class="p-4 text-center text-white text-lg font-bold shadow-md sticky top-0 z-10" style="background-color: #3E386B;">
                 <h1 id="header-title">تیکت‌ها</h1>
             </header>
             <div id="tickets-list-view" class="p-4">
@@ -46,17 +52,18 @@
                     <div><label for="subject" class="block mb-2 text-sm font-medium">موضوع</label><input type="text" id="subject" name="subject" class="form-input" placeholder="موضوع تیکت خود را وارد کنید" required></div>
                     <div><label for="message" class="block mb-2 text-sm font-medium">متن پیام</label><textarea id="message" name="message" rows="6" class="form-textarea" placeholder="مشکل یا سوال خود را با جزئیات کامل بنویسید..." required></textarea></div>
                     <div class="flex justify-between items-center pt-2">
-                        <button type="button" id="submit-new-ticket-btn" class="bg-purple-600 text-white px-4 py-2 rounded-md">ارسال</button>
-                        <button type="button" id="cancel-new-ticket" class="text-gray-300">لغو</button>
+                        <button type="button" id="submit-new-ticket-btn" class="bg-purple-600 text-white px-4 py-2 rounded-md w-full">ارسال</button>
                     </div>
                 </form>
             </div>
-            <div id="conversation-view" class="p-4 hidden">
-                 <button id="back-to-tickets" class="mb-4 text-sm text-gray-300 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-180 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>بازگشت</button>
-                <div id="conversation-container" class="space-y-4 pb-20"></div>
+            <div id="conversation-view" class="hidden flex-1 flex-col">
+                 <header class="p-3 flex items-center sticky top-0 z-10" style="background-color: #3E386B;">
+                    <button id="back-to-tickets" class="p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></button>
+                    <h2 id="conversation-header" class="text-white font-bold mr-2">گفتگو</h2>
+                 </header>
+                <div id="conversation-container" class="p-4 space-y-4 flex-grow"></div>
                 
-                <!-- Rating View -->
-                <div id="rating-view" class="hidden text-center p-4 rounded-lg mt-4" style="background-color: #4C467E;">
+                <div id="rating-view" class="hidden text-center p-4 rounded-t-lg" style="background-color: #4C467E;">
                     <p class="font-semibold mb-2">لطفا به این گفتگو امتیاز دهید:</p>
                     <div id="rating-stars" class="flex justify-center space-x-2 space-x-reverse text-3xl cursor-pointer">
                         <span data-value="1" class="rating-star">☆</span><span data-value="2" class="rating-star">☆</span><span data-value="3" class="rating-star">☆</span><span data-value="4" class="rating-star">☆</span><span data-value="5" class="rating-star">☆</span>
@@ -64,7 +71,7 @@
                     <p id="rating-thanks" class="hidden mt-2 text-green-400">از بازخورد شما متشکریم!</p>
                 </div>
 
-                 <div id="reply-box" class="fixed bottom-[80px] right-0 left-0 p-4" style="background-color: #4C467E;">
+                 <div id="reply-box" class="p-4 sticky bottom-0" style="background-color: #302B5A;">
                     <form id="reply-form" class="flex items-center space-x-2 space-x-reverse">
                         <input type="text" id="reply-message" class="form-input flex-grow rounded-lg" placeholder="پاسخ..." required>
                         <button type="submit" class="bg-purple-600 text-white p-3 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg></button>
@@ -73,10 +80,25 @@
                 </div>
             </div>
         </main>
-        <nav class="nav-bar h-[80px] flex items-center justify-around">
+        <nav id="main-nav" class="nav-bar h-[80px] flex items-center justify-around">
             <button id="nav-tickets-list" class="nav-button active flex flex-col items-center space-y-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg><span class="text-xs">تیکت‌ها</span></button>
             <button id="nav-new-ticket" class="nav-button flex flex-col items-center space-y-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="text-xs">تیکت جدید</span></button>
         </nav>
+    </div>
+
+    <!-- Custom Modal -->
+    <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-[#3E386B] rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
+            <div id="modal-icon" class="mx-auto mb-4"></div>
+            <h3 id="modal-title" class="text-lg font-bold mb-2 text-white"></h3>
+            <p id="modal-message" class="text-gray-300 mb-6"></p>
+            <button id="modal-close-btn" class="bg-purple-600 text-white px-6 py-2 rounded-md w-full">باشه</button>
+        </div>
+    </div>
+    
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="fixed top-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <p id="notification-message"></p>
     </div>
 
     <script>
@@ -95,15 +117,18 @@
         const db = firebase.database();
 
         let telegramUserId = null;
-        let telegramUserName = 'کاربر'; // Default name
+        let telegramUserName = 'کاربر';
         let currentTicketId = null;
+        let currentTicketData = null;
         let ticketsRef = null;
         let messagesRef = null;
         let typingTimeout = null;
         let hasOpenTicket = false;
+        let isSubmitting = false;
 
         const loadingView = document.getElementById('loading-view');
         const mainAppContainer = document.getElementById('main-app-container');
+        const mainNav = document.getElementById('main-nav');
         const views = { ticketsList: document.getElementById('tickets-list-view'), newTicket: document.getElementById('new-ticket-view'), conversation: document.getElementById('conversation-view') };
         const navButtons = { ticketsList: document.getElementById('nav-tickets-list'), newTicket: document.getElementById('nav-new-ticket') };
         const headerTitle = document.getElementById('header-title');
@@ -111,9 +136,9 @@
         const noTicketsMessage = document.getElementById('no-tickets-message');
         const newTicketForm = document.getElementById('new-ticket-form');
         const submitNewTicketBtn = document.getElementById('submit-new-ticket-btn');
-        const cancelNewTicketBtn = document.getElementById('cancel-new-ticket');
         const backToTicketsBtn = document.getElementById('back-to-tickets');
         const conversationContainer = document.getElementById('conversation-container');
+        const conversationHeader = document.getElementById('conversation-header');
         const replyForm = document.getElementById('reply-form');
         const replyMessageInput = document.getElementById('reply-message');
         const replyBox = document.getElementById('reply-box');
@@ -121,6 +146,32 @@
 
         const departmentMap = { general: 'سوالات متفرقه', technical: 'پشتیبانی فنی', sales: 'بخش فروش' };
 
+        // --- UI Helper Functions ---
+        function showNotification(message, success = true) {
+            const toast = document.getElementById('notification-toast');
+            toast.textContent = message;
+            toast.className = `fixed top-5 right-5 text-white px-4 py-2 rounded-lg shadow-lg transform transition-transform duration-300 z-50 ${success ? 'bg-green-500' : 'bg-red-500'}`;
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
+
+        function showModal(title, message, isError = false) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            const icon = isError ? `<svg class="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>` : `<svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            document.getElementById('modal-icon').innerHTML = icon;
+            document.getElementById('custom-modal').classList.remove('hidden');
+            document.getElementById('custom-modal').classList.add('flex');
+        }
+
+        document.getElementById('modal-close-btn').addEventListener('click', () => {
+            document.getElementById('custom-modal').classList.add('hidden');
+            document.getElementById('custom-modal').classList.remove('flex');
+        });
+
+        // --- App Logic ---
         function startApp(user) {
             telegramUserId = user.id.toString();
             telegramUserName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'کاربر';
@@ -140,24 +191,28 @@
                 } else {
                     startApp({id: "12345-test-user", first_name: "تست", last_name: "کاربر"}); 
                 }
-            } catch (error) {
-                console.error("Authentication failed:", error);
-            }
+            } catch (error) { console.error("Authentication failed:", error); }
         });
 
         function showView(viewName) {
             Object.values(views).forEach(view => view.classList.add('hidden'));
-            if (views[viewName]) views[viewName].classList.remove('hidden');
+            if (views[viewName]) {
+                if (viewName === 'conversation') {
+                    views[viewName].classList.remove('hidden');
+                    views[viewName].classList.add('flex');
+                    mainNav.classList.add('hidden');
+                } else {
+                    views[viewName].classList.remove('hidden');
+                    views[viewName].classList.remove('flex');
+                    mainNav.classList.remove('hidden');
+                }
+            }
             Object.values(navButtons).forEach(btn => btn.classList.remove('active'));
             if (navButtons[viewName]) navButtons[viewName].classList.add('active');
-            
-            if (viewName === 'ticketsList') headerTitle.textContent = 'تیکت‌ها';
-            if (viewName === 'newTicket') headerTitle.textContent = 'تیکت جدید';
-            if (viewName === 'conversation') headerTitle.textContent = 'گفتگو';
         }
 
         function renderTickets(tickets) {
-             hasOpenTicket = tickets.some(ticket => ['open', 'answered', 'in-progress'].includes(ticket.status));
+             hasOpenTicket = tickets.some(ticket => ['open', 'in-progress'].includes(ticket.status));
             if (tickets.length === 0) {
                 ticketsContainer.innerHTML = '';
                 noTicketsMessage.classList.remove('hidden');
@@ -166,6 +221,7 @@
                 const sortedTickets = tickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 ticketsContainer.innerHTML = sortedTickets.map(renderTicket).join('');
                 document.querySelectorAll('.ticket-card').forEach(card => { card.addEventListener('click', () => openConversation(card.dataset.id)); });
+                document.querySelectorAll('.delete-ticket-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); deleteTicket(btn.dataset.id); }); });
             }
         }
 
@@ -180,116 +236,104 @@
             });
         }
         
-        function getStatusInfo(status) {
-            const statuses = { 
-                open: { text: 'باز' }, answered: { text: 'پاسخ داده شد' }, 
-                'in-progress': { text: 'درحال بررسی' }, closed: { text: 'بسته شده' } 
-            };
-            return statuses[status] || { text: 'نامشخص' };
+        function deleteTicket(ticketId) {
+            if (confirm('آیا از حذف این تیکت مطمئن هستید؟ این عمل غیرقابل بازگشت است.')) {
+                db.ref(`tickets/${ticketId}`).remove();
+                db.ref(`messages/${ticketId}`).remove();
+                db.ref(`typing_status/${ticketId}`).remove();
+            }
         }
 
         function renderTicket(data) {
-            const status = getStatusInfo(data.status);
+            const status = data.status;
             const creationDate = new Date(data.created_at).toLocaleString('fa-IR', { dateStyle: 'short', timeStyle: 'short' });
             const departmentName = departmentMap[data.department] || 'نامشخص';
-            const highlightClass = data.status === 'answered' ? 'ticket-answered-highlight' : '';
+            const highlightClass = status === 'answered' ? 'ticket-answered-highlight' : '';
+            const deleteButton = status === 'closed' ? `<button data-id="${data.id}" class="delete-ticket-btn p-1"><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>` : '';
             
             return `<div class="ticket-card bg-[#3E386B] p-4 rounded-lg shadow-lg cursor-pointer ${highlightClass}" data-id="${data.id}">
-                        <div class="flex justify-between items-start"><p class="font-bold text-md">${data.subject}</p><span class="text-xs px-2 py-1 rounded-full bg-gray-600">${status.text}</span></div>
+                        <div class="flex justify-between items-start"><p class="font-bold text-md">${data.subject}</p><div class="flex items-center">${deleteButton}<span class="text-xs px-2 py-1 rounded-full bg-gray-600">${status}</span></div></div>
                         <div class="flex justify-between items-center text-xs text-gray-400 mt-4 pt-2 border-t border-gray-600"><span>${departmentName}</span><span>${creationDate}</span></div>
                     </div>`;
         }
         
         function renderMessage(data) {
-            const messageClass = data.sender === 'user' ? 'message-user' : 'message-admin';
-            const containerClass = data.sender === 'user' ? 'self-end' : 'self-start';
+            const isUser = data.sender === 'user';
+            const messageClass = isUser ? 'message-user' : 'message-admin';
+            const containerClass = isUser ? 'self-end' : 'self-start';
+            const nameAlign = isUser ? 'text-right' : 'text-left';
+            const nameColor = isUser ? 'text-purple-300' : 'text-gray-400';
+            const senderName = isUser ? telegramUserName : departmentMap[currentTicketData.department];
             const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
-            let receipt = '';
-            if (data.sender === 'user') {
-                const checkColor = data.read_by_user ? 'text-blue-300' : 'text-gray-400';
-                const checkCount = data.read_by_user ? '✓✓' : '✓';
-                receipt = `<span class="text-xs ${checkColor} mr-1">${checkCount}</span>`;
-            }
-            return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md"><div class="p-3 ${messageClass}"><p class="whitespace-pre-wrap text-sm">${data.text}</p></div><span class="text-xs text-gray-400 mt-1 px-2 ${containerClass}">${receipt}${time}</span></div>`;
+            
+            return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md">
+                        <p class="sender-name ${nameAlign} ${nameColor}">${senderName}</p>
+                        <div class="p-3 ${messageClass}"><p class="whitespace-pre-wrap text-sm">${data.text}</p></div>
+                        <span class="text-xs text-gray-400 mt-1 px-2 ${containerClass}">${time}</span>
+                    </div>`;
         }
 
         function openConversation(ticketId) {
             currentTicketId = ticketId;
             if (messagesRef) messagesRef.off();
-
-            const ratingView = document.getElementById('rating-view');
-            const ratingStars = document.getElementById('rating-stars');
-            const ratingThanks = document.getElementById('rating-thanks');
-
-            db.ref(`tickets/${ticketId}`).on('value', (snapshot) => {
-                const ticketData = snapshot.val();
-                if (ticketData.status === 'closed') {
-                    replyBox.classList.add('hidden');
-                    closedTicketMessage.classList.remove('hidden');
-                    if (!ticketData.rating) {
-                        ratingView.classList.remove('hidden');
-                        ratingStars.classList.remove('hidden');
-                        ratingThanks.classList.add('hidden');
-                    } else {
-                        ratingView.classList.add('hidden');
-                    }
-                } else {
-                    replyBox.classList.remove('hidden');
-                    closedTicketMessage.classList.add('hidden');
-                    ratingView.classList.add('hidden');
-                }
+            
+            db.ref(`tickets/${ticketId}`).once('value', (snapshot) => {
+                currentTicketData = snapshot.val();
+                conversationHeader.textContent = currentTicketData.subject;
             });
+
+            showView('conversation');
 
             messagesRef = db.ref(`messages/${ticketId}`);
             messagesRef.on('value', (snapshot) => {
                 const messagesData = snapshot.val();
                 conversationContainer.innerHTML = '';
                 if (messagesData) {
-                    Object.keys(messagesData).forEach(key => {
-                        if (messagesData[key].sender === 'admin' && !messagesData[key].read_by_user) {
-                            db.ref(`messages/${ticketId}/${key}`).update({ read_by_user: true });
-                        }
-                    });
                     conversationContainer.innerHTML = Object.values(messagesData).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(renderMessage).join('');
                 }
-                setTimeout(() => { document.getElementById('app-container').scrollTop = document.getElementById('app-container').scrollHeight; }, 100);
+                setTimeout(() => { appContainer.scrollTop = appContainer.scrollHeight; }, 100);
             });
-            showView('conversation');
         }
 
         const handleNewTicketSubmit = async () => {
+            if (isSubmitting) return;
             const subject = document.getElementById('subject').value.trim();
             const message = document.getElementById('message').value.trim();
             const department = document.getElementById('department').value;
             if (!subject || !message) return;
 
+            isSubmitting = true;
+            submitNewTicketBtn.disabled = true;
+            submitNewTicketBtn.textContent = 'در حال ارسال...';
+
             try {
                 const response = await fetch(`${WORKER_URL}/tickets`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        telegram_id: telegramUserId,
-                        user_name: telegramUserName,
-                        subject: subject,
-                        department: department,
-                        message: message,
-                    }),
+                    body: JSON.stringify({ telegram_id: telegramUserId, user_name: telegramUserName, subject, department, message }),
                 });
                 if (!response.ok) throw new Error('خطا در ارسال تیکت');
                 newTicketForm.reset();
-                showView('ticketsList');
+                showNotification('تیکت شما با موفقیت ارسال شد.');
+                setTimeout(() => showView('ticketsList'), 1500);
             } catch (error) {
+                showNotification('ارسال تیکت با خطا مواجه شد.', false);
                 console.error("Error creating ticket:", error);
+            } finally {
+                isSubmitting = false;
+                submitNewTicketBtn.disabled = false;
+                submitNewTicketBtn.textContent = 'ارسال';
             }
         };
         
         // --- Event Listeners ---
-        navButtons.ticketsList.addEventListener('click', () => showView('ticketsList'));
         navButtons.newTicket.addEventListener('click', () => {
-            if (hasOpenTicket) { alert('شما یک تیکت باز دارید. لطفا تا بسته شدن آن صبر کنید.'); } 
-            else { showView('newTicket'); }
+            if (hasOpenTicket) { 
+                showModal('خطا', 'شما در حال حاضر یک تیکت باز دارید. لطفا تا زمان بسته شدن آن توسط پشتیبانی منتظر بمانید.', true);
+            } else { 
+                showView('newTicket'); 
+            }
         });
-        cancelNewTicketBtn.addEventListener('click', () => showView('ticketsList'));
         backToTicketsBtn.addEventListener('click', () => showView('ticketsList'));
         submitNewTicketBtn.addEventListener('click', handleNewTicketSubmit);
         
@@ -322,16 +366,6 @@
             }
         });
 
-        document.getElementById('rating-stars').addEventListener('click', (e) => {
-            if (e.target.tagName === 'SPAN') {
-                const rating = parseInt(e.target.dataset.value);
-                if (currentTicketId) {
-                    db.ref(`tickets/${currentTicketId}`).update({ rating: rating });
-                    document.getElementById('rating-stars').classList.add('hidden');
-                    document.getElementById('rating-thanks').classList.remove('hidden');
-                }
-            }
-        });
     </script>
 </body>
 </html>

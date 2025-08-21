@@ -16,6 +16,18 @@
         .message-admin { background-color: #4a4a6a; color: white; border-radius: 1rem 1rem 1rem 0; }
         .sender-name { font-size: 0.8rem; font-weight: 500; margin-bottom: 0.25rem; padding: 0 0.5rem; }
         #conversation-view.is-open { transform: translateX(0%); }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -32,7 +44,13 @@
             </header>
             <main id="app-container" class="flex-grow overflow-y-auto">
                 <div id="tickets-list-view" class="p-4">
-                    <div id="tickets-container" class="space-y-3"></div>
+                    <div id="tickets-container" class="space-y-3">
+                        <!-- Loading placeholder for tickets -->
+                        <div id="tickets-loading-placeholder" class="flex flex-col items-center justify-center text-center text-gray-400 mt-16">
+                            <div class="spinner"></div>
+                            <p class="mt-4 text-lg">در حال بارگذاری تیکت‌ها...</p>
+                        </div>
+                    </div>
                     <div id="no-tickets-message" class="hidden text-center text-gray-400 mt-16">
                         <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                         <p class="mt-4 text-lg">تیکت ندارید!</p>
@@ -40,7 +58,16 @@
                 </div>
                 <div id="new-ticket-view" class="p-4 hidden">
                     <form id="new-ticket-form" class="space-y-4">
-                        <div><label for="department" class="block mb-2 text-sm font-medium">دپارتمان</label><select id="department" name="department" class="form-select"><option value="general">سوالات متفرقه</option><option value="technical">پشتیبانی فنی</option><option value="sales">بخش فروش</option></select></div>
+                        <div>
+                            <label for="department" class="block mb-2 text-sm font-medium">دپارتمان</label>
+                            <select id="department" name="department" class="form-select">
+                                <option value="technical">واحد فنی</option>
+                                <option value="sales">واحد فروش</option>
+                                <option value="marketing">واحد بازاریابی</option>
+                                <option value="inquiry">واحد استعلام قیمت</option>
+                                <option value="ideas">ایده‌ها و پیشنهادات</option>
+                            </select>
+                        </div>
                         <div><label for="subject" class="block mb-2 text-sm font-medium">موضوع</label><input type="text" id="subject" name="subject" class="form-input" placeholder="موضوع تیکت خود را وارد کنید" required></div>
                         <div><label for="message" class="block mb-2 text-sm font-medium">متن پیام</label><textarea id="message" name="message" rows="6" class="form-textarea" placeholder="مشکل یا سوال خود را با جزئیات کامل بنویسید..." required></textarea></div>
                         <div class="flex justify-between items-center pt-2">
@@ -102,6 +129,7 @@
         const navButtons = { ticketsList: document.getElementById('nav-tickets-list'), newTicket: document.getElementById('nav-new-ticket') };
         const headerTitle = document.getElementById('header-title');
         const ticketsContainer = document.getElementById('tickets-container');
+        const ticketsLoadingPlaceholder = document.getElementById('tickets-loading-placeholder');
         const noTicketsMessage = document.getElementById('no-tickets-message');
         const newTicketForm = document.getElementById('new-ticket-form');
         const submitNewTicketBtn = document.getElementById('submit-new-ticket-btn');
@@ -111,7 +139,13 @@
         const replyForm = document.getElementById('reply-form');
         const replyMessageInput = document.getElementById('reply-message');
 
-        const departmentMap = { general: 'سوالات متفرقه', technical: 'پشتیبانی فنی', sales: 'بخش فروش' };
+        const departmentMap = { 
+            technical: 'واحد فنی', 
+            sales: 'واحد فروش', 
+            marketing: 'واحد بازاریابی',
+            inquiry: 'واحد استعلام قیمت',
+            ideas: 'ایده‌ها و پیشنهادات'
+        };
 
         function showNotification(message, success = true) {
             const toast = document.getElementById('notification-toast');
@@ -198,6 +232,8 @@
             } catch (error) {
                 console.error("Error fetching tickets via worker:", error);
                 showNotification(`خطا در دریافت تیکت‌ها: ${error.message}`, false);
+                // Hide loader on error as well
+                ticketsLoadingPlaceholder.classList.add('hidden');
             }
         }
 
@@ -231,6 +267,9 @@
         }
 
         function renderTickets(tickets) {
+            // Hide the loading placeholder once we have the data
+            ticketsLoadingPlaceholder.classList.add('hidden');
+
             hasOpenTicket = tickets.some(ticket => ['open', 'in-progress', 'answered'].includes(ticket.status));
             if (tickets.length === 0) {
                 ticketsContainer.innerHTML = '';

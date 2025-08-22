@@ -131,20 +131,20 @@
             --secondary-text-color: var(--brand-text-secondary);
         }
 
-        /* Rating Stars Style */
+        /* Rating Stars Style - CORRECTED */
         .rating-stars {
-            direction: ltr; /* To make hover effect work correctly with flex-row-reverse */
+            direction: ltr; 
         }
         .rating-star {
             cursor: pointer;
-            color: #6b7280; /* Gray color for empty stars */
+            color: #6b7280; 
             transition: color 0.2s;
         }
         .rating-stars:hover .rating-star {
-            color: #f59e0b; /* Amber color on hover */
+            color: #f59e0b;
         }
-        .rating-star:hover ~ .rating-star {
-            color: #6b7280; /* Keep subsequent stars gray */
+        .rating-stars .rating-star:hover ~ .rating-star {
+            color: #6b7280;
         }
         .rating-stars[data-rated="true"] .rating-star {
             cursor: default;
@@ -175,7 +175,16 @@
                 </div>
                 <div id="new-ticket-view" class="p-4 hidden">
                     <form id="new-ticket-form" class="space-y-4">
-                        <div><label for="department" class="block mb-2 text-sm font-medium">دپارتمان</label><select id="department" name="department" class="form-select"><option value="general">سوالات متفرقه</option><option value="technical">پشتیبانی فنی</option><option value="sales">بخش فروش</option></select></div>
+                        <div>
+                            <label for="department" class="block mb-2 text-sm font-medium">دپارتمان</label>
+                            <select id="department" name="department" class="form-select">
+                                <option value="general">سوالات متفرقه</option>
+                                <option value="technical">واحد فنی</option>
+                                <option value="sales">واحد فروش</option>
+                                <option value="marketing">واحد بازاریابی</option>
+                                <option value="ideas">ایده ها و پیشنهادات</option>
+                            </select>
+                        </div>
                         <div><label for="subject" class="block mb-2 text-sm font-medium">موضوع</label><input type="text" id="subject" name="subject" class="form-input" placeholder="موضوع تیکت خود را وارد کنید" required></div>
                         <div><label for="message" class="block mb-2 text-sm font-medium">متن پیام</label><textarea id="message" name="message" rows="6" class="form-textarea" placeholder="مشکل یا سوال خود را با جزئیات کامل بنویسید..." required></textarea></div>
                         <div class="flex justify-between items-center pt-2">
@@ -306,7 +315,13 @@
         const emojiPickerContainer = document.getElementById('emoji-picker-container');
         const emojiPicker = document.querySelector('emoji-picker');
 
-        const departmentMap = { general: 'سوالات متفرقه', technical: 'پشتیبانی فنی', sales: 'بخش فروش' };
+        const departmentMap = {
+            general: 'سوالات متفرقه',
+            technical: 'واحد فنی',
+            sales: 'واحد فروش',
+            marketing: 'واحد بازاریابی',
+            ideas: 'ایده ها و پیشنهادات'
+        };
 
         function showNotification(message, success = true) {
             const toast = document.getElementById('notification-toast');
@@ -401,7 +416,6 @@
         }
         
         async function deleteTicket(ticketId) {
-            // This is a simple confirmation. For a better UX, a custom modal could be used.
             if (confirm('آیا از حذف این تیکت مطمئن هستید؟')) {
                 try {
                     const response = await fetch(`${WORKER_URL}/tickets?ticket_id=${ticketId}`, { method: 'DELETE' });
@@ -434,14 +448,12 @@
                 ticketsContainer.innerHTML = sortedTickets.map(renderTicket).join('');
                 document.querySelectorAll('.ticket-card').forEach(card => { 
                     card.addEventListener('click', (e) => {
-                        // Prevent opening conversation if clicking on the rating area
                         if (e.target.closest('.rating-stars')) return;
                         openConversation(card.dataset.id)
                     }); 
                 });
                 document.querySelectorAll('.delete-ticket-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); deleteTicket(btn.dataset.id); }); });
                 
-                // Add event listeners for rating stars
                 document.querySelectorAll('.rating-star').forEach(star => {
                     star.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -453,7 +465,6 @@
             }
         }
         
-        // MODIFIED: Function to submit ticket rating, now sends telegram_id
         async function submitRating(ticketId, rating) {
             const starContainer = document.querySelector(`.rating-stars[data-ticket-id="${ticketId}"]`);
             if (!starContainer || starContainer.dataset.submitting === 'true' || starContainer.dataset.rated === 'true') return;
@@ -472,12 +483,11 @@
                     throw new Error(err.error || 'خطا در ثبت امتیاز');
                 }
                 showNotification('امتیاز شما با موفقیت ثبت شد.');
-                // Find the ticket in local data and update its rating to reflect immediately
                 const ticket = allTicketsData.find(t => t.id === ticketId);
                 if (ticket) {
                     ticket.rating = rating;
                 }
-                renderTickets(allTicketsData); // Re-render to show the rated state
+                renderTickets(allTicketsData);
             } catch (error) {
                 showNotification(`ثبت امتیاز با خطا مواجه شد: ${error.message}`, false);
                 delete starContainer.dataset.submitting;
@@ -485,18 +495,16 @@
             }
         }
 
-        // MODIFIED: renderTicket function now includes rating logic
         function renderTicket(data) {
             const status = data.status;
             const statusText = {open: 'باز', 'in-progress': 'در حال بررسی', answered: 'پاسخ داده شد', closed: 'بسته شده'}[status] || status;
             const creationDate = new Date(data.created_at).toLocaleString('fa-IR', { dateStyle: 'short', timeStyle: 'short' });
-            const departmentName = departmentMap[data.department] || 'نامشخص';
+            const departmentName = departmentMap[data.department] || data.department;
             const deleteButton = status === 'closed' ? `<button data-id="${data.id}" class="delete-ticket-btn p-1"><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>` : '';
 
             let ratingSection = '';
             if (status === 'closed') {
                 if (data.rating && data.rating > 0) {
-                    // Display static rated stars
                     let stars = '';
                     for (let i = 1; i <= 5; i++) {
                         const starColor = i <= data.rating ? 'text-amber-400' : 'text-gray-600';
@@ -508,7 +516,6 @@
                             <div class="flex justify-center">${stars}</div>
                         </div>`;
                 } else {
-                    // Display interactive stars for rating
                     ratingSection = `
                         <div class="mt-3 pt-3 border-t text-center" style="border-color: var(--brand-dark-blue);">
                             <p class="text-xs text-gray-400 mb-2">به کیفیت پاسخ‌دهی امتیاز دهید:</p>
@@ -538,19 +545,18 @@
         function renderMessage(data) {
             const isUser = data.sender === 'user';
             const isAdmin = data.sender === 'admin';
-            const isAI = isAdmin && data.source === 'ai'; // Check if the source is AI
+            const isAI = isAdmin && data.source === 'ai';
 
             const messageClass = isUser ? 'message-user' : 'message-admin';
             const containerClass = isUser ? 'self-start' : 'self-end'; 
             const nameAlign = isUser ? 'text-right' : 'text-left';
             
-            // Dynamically set the sender's name based on the source
             let senderName = '';
             if (isUser) {
                 senderName = telegramUserName;
             } else if (isAI) {
                 senderName = 'دستیار هوش مصنوعی';
-            } else { // It's a human admin
+            } else {
                 senderName = currentTicketData ? departmentMap[currentTicketData.department] : 'پشتیبانی';
             }
 
@@ -561,7 +567,6 @@
                 messageContent += `<a href="${data.imageUrl}" target="_blank"><img src="${data.imageUrl}" class="rounded-lg max-w-xs mt-2" alt="تصویر پیوست شده"></a>`;
             }
 
-            // Conditionally add the "request human" button ONLY for AI messages
             let humanRequestButton = '';
             if (isAI) {
                 humanRequestButton = `

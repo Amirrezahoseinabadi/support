@@ -442,13 +442,13 @@
                     </div>`;
         }
         
+        // === NEW/MODIFIED START ===
         function renderMessage(data) {
             const isUser = data.sender === 'user';
             const messageClass = isUser ? 'message-user' : 'message-admin';
-            // In RTL: user is on the right, admin is on the left.
             const containerClass = isUser ? 'self-start' : 'self-end'; 
             const nameAlign = isUser ? 'text-right' : 'text-left';
-            const senderName = isUser ? telegramUserName : (currentTicketData ? departmentMap[currentTicketData.department] : 'پشتیبانی');
+            const senderName = isUser ? telegramUserName : 'ربات دستیار آقای مرزبان';
             const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
             
             let messageContent = data.text ? `<p class="whitespace-pre-wrap text-sm">${data.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-300 underline">$1</a>')}</p>` : '';
@@ -456,13 +456,29 @@
                 messageContent += `<a href="${data.imageUrl}" target="_blank"><img src="${data.imageUrl}" class="rounded-lg max-w-xs mt-2" alt="تصویر پیوست شده"></a>`;
             }
 
+            // Add the "request human" button for admin/bot messages
+            let humanRequestButton = '';
+            if (!isUser) {
+                humanRequestButton = `
+                    <div class="mt-3 pt-2 border-t border-white/10">
+                        <p class="text-xs text-gray-400 mb-2">اگر این پیام مشکلتان را برطرف نکرد:</p>
+                        <button class="request-human-btn text-xs w-full text-center py-2 px-3 rounded-lg border border-sky-500 text-sky-400 hover:bg-sky-500 hover:text-white transition-colors duration-200" data-ticket-id="${currentTicketId}">
+                            برای اتصال به کارشناس کلیک کنید
+                        </button>
+                    </div>
+                `;
+            }
+
             return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md">
                         <p class="sender-name ${nameAlign}" style="color: ${isUser ? '#82aaff' : '#a2a2a2'}">${senderName}</p>
-                        <div class="message-bubble ${messageClass}">${messageContent}</div>
+                        <div class="message-bubble ${messageClass}">
+                            ${messageContent}
+                            ${humanRequestButton}
+                        </div>
                         <span class="message-time px-2 w-full ${nameAlign}">${time}</span>
                     </div>`;
         }
-
+        // === NEW/MODIFIED END ===
 
         function openConversation(ticketId) {
             currentTicketId = ticketId;
@@ -496,6 +512,10 @@
                     conversationContainer.innerHTML = '';
                     if (messagesData) {
                         conversationContainer.innerHTML = Object.values(messagesData).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(renderMessage).join('');
+                        // === NEW/MODIFIED START ===
+                        // Attach event listeners to the newly rendered buttons
+                        attachHumanRequestListeners();
+                        // === NEW/MODIFIED END ===
                     }
                     
                     if(isScrolledToBottom) {
@@ -506,6 +526,46 @@
                 console.error("Error fetching messages:", error);
             }
         }
+
+        // === NEW/MODIFIED START ===
+        function attachHumanRequestListeners() {
+            document.querySelectorAll('.request-human-btn').forEach(button => {
+                // Prevent adding duplicate listeners
+                if (button.dataset.listenerAttached) return;
+                button.dataset.listenerAttached = 'true';
+
+                button.addEventListener('click', async (e) => {
+                    const ticketId = e.target.dataset.ticketId;
+                    if (!ticketId) return;
+                    
+                    e.target.disabled = true;
+                    e.target.textContent = 'در حال ارسال...';
+
+                    try {
+                        const response = await fetch(`${WORKER_URL}/tickets/${ticketId}/request-human`, {
+                            method: 'POST'
+                        });
+                        if (!response.ok) {
+                            throw new Error('خطا در ارسال درخواست');
+                        }
+                        const result = await response.json();
+                        if (result.success) {
+                            showNotification('درخواست شما برای اتصال به کارشناس ثبت شد.');
+                            e.target.textContent = 'درخواست ثبت شد';
+                            e.target.classList.add('opacity-50', 'cursor-not-allowed');
+                        } else {
+                            throw new Error(result.error || 'خطا در ثبت درخواست');
+                        }
+                    } catch (error) {
+                        console.error("Error requesting human agent:", error);
+                        showNotification(error.message, false);
+                        e.target.disabled = false;
+                        e.target.textContent = 'برای اتصال به کارشناس کلیک کنید';
+                    }
+                });
+            });
+        }
+        // === NEW/MODIFIED END ===
 
         function listenToMessages(ticketId) {
             fetchMessages(ticketId);

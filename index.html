@@ -445,10 +445,23 @@
         // === NEW/MODIFIED START ===
         function renderMessage(data) {
             const isUser = data.sender === 'user';
+            const isAdmin = data.sender === 'admin';
+            const isAI = isAdmin && data.source === 'ai'; // Check if the source is AI
+
             const messageClass = isUser ? 'message-user' : 'message-admin';
             const containerClass = isUser ? 'self-start' : 'self-end'; 
             const nameAlign = isUser ? 'text-right' : 'text-left';
-            const senderName = isUser ? telegramUserName : 'ربات دستیار آقای مرزبان';
+            
+            // Dynamically set the sender's name based on the source
+            let senderName = '';
+            if (isUser) {
+                senderName = telegramUserName;
+            } else if (isAI) {
+                senderName = 'دستیار هوش مصنوعی';
+            } else { // It's a human admin
+                senderName = currentTicketData ? departmentMap[currentTicketData.department] : 'پشتیبانی';
+            }
+
             const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
             
             let messageContent = data.text ? `<p class="whitespace-pre-wrap text-sm">${data.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-300 underline">$1</a>')}</p>` : '';
@@ -456,9 +469,9 @@
                 messageContent += `<a href="${data.imageUrl}" target="_blank"><img src="${data.imageUrl}" class="rounded-lg max-w-xs mt-2" alt="تصویر پیوست شده"></a>`;
             }
 
-            // Add the "request human" button for admin/bot messages
+            // Conditionally add the "request human" button ONLY for AI messages
             let humanRequestButton = '';
-            if (!isUser) {
+            if (isAI) {
                 humanRequestButton = `
                     <div class="mt-3 pt-2 border-t border-white/10">
                         <p class="text-xs text-gray-400 mb-2">اگر این پیام مشکلتان را برطرف نکرد:</p>
@@ -512,10 +525,7 @@
                     conversationContainer.innerHTML = '';
                     if (messagesData) {
                         conversationContainer.innerHTML = Object.values(messagesData).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(renderMessage).join('');
-                        // === NEW/MODIFIED START ===
-                        // Attach event listeners to the newly rendered buttons
                         attachHumanRequestListeners();
-                        // === NEW/MODIFIED END ===
                     }
                     
                     if(isScrolledToBottom) {
@@ -527,10 +537,8 @@
             }
         }
 
-        // === NEW/MODIFIED START ===
         function attachHumanRequestListeners() {
             document.querySelectorAll('.request-human-btn').forEach(button => {
-                // Prevent adding duplicate listeners
                 if (button.dataset.listenerAttached) return;
                 button.dataset.listenerAttached = 'true';
 
@@ -565,7 +573,6 @@
                 });
             });
         }
-        // === NEW/MODIFIED END ===
 
         function listenToMessages(ticketId) {
             fetchMessages(ticketId);

@@ -10,6 +10,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <!-- Emoji Picker Library -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -110,6 +112,24 @@
         .icon-button:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
+
+        /* Glassmorphism Modal Style */
+        .glass-modal-content {
+            background: rgba(39, 64, 89, 0.6); /* --brand-secondary-bg with opacity */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        
+        /* Emoji Picker Style */
+        #emoji-picker-container emoji-picker {
+            --background: var(--brand-secondary-bg);
+            --border-color: var(--brand-dark-blue);
+            --text-color: var(--brand-text-primary);
+            --secondary-text-color: var(--brand-text-secondary);
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -135,13 +155,6 @@
                     </div>
                 </div>
                 <div id="new-ticket-view" class="p-4 hidden">
-                    <div class="mb-6 p-4 rounded-lg" style="background-color: var(--brand-secondary-bg);">
-                        <h3 class="text-md font-bold mb-3 text-center">ارسال تیکت سریع</h3>
-                        <p class="text-xs text-center text-gray-300 mb-4">برای مشکلات رایج از الگوهای آماده استفاده کنید.</p>
-                        <button id="quick-ticket-password-btn" class="w-full text-sm bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-lg">
-                            عدم دریافت رمز پنل
-                        </button>
-                    </div>
                     <form id="new-ticket-form" class="space-y-4">
                         <div><label for="department" class="block mb-2 text-sm font-medium">دپارتمان</label><select id="department" name="department" class="form-select"><option value="general">سوالات متفرقه</option><option value="technical">پشتیبانی فنی</option><option value="sales">بخش فروش</option></select></div>
                         <div><label for="subject" class="block mb-2 text-sm font-medium">موضوع</label><input type="text" id="subject" name="subject" class="form-input" placeholder="موضوع تیکت خود را وارد کنید" required></div>
@@ -155,7 +168,6 @@
             <nav id="main-nav" class="nav-bar h-[80px] flex items-center justify-around">
                 <button id="nav-tickets-list" class="nav-button active flex flex-col items-center space-y-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg><span class="text-xs">تیکت‌ها</span></button>
                 <button id="nav-new-ticket" class="nav-button flex flex-col items-center space-y-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="text-xs">تیکت جدید</span></button>
-                <button id="nav-faq" class="nav-button flex flex-col items-center space-y-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.546-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="text-xs">سوالات متداول</span></button>
             </nav>
         </div>
 
@@ -165,6 +177,9 @@
                 <h2 id="conversation-header" class="text-white font-bold mr-2">گفتگو</h2>
              </header>
             <div id="conversation-container" class="p-4 space-y-2 flex flex-col flex-grow overflow-y-auto"></div>
+            <div id="emoji-picker-container" class="absolute bottom-[70px] right-2 z-30 hidden">
+                <emoji-picker></emoji-picker>
+            </div>
              <div id="reply-box" class="p-2 sticky bottom-0 border-t" style="border-color: var(--brand-dark-blue);">
                 <form id="reply-form" class="flex items-center space-x-2 space-x-reverse">
                     <button type="button" id="attach-file-btn" class="icon-button">
@@ -182,31 +197,28 @@
         </div>
     </div>
 
-    <!-- Rules Modal -->
-    <div id="rules-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4">
-        <div class="bg-[var(--brand-secondary-bg)] rounded-lg shadow-xl p-6 w-full max-w-md flex flex-col max-h-[90vh]">
-            <h3 class="text-xl font-bold mb-4 text-white text-center">قوانین و مقررات</h3>
-            <div class="overflow-y-auto pr-2 space-y-3 text-sm text-[var(--brand-text-secondary)]">
-                <p>۱. لطفا از ارسال تیکت‌های تکراری خودداری فرمایید.</p>
-                <p>۲. پیش از ارسال تیکت، بخش سوالات متداول را مطالعه کنید.</p>
-                <p>۳. زبان فارسی را پاس بدارید و از به کار بردن کلمات انگلیسی غیرضروری خودداری کنید.</p>
-                <p>۴. توهین به کارشناسان پشتیبانی منجر به مسدود شدن حساب کاربری شما خواهد شد.</p>
-                <p>۵. زمان پاسخگویی به تیکت‌ها بین ۱ تا ۲۴ ساعت کاری می‌باشد. لطفا صبور باشید.</p>
-                <p>۶. مسئولیت اطلاعات وارد شده در تیکت بر عهده کاربر است.</p>
-                <p>۷. در صورت نیاز به ارسال اطلاعات حساس (مانند رمز عبور)، از طریق راه‌های امن اقدام کنید.</p>
-                 <p>۸. این یک متن نمونه برای قوانین است و میتواند طولانی تر باشد.</p>
-                 <p>۹. این یک متن نمونه برای قوانین است.</p>
-                 <p>۱۰. این یک متن نمونه برای قوانین است.</p>
+    <!-- Info Modal -->
+    <div id="info-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4 transition-opacity duration-300">
+        <div class="glass-modal-content p-6 w-full max-w-md flex flex-col max-h-[90vh]">
+            <h3 class="text-xl font-bold mb-4 text-white text-center">راهنمای ارسال تیکت</h3>
+            <div class="overflow-y-auto pr-2 space-y-4 text-sm text-[var(--brand-text-secondary)]">
+                <div>
+                    <h4 class="font-bold text-white mb-2">💡 قبل از ارسال تیکت:</h4>
+                    <p>لطفا ابتدا <a href="https://faqhub.amiruserbot7.workers.dev/" target="_blank" class="text-blue-300 hover:underline">صفحه سوالات متداول</a> را بررسی کنید. شاید پاسخ سوال شما آنجا باشد!</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-2">📋 نمونه الگوریتم ارسال تیکت:</h4>
+                    <div class="p-3 rounded-lg text-xs" style="background-color: var(--brand-dark-blue);">
+                        <p class="whitespace-pre-wrap">❗️ تیکت را با الگوریتم زیر ارسال کنید:
+دپارتمان: (نسبت به موضوع تیکت تنظیم شود)
+موضوع: عدم دریافت پسورد پنل
+سلام و وقت بخیر، بنده در پنل مدیریت سرویس امکان تغییر/ایجاد پسورد پنلم را ندارم.
+لطفا درخواست دارم این مورد را بررسی و رفع بفرمایید.</p>
+                    </div>
+                </div>
             </div>
-            <div class="mt-6 pt-4 border-t border-[var(--brand-dark-blue)]">
-                 <div class="flex items-center mb-4">
-                    <input id="agree-checkbox" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 ml-2">
-                    <label for="agree-checkbox" class="text-sm font-medium text-white">قوانین را مطالعه کرده و می‌پذیرم.</label>
-                </div>
-                <div class="flex justify-between items-center gap-4">
-                    <button id="agree-btn" class="text-white px-6 py-2 rounded-md w-full disabled:opacity-50 disabled:cursor-not-allowed" style="background-color: var(--brand-light-blue);" disabled>تایید و ادامه</button>
-                    <button id="disagree-btn" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-md w-full">انصراف</button>
-                </div>
+            <div class="mt-6 pt-4 border-t border-white/10">
+                <button id="info-modal-close-btn" class="text-white px-6 py-2.5 rounded-md w-full transition" style="background-color: var(--brand-light-blue);">متوجه شدم</button>
             </div>
         </div>
     </div>
@@ -224,7 +236,6 @@
 
     <script>
         const WORKER_URL = 'https://support-api-worker.amiruserbot7.workers.dev';
-        const FAQ_URL = 'https://faqhub.amiruserbot7.workers.dev/';
         const firebaseConfig = {
             apiKey: "AIzaSyAjBkdCe-kJK2VFfM3lSFyFiFNXElOCPSg",
             authDomain: "support-app-final.firebaseapp.com",
@@ -253,11 +264,7 @@
         const ticketsListView = document.getElementById('tickets-list-view');
         const newTicketView = document.getElementById('new-ticket-view');
         const conversationView = document.getElementById('conversation-view');
-        const navButtons = { 
-            ticketsList: document.getElementById('nav-tickets-list'), 
-            newTicket: document.getElementById('nav-new-ticket'),
-            faq: document.getElementById('nav-faq')
-        };
+        const navButtons = { ticketsList: document.getElementById('nav-tickets-list'), newTicket: document.getElementById('nav-new-ticket') };
         const headerTitle = document.getElementById('header-title');
         const ticketsContainer = document.getElementById('tickets-container');
         const noTicketsMessage = document.getElementById('no-tickets-message');
@@ -271,13 +278,14 @@
         const fileUploadInput = document.getElementById('file-upload');
         const attachFileBtn = document.getElementById('attach-file-btn');
         const emojiBtn = document.getElementById('emoji-btn');
-        const quickTicketPasswordBtn = document.getElementById('quick-ticket-password-btn');
         
-        // Rules Modal Elements
-        const rulesModal = document.getElementById('rules-modal');
-        const agreeCheckbox = document.getElementById('agree-checkbox');
-        const agreeBtn = document.getElementById('agree-btn');
-        const disagreeBtn = document.getElementById('disagree-btn');
+        // Info Modal Elements
+        const infoModal = document.getElementById('info-modal');
+        const infoModalCloseBtn = document.getElementById('info-modal-close-btn');
+
+        // Emoji Picker Elements
+        const emojiPickerContainer = document.getElementById('emoji-picker-container');
+        const emojiPicker = document.querySelector('emoji-picker');
 
         const departmentMap = { general: 'سوالات متفرقه', technical: 'پشتیبانی فنی', sales: 'بخش فروش' };
 
@@ -596,36 +604,32 @@
         });
 
         attachFileBtn.addEventListener('click', () => {
-            fileUploadInput.click();
+            showNotification('این قابلیت بزودی اضافه می‌شود.', false);
         });
 
-        fileUploadInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file || !currentTicketId) return;
-
-            const filePath = `ticket_attachments/${currentTicketId}/${new Date().getTime()}_${file.name}`;
-            const uploadTask = storage.ref(filePath).put(file);
-            showNotification('در حال آپلود عکس...');
-
-            uploadTask.on('state_changed', 
-                (snapshot) => { /* can be used for progress bar */ }, 
-                (error) => { 
-                    console.error("Upload failed:", error); 
-                    showNotification('آپلود عکس با خطا مواجه شد.', false);
-                }, 
-                () => {
-                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                        sendMessage(null, downloadURL);
-                        showNotification('عکس با موفقیت ارسال شد.');
-                    });
-                }
-            );
-            e.target.value = ''; // Reset input
+        emojiBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            emojiPickerContainer.classList.toggle('hidden');
         });
 
-        emojiBtn.addEventListener('click', () => {
-            showNotification('این قابلیت به زودی اضافه می‌شود.', false);
+        emojiPicker.addEventListener('emoji-click', event => {
+            const emoji = event.detail.unicode;
+            const textarea = replyMessageInput;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            textarea.value = text.substring(0, start) + emoji + text.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+            textarea.focus();
+            emojiPickerContainer.classList.add('hidden');
         });
+
+        document.addEventListener('click', (e) => {
+            if (!emojiPickerContainer.contains(e.target) && !emojiBtn.contains(e.target)) {
+                emojiPickerContainer.classList.add('hidden');
+            }
+        });
+
 
         replyMessageInput.addEventListener('input', () => {
             replyMessageInput.style.height = 'auto';
@@ -639,15 +643,11 @@
             if (hasOpenTicket) { 
                 showModal('امکان ایجاد تیکت جدید وجود ندارد', 'شما در حال حاضر یک تیکت باز دارید. لطفا تا زمان بسته شدن آن توسط پشتیبانی منتظر بمانید.', true);
             } else { 
-                rulesModal.classList.remove('hidden');
-                rulesModal.classList.add('flex');
+                infoModal.classList.remove('hidden');
+                infoModal.classList.add('flex');
             }
         });
         
-        navButtons.faq.addEventListener('click', () => {
-            window.open(FAQ_URL, '_blank');
-        });
-
         backToTicketsBtn.addEventListener('click', closeConversation);
         
         newTicketForm.addEventListener('submit', (e) => {
@@ -657,40 +657,11 @@
         
         submitNewTicketBtn.addEventListener('click', handleNewTicketSubmit);
 
-        // --- Rules Modal Listeners ---
-        agreeCheckbox.addEventListener('change', () => {
-            agreeBtn.disabled = !agreeCheckbox.checked;
-        });
-
-        disagreeBtn.addEventListener('click', () => {
-            rulesModal.classList.add('hidden');
-            rulesModal.classList.remove('flex');
-            agreeCheckbox.checked = false; // Reset checkbox
-            agreeBtn.disabled = true; // Reset button state
-        });
-
-        agreeBtn.addEventListener('click', () => {
-            if (agreeCheckbox.checked) {
-                rulesModal.classList.add('hidden');
-                rulesModal.classList.remove('flex');
-                showView('newTicket');
-                agreeCheckbox.checked = false; // Reset for next time
-                agreeBtn.disabled = true;
-            }
-        });
-
-        quickTicketPasswordBtn.addEventListener('click', () => {
-            const departmentSelect = document.getElementById('department');
-            const subjectInput = document.getElementById('subject');
-            const messageTextarea = document.getElementById('message');
-
-            departmentSelect.value = 'technical';
-            subjectInput.value = 'عدم دریافت پسورد پنل';
-            messageTextarea.value = `سلام و وقت بخیر،
-بنده در پنل مدیریت سرویس امکان تغییر/ایجاد پسورد پنلم را ندارم.
-لطفا درخواست دارم این مورد را بررسی و رفع بفرمایید.`;
-            
-            showNotification('فرم با الگوی انتخابی پر شد.');
+        // --- Info Modal Listener ---
+        infoModalCloseBtn.addEventListener('click', () => {
+            infoModal.classList.add('hidden');
+            infoModal.classList.remove('flex');
+            showView('newTicket');
         });
         
     </script>

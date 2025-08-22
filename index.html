@@ -6,6 +6,10 @@
     <title>پشتیبانی</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -55,16 +59,20 @@
             word-wrap: break-word;
         }
         .message-user {
-            background-color: #4a4a6a;
-            color: white;
-            border-bottom-right-radius: 4px;
-            align-self: flex-end;
-        }
-        .message-admin {
-            background-color: #2b5278;
+            background-color: #2b5278; /* Blue for user */
             color: white;
             border-bottom-left-radius: 4px;
-            align-self: flex-start;
+        }
+        .message-admin {
+            background-color: #4a4a6a; /* Purple/Gray for admin */
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .sender-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            padding: 0 8px;
         }
         .message-time {
             font-size: 0.7rem;
@@ -103,6 +111,8 @@
     </style>
 </head>
 <body class="flex flex-col h-screen">
+
+    <input type="file" id="file-upload" class="hidden" accept="image/*">
 
     <div id="loading-view" class="flex flex-col items-center justify-center h-full text-center p-4">
         <svg class="animate-spin h-10 w-10 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -147,11 +157,11 @@
             <div id="conversation-container" class="p-4 space-y-3 flex flex-col flex-grow overflow-y-auto"></div>
              <div id="reply-box" class="p-2 sticky bottom-0 border-t border-gray-700">
                 <form id="reply-form" class="flex items-center space-x-2 space-x-reverse">
-                    <button type="button" class="icon-button">
+                    <button type="button" id="attach-file-btn" class="icon-button">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                     </button>
                     <textarea id="reply-message" rows="1" class="flex-grow" placeholder="پاسخ..." required></textarea>
-                    <button type="button" class="icon-button">
+                    <button type="button" id="emoji-btn" class="icon-button">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </button>
                     <button type="submit" class="icon-button text-white" style="background-color: var(--tg-theme-button-color);">
@@ -175,6 +185,18 @@
 
     <script>
         const WORKER_URL = 'https://support-api-worker.amiruserbot7.workers.dev';
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjBkdCe-kJK2VFfM3lSFyFiFNXElOCPSg",
+            authDomain: "support-app-final.firebaseapp.com",
+            databaseURL: "https://support-app-final-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "support-app-final",
+            storageBucket: "support-app-final.appspot.com",
+            messagingSenderId: "220983533006",
+            appId: "1:220983533006:web:87f404486afb9f6a06df9f"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
 
         let telegramUserId = null;
         let telegramUserName = 'کاربر';
@@ -202,6 +224,9 @@
         const conversationHeader = document.getElementById('conversation-header');
         const replyForm = document.getElementById('reply-form');
         const replyMessageInput = document.getElementById('reply-message');
+        const fileUploadInput = document.getElementById('file-upload');
+        const attachFileBtn = document.getElementById('attach-file-btn');
+        const emojiBtn = document.getElementById('emoji-btn');
 
         const departmentMap = { general: 'سوالات متفرقه', technical: 'پشتیبانی فنی', sales: 'بخش فروش' };
 
@@ -247,7 +272,7 @@
                     startApp(tg.initDataUnsafe.user);
                 } else {
                     console.warn("Telegram user data not found. Using mock user.");
-                    startApp({id: "12345-test-user", first_name: "تست", last_name: "کاربر"}); 
+                    startApp({id: "319237991", first_name: "Amir", last_name: "Hoseinabadi"}); 
                 }
             } catch (error) { 
                 console.error("Could not initialize Telegram Web App:", error);
@@ -288,7 +313,7 @@
                 }
             } catch (error) {
                 console.error("Error fetching tickets via worker:", error);
-                showNotification(`خطا در دریافت تیکت‌ها: ${error.message}`, false);
+                // showNotification(`خطا در دریافت تیکت‌ها: ${error.message}`, false);
             }
         }
 
@@ -359,13 +384,21 @@
         function renderMessage(data) {
             const isUser = data.sender === 'user';
             const messageClass = isUser ? 'message-user' : 'message-admin';
+            const containerClass = isUser ? 'items-start' : 'items-end';
+            const nameAlign = isUser ? 'text-right' : 'text-left';
+            const nameColor = isUser ? 'text-purple-300' : 'text-gray-400';
+            const senderName = isUser ? telegramUserName : (currentTicketData ? departmentMap[currentTicketData.department] : 'پشتیبانی');
             const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
             
-            return `<div class="flex flex-col ${isUser ? 'items-end' : 'items-start'}">
-                        <div class="message-bubble ${messageClass}">
-                            <p class="whitespace-pre-wrap text-sm">${data.text}</p>
-                        </div>
-                        <span class="message-time px-2">${time}</span>
+            let messageContent = data.text ? `<p class="whitespace-pre-wrap text-sm">${data.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-300 underline">$1</a>')}</p>` : '';
+            if (data.imageUrl) {
+                messageContent += `<a href="${data.imageUrl}" target="_blank"><img src="${data.imageUrl}" class="rounded-lg max-w-xs mt-2" alt="تصویر پیوست شده"></a>`;
+            }
+
+            return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md w-full">
+                        <p class="sender-name ${nameAlign} ${nameColor}">${senderName}</p>
+                        <div class="message-bubble ${messageClass}">${messageContent}</div>
+                        <span class="message-time px-2 self-${isUser ? 'start' : 'end'}">${time}</span>
                     </div>`;
         }
 
@@ -409,7 +442,7 @@
                 }
             } catch (error) {
                 console.error("Error fetching messages:", error);
-                showNotification(error.message, false);
+                // showNotification(error.message, false);
             }
         }
 
@@ -428,6 +461,44 @@
                 currentTicketId = null;
                 currentTicketData = null;
             }, 300);
+        }
+
+        async function sendMessage(text, imageUrl = null) {
+            if (!currentTicketId || (!text && !imageUrl)) return;
+
+            const payload = {
+                ticket_id: currentTicketId,
+                sender: 'user',
+                text: text,
+                imageUrl: imageUrl
+            };
+
+            const submitButton = replyForm.querySelector('button[type="submit"]');
+            const originalButtonContent = submitButton.innerHTML;
+            submitButton.disabled = true;
+
+            try {
+                const response = await fetch(`${WORKER_URL}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                 if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'خطا در ارسال پیام');
+                }
+                if(text) {
+                    replyMessageInput.value = '';
+                    replyMessageInput.style.height = 'auto';
+                }
+                await fetchMessages(currentTicketId);
+            } catch (error) {
+                console.error("Error sending message:", error);
+                showNotification(error.message, false);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonContent;
+            }
         }
 
         const handleNewTicketSubmit = async () => {
@@ -468,34 +539,41 @@
             }
         };
         
-        replyForm.addEventListener('submit', async (e) => {
+        replyForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const messageText = replyMessageInput.value.trim();
-            if (messageText === '' || !currentTicketId) return;
-            const submitButton = e.target.querySelector('button[type="submit"]');
-            const originalButtonContent = submitButton.innerHTML;
-            submitButton.disabled = true;
+            sendMessage(replyMessageInput.value.trim());
+        });
 
-            try {
-                const response = await fetch(`${WORKER_URL}/messages`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ticket_id: currentTicketId, sender: 'user', text: messageText }),
-                });
-                 if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.error || 'خطا در ارسال پیام');
+        attachFileBtn.addEventListener('click', () => {
+            fileUploadInput.click();
+        });
+
+        fileUploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file || !currentTicketId) return;
+
+            const filePath = `ticket_attachments/${currentTicketId}/${new Date().getTime()}_${file.name}`;
+            const uploadTask = storage.ref(filePath).put(file);
+            showNotification('در حال آپلود عکس...');
+
+            uploadTask.on('state_changed', 
+                (snapshot) => { /* can be used for progress bar */ }, 
+                (error) => { 
+                    console.error("Upload failed:", error); 
+                    showNotification('آپلود عکس با خطا مواجه شد.', false);
+                }, 
+                () => {
+                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        sendMessage(null, downloadURL);
+                        showNotification('عکس با موفقیت ارسال شد.');
+                    });
                 }
-                replyMessageInput.value = '';
-                replyMessageInput.style.height = 'auto';
-                await fetchMessages(currentTicketId);
-            } catch (error) {
-                console.error("Error sending message:", error);
-                showNotification(error.message, false);
-            } finally {
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalButtonContent;
-            }
+            );
+            e.target.value = ''; // Reset input
+        });
+
+        emojiBtn.addEventListener('click', () => {
+            showNotification('این قابلیت به زودی اضافه می‌شود.', false);
         });
 
         replyMessageInput.addEventListener('input', () => {
@@ -521,4 +599,4 @@
         
     </script>
 </body>
-</html>
+</ht

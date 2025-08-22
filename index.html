@@ -63,12 +63,12 @@
         .message-user {
             background-color: var(--brand-user-message);
             color: white;
-            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px; /* Tail points outwards (right) */
         }
         .message-admin {
             background-color: var(--brand-admin-message);
             color: white;
-            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 4px; /* Tail points outwards (left) */
         }
         .sender-name {
             font-size: 0.8rem;
@@ -385,9 +385,8 @@
         function renderMessage(data) {
             const isUser = data.sender === 'user';
             const messageClass = isUser ? 'message-user' : 'message-admin';
-            const containerClass = isUser ? 'items-start' : 'items-end'; // User left, Admin right
+            const containerClass = isUser ? 'self-start' : 'self-end'; // User right, Admin left
             const nameAlign = isUser ? 'text-right' : 'text-left';
-            const nameColor = isUser ? 'text-blue-300' : 'text-gray-400';
             const senderName = isUser ? telegramUserName : (currentTicketData ? departmentMap[currentTicketData.department] : 'پشتیبانی');
             const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
             
@@ -396,7 +395,7 @@
                 messageContent += `<a href="${data.imageUrl}" target="_blank"><img src="${data.imageUrl}" class="rounded-lg max-w-xs mt-2" alt="تصویر پیوست شده"></a>`;
             }
 
-            return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md w-full">
+            return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md">
                         <p class="sender-name ${nameAlign}" style="color: ${isUser ? '#82aaff' : '#a2a2a2'}">${senderName}</p>
                         <div class="message-bubble ${messageClass}">${messageContent}</div>
                         <span class="message-time px-2 self-${isUser ? 'start' : 'end'}">${time}</span>
@@ -600,4 +599,4 @@
         
     </script>
 </body>
-</ht
+</html>

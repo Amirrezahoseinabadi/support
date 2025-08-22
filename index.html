@@ -385,7 +385,7 @@
         function renderMessage(data) {
             const isUser = data.sender === 'user';
             const messageClass = isUser ? 'message-user' : 'message-admin';
-            const containerClass = isUser ? 'self-start' : 'self-end'; // User right, Admin left
+            const containerClass = isUser ? 'self-end' : 'self-start'; // User right, Admin left
             const nameAlign = isUser ? 'text-right' : 'text-left';
             const senderName = isUser ? telegramUserName : (currentTicketData ? departmentMap[currentTicketData.department] : 'پشتیبانی');
             const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
@@ -398,7 +398,7 @@
             return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md">
                         <p class="sender-name ${nameAlign}" style="color: ${isUser ? '#82aaff' : '#a2a2a2'}">${senderName}</p>
                         <div class="message-bubble ${messageClass}">${messageContent}</div>
-                        <span class="message-time px-2 self-${isUser ? 'start' : 'end'}">${time}</span>
+                        <span class="message-time px-2 self-${isUser ? 'end' : 'start'}">${time}</span>
                     </div>`;
         }
 
@@ -599,4 +599,4 @@
         
     </script>
 </body>
-</html>
+</ht

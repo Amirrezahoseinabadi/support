@@ -10,6 +10,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <!-- Emoji Picker Library -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -110,6 +112,20 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
 
+        /* Emoji Picker Styles */
+        emoji-picker {
+            --background: var(--brand-secondary-bg);
+            --border-color: var(--brand-dark-blue);
+            --text-color: var(--brand-text-primary);
+            --secondary-text-color: var(--brand-text-secondary);
+            --hover-background: var(--brand-dark-blue);
+            --indicator-color: var(--brand-light-blue);
+            --border-radius: 12px;
+            width: 100%;
+            max-width: 340px;
+            height: 350px;
+        }
+
         /* Glassmorphism Modal Styles */
         #rules-modal-backdrop {
             background-color: rgba(10, 20, 30, 0.5);
@@ -117,9 +133,7 @@
             -webkit-backdrop-filter: blur(8px);
         }
         #rules-modal-content {
-            /* UPDATED: Added a subtle gradient background */
             background: linear-gradient(135deg, rgba(50, 70, 110, 0.7), rgba(25, 45, 75, 0.8));
-            /* UPDATED: A slightly brighter border to enhance the glass edge */
             border: 1px solid rgba(200, 210, 230, 0.4);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
             backdrop-filter: blur(15px);
@@ -131,7 +145,7 @@
             text-align: right;
         }
         .rules-content pre {
-            background-color: rgba(26, 46, 64, 0.7); /* --brand-dark-blue with opacity */
+            background-color: rgba(26, 46, 64, 0.7);
             padding: 1rem;
             border-radius: 0.5rem;
             white-space: pre-wrap;
@@ -171,7 +185,14 @@
                 <!-- New Ticket View -->
                 <div id="new-ticket-view" class="p-4 hidden">
                     <form id="new-ticket-form" class="space-y-4">
-                        <div><label for="department" class="block mb-2 text-sm font-medium">دپارتمان</label><select id="department" name="department" class="form-select"><option value="general">سوالات متفرقه</option><option value="technical">پشتیبانی فنی</option><option value="sales">بخش فروش</option></select></div>
+                        <div>
+                            <label for="department" class="block mb-2 text-sm font-medium">دپارتمان</label>
+                            <select id="department" name="department" class="form-select">
+                                <option value="general">سوالات متفرقه</option>
+                                <option value="technical">واحد فنی</option>
+                                <option value="sales">واحد فروش</option>
+                            </select>
+                        </div>
                         <div><label for="subject" class="block mb-2 text-sm font-medium">موضوع</label><input type="text" id="subject" name="subject" class="form-input" placeholder="موضوع تیکت خود را وارد کنید" required></div>
                         <div><label for="message" class="block mb-2 text-sm font-medium">متن پیام</label><textarea id="message" name="message" rows="6" class="form-textarea" placeholder="مشکل یا سوال خود را با جزئیات کامل بنویسید..." required></textarea></div>
                         <div class="flex justify-between items-center pt-2">
@@ -188,12 +209,18 @@
         </div>
 
         <!-- Conversation View -->
-        <div id="conversation-view" class="absolute top-0 right-0 w-full h-full flex-col transform translate-x-full transition-transform duration-300 ease-in-out z-20 hidden">
+        <div id="conversation-view" class="absolute top-0 right-0 w-full h-full flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out z-20 hidden">
              <header class="p-3 flex items-center sticky top-0 z-10" style="background-color: var(--brand-secondary-bg);">
                 <button id="back-to-tickets" class="p-2 rounded-full transform rotate-180"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></button>
                 <h2 id="conversation-header" class="text-white font-bold mr-2">گفتگو</h2>
              </header>
             <div id="conversation-container" class="p-4 space-y-2 flex flex-col flex-grow overflow-y-auto"></div>
+            
+            <!-- Emoji Picker Container -->
+            <div id="emoji-picker-container" class="absolute bottom-[65px] right-2 z-30 hidden">
+                <emoji-picker></emoji-picker>
+            </div>
+
              <div id="reply-box" class="p-2 sticky bottom-0 border-t" style="border-color: var(--brand-dark-blue);">
                 <form id="reply-form" class="flex items-center space-x-2 space-x-reverse">
                     <button type="button" id="attach-file-btn" class="icon-button">
@@ -221,7 +248,7 @@
         </div>
     </div>
     
-    <!-- NEW: Glassmorphism Rules Modal -->
+    <!-- Glassmorphism Rules Modal -->
     <div id="rules-modal-backdrop" class="fixed inset-0 z-40 hidden items-center justify-center p-4">
         <div id="rules-modal-content" class="w-full max-w-md p-6 text-white">
             <h2 class="text-xl font-bold mb-4 text-center">❗️ قوانین ارسال تیکت</h2>
@@ -294,8 +321,9 @@
         const emojiBtn = document.getElementById('emoji-btn');
         const rulesModal = document.getElementById('rules-modal-backdrop');
         const acceptRulesBtn = document.getElementById('accept-rules-btn');
+        const emojiPickerContainer = document.getElementById('emoji-picker-container');
 
-        const departmentMap = { general: 'سوالات متفرقه', technical: 'پشتیبانی فنی', sales: 'بخش فروش' };
+        const departmentMap = { general: 'سوالات متفرقه', technical: 'واحد فنی', sales: 'واحد فروش', sales: 'واحد استعلام قیمت', sales: 'واحد بازاریابی', sales: 'ایده ها-پیشنهادات' };
 
         // --- UI Functions ---
         function showNotification(message, success = true) {
@@ -393,7 +421,6 @@
         }
         
         async function deleteTicket(ticketId) {
-            // Replaced window.confirm with a custom modal if needed, but for now it's fine.
             if (confirm('آیا از حذف این تیکت مطمئن هستید؟')) {
                 try {
                     const response = await fetch(`${WORKER_URL}/tickets?ticket_id=${ticketId}`, { method: 'DELETE' });
@@ -601,10 +628,21 @@
             }
         };
         
+        function insertTextAtCursor(input, textToInsert) {
+            const startPos = input.selectionStart;
+            const endPos = input.selectionEnd;
+            const text = input.value;
+            input.value = text.substring(0, startPos) + textToInsert + text.substring(endPos);
+            const newCursorPos = startPos + textToInsert.length;
+            input.selectionStart = newCursorPos;
+            input.selectionEnd = newCursorPos;
+            input.focus();
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
         // --- Event Listeners ---
         navButtons.ticketsList.addEventListener('click', () => showView('ticketsList'));
         
-        // MODIFIED: Show rules modal before showing the new ticket form
         navButtons.newTicket.addEventListener('click', () => {
             if (hasOpenTicket) { 
                 showModal('امکان ایجاد تیکت جدید وجود ندارد', 'شما در حال حاضر یک تیکت باز دارید. لطفا تا زمان بسته شدن آن توسط پشتیبانی منتظر بمانید.', true);
@@ -614,7 +652,6 @@
             }
         });
 
-        // NEW: Event listener for accepting rules
         acceptRulesBtn.addEventListener('click', () => {
             rulesModal.classList.add('hidden');
             rulesModal.classList.remove('flex');
@@ -634,35 +671,22 @@
         });
 
         attachFileBtn.addEventListener('click', () => {
-            fileUploadInput.click();
+            showNotification('این قابلیت بزودی اضافه میشود', false);
         });
 
-        fileUploadInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file || !currentTicketId) return;
-
-            const filePath = `ticket_attachments/${currentTicketId}/${new Date().getTime()}_${file.name}`;
-            const uploadTask = storage.ref(filePath).put(file);
-            showNotification('در حال آپلود عکس...');
-
-            uploadTask.on('state_changed', 
-                (snapshot) => { /* progress */ }, 
-                (error) => { 
-                    console.error("Upload failed:", error); 
-                    showNotification('آپلود عکس با خطا مواجه شد.', false);
-                }, 
-                () => {
-                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                        sendMessage(null, downloadURL);
-                        showNotification('عکس با موفقیت ارسال شد.');
-                    });
-                }
-            );
-            e.target.value = '';
+        emojiBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            emojiPickerContainer.classList.toggle('hidden');
         });
 
-        emojiBtn.addEventListener('click', () => {
-            showNotification('این قابلیت به زودی اضافه می‌شود.', false);
+        document.querySelector('emoji-picker').addEventListener('emoji-click', event => {
+            insertTextAtCursor(replyMessageInput, event.detail.unicode);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!emojiPickerContainer.contains(e.target) && e.target !== emojiBtn && !emojiBtn.contains(e.target)) {
+                emojiPickerContainer.classList.add('hidden');
+            }
         });
 
         replyMessageInput.addEventListener('input', () => {

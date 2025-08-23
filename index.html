@@ -6,9 +6,11 @@
     <title>پشتیبانی</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <!-- Emoji Picker Library -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -195,6 +197,7 @@
                             </div>
                             <textarea id="message" name="message" rows="6" class="form-textarea" placeholder="مشکل یا سوال خود را با جزئیات کامل بنویسید..." required></textarea>
                         </div>
+                        <!-- AI Suggestion Box -->
                         <div id="ai-suggestion-box" class="hidden p-3 mt-2 rounded-lg" style="background-color: var(--brand-secondary-bg); border: 1px solid var(--brand-admin-message);">
                             <h4 class="text-sm font-bold text-white mb-2">✨ پیشنهاد هوش مصنوعی</h4>
                             <div class="mb-3">
@@ -216,6 +219,7 @@
                     </form>
                 </div>
             </main>
+            <!-- Navigation bar updated: text removed, buttons take up half width each -->
             <nav id="main-nav" class="nav-bar h-[80px] flex items-center justify-around">
                 <button id="nav-tickets-list" class="nav-button active flex flex-col items-center space-y-1 w-1/2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg><span class="text-xs">تیکت‌ها</span></button>
                 <button id="nav-new-ticket" class="nav-button flex flex-col items-center space-y-1 w-1/2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="text-xs">تیکت جدید</span></button>
@@ -248,6 +252,7 @@
         </div>
     </div>
 
+    <!-- Info Modal -->
     <div id="info-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4 transition-opacity duration-300">
         <div class="glass-modal-content p-6 w-full max-w-md flex flex-col max-h-[90vh]">
             <h3 class="text-xl font-bold mb-4 text-white text-center">❗️ راهنمای ارسال تیکت</h3>
@@ -296,11 +301,8 @@
         };
         
         // --- AI ENHANCEMENT CONSTANTS ---
-        const GPT_API_KEY = '7135477742:xpbZ0YO92loHaRu@Api_ManagerRoBot';
-        // ⚠️ SECURITY WARNING: Exposing API keys on the client-side is highly insecure.
-        // This key should be stored on a secure backend (like a Cloudflare Worker) and not here.
-        // Replace the URL below with your actual AI processing endpoint.
-        const AI_WORKER_URL = 'https://support-api-worker.amiruserbot7.workers.dev'; // <-- ❗️ REPLACE THIS
+        const GPT_API_KEY = '7135477742:xpbZ0YO92loHaRu@Api_ManagerRoBot'; 
+        const AI_ENHANCE_ENDPOINT = '/enhance'; 
 
         firebase.initializeApp(firebaseConfig);
         const storage = firebase.storage();
@@ -455,22 +457,34 @@
             ticketsPollingInterval = setInterval(fetchTickets, 5000);
         }
         
+        // [MODIFIED] Improved error handling for delete operation
         async function deleteTicket(ticketId) {
             if (confirm('آیا از حذف این تیکت مطمئن هستید؟')) {
                 try {
                     const response = await fetch(`${WORKER_URL}/tickets?ticket_id=${ticketId}`, { method: 'DELETE' });
-                     if (!response.ok) {
-                        const errorResult = await response.json();
-                        throw new Error(errorResult.error || 'خطا در حذف تیکت');
+                    
+                    if (!response.ok) {
+                        // Try to get a meaningful error message from the worker
+                        let errorMsg = 'خطا در حذف تیکت';
+                        try {
+                            const errorResult = await response.json();
+                            errorMsg = errorResult.error || errorMsg;
+                        } catch (e) {
+                            // If the response is not JSON, use the status text
+                            errorMsg = await response.text() || errorMsg;
+                        }
+                        throw new Error(errorMsg);
                     }
+
                     const result = await response.json();
                     if (result.success) {
                         showNotification('تیکت با موفقیت حذف شد.');
                         fetchTickets(); 
                     } else {
-                        throw new Error(result.error);
+                        throw new Error(result.error || 'حذف تیکت با خطای ناشناخته مواجه شد');
                     }
                 } catch (error) {
+                    // This will now catch network errors like "Failed to fetch" and server errors
                     showNotification(`حذف تیکت با خطا مواجه شد: ${error.message}`, false);
                     console.error("Error deleting ticket:", error);
                 }
@@ -836,7 +850,7 @@ Original message:
 "${userInput}"`;
 
             try {
-                const response = await fetch(AI_WORKER_URL, {
+                const response = await fetch(`${WORKER_URL}${AI_ENHANCE_ENDPOINT}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: prompt, apiKey: GPT_API_KEY }),
@@ -846,12 +860,8 @@ Original message:
                     const errorData = await response.json().catch(() => ({ error: 'خطای ناشناخته از سرور هوش مصنوعی' }));
                     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
                 }
-
-                const resultText = await response.text();
-                const jsonMatch = resultText.match(/\{[\s\S]*\}/);
-                if (!jsonMatch) throw new Error("پاسخ دریافتی از هوش مصنوعی در فرمت صحیحی نبود.");
                 
-                const aiData = JSON.parse(jsonMatch[0]);
+                const aiData = await response.json();
 
                 if (aiData.suggested_subject && aiData.improved_message) {
                     displayAISuggestions(aiData.suggested_subject, aiData.improved_message);
@@ -958,4 +968,3 @@ Original message:
     </script>
 </body>
 </html>
-

@@ -15,6 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* New Color Palette Inspired by Logo */
             --brand-dark-blue: #1A2E40;
             --brand-light-blue: #0091D5;
             --brand-secondary-bg: #274059;
@@ -48,6 +49,7 @@
             border-color: var(--brand-light-blue);
         }
         
+        /* New Chat Styles */
         #conversation-container {
             background-color: #0e1621;
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
@@ -63,12 +65,12 @@
         .message-user {
             background-color: var(--brand-user-message);
             color: white;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: 4px; /* Tail points outwards (right) */
         }
         .message-admin {
             background-color: var(--brand-admin-message);
             color: white;
-            border-bottom-left-radius: 4px;
+            border-bottom-left-radius: 4px; /* Tail points outwards (left) */
         }
         .sender-name {
             font-size: 0.8rem;
@@ -83,6 +85,7 @@
         }
         #conversation-view.is-open { transform: translateX(0%); }
 
+        /* Reply box styles */
         #reply-box {
             background-color: var(--brand-secondary-bg);
         }
@@ -105,18 +108,14 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: background-color 0.2s, color 0.2s, transform 0.2s;
         }
         .icon-button:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
-        .icon-button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
 
+        /* Glassmorphism Modal Style */
         .glass-modal-content {
-            background: rgba(39, 64, 89, 0.6);
+            background: rgba(39, 64, 89, 0.6); /* --brand-secondary-bg with opacity */
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -124,34 +123,31 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
         
+        /* Emoji Picker Style */
         #emoji-picker-container emoji-picker {
             --background: var(--brand-secondary-bg);
             --border-color: var(--brand-dark-blue);
             --text-color: var(--brand-text-primary);
             --secondary-text-color: var(--brand-text-secondary);
         }
-        
-        /* --- NEW: AI Suggestion Box --- */
-        #ai-suggestion-box {
-            background-color: rgba(14, 22, 33, 0.8);
-            backdrop-filter: blur(5px);
-            border: 1px solid var(--brand-text-secondary);
-        }
 
-        /* --- NEW: AI Button Animation --- */
-        @keyframes pulse-attention {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(0, 145, 213, 0.7);
-            }
-            70% {
-                transform: scale(1.1);
-                box-shadow: 0 0 0 10px rgba(0, 145, 213, 0);
-            }
+        /* Rating Stars Style - CORRECTED */
+        .rating-stars {
+            direction: ltr; 
         }
-        #ai-assist-btn:not(:disabled) {
-            animation: pulse-attention 2s infinite;
-            color: var(--brand-light-blue);
+        .rating-star {
+            cursor: pointer;
+            color: #6b7280; 
+            transition: color 0.2s;
+        }
+        .rating-stars:hover .rating-star {
+            color: #f59e0b;
+        }
+        .rating-stars .rating-star:hover ~ .rating-star {
+            color: #6b7280;
+        }
+        .rating-stars[data-rated="true"] .rating-star {
+            cursor: default;
         }
     </style>
 </head>
@@ -161,7 +157,7 @@
 
     <div id="loading-view" class="flex flex-col items-center justify-center h-full text-center p-4">
         <svg class="animate-spin h-10 w-10 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-        <p class="mt-4 text-white text-sm">در حال احراز هویت و بارگذاری تنظیمات...</p>
+        <p class="mt-4 text-white text-sm">در حال احراز هویت...</p>
     </div>
 
     <div id="main-app-container" class="hidden h-full flex-col relative w-full">
@@ -182,28 +178,22 @@
                         <div>
                             <label for="department" class="block mb-2 text-sm font-medium">دپارتمان</label>
                             <select id="department" name="department" class="form-select">
-                                <!-- Options are loaded dynamically -->
+                                <option value="general">سوالات متفرقه</option>
+                                <option value="technical">واحد فنی</option>
+                                <option value="sales">واحد فروش</option>
+                                <option value="marketing">واحد بازاریابی</option>
+                                <option value="ideas">ایده ها و پیشنهادات</option>
                             </select>
-                            <p id="response-time-display" class="text-xs text-gray-400 mt-2 h-4 transition-opacity duration-300"></p>
                         </div>
-                        <div>
-                            <label for="subject" class="block mb-2 text-sm font-medium">موضوع</label>
-                            <input type="text" id="subject" name="subject" class="form-input" placeholder="موضوع تیکت خود را وارد کنید" required>
-                        </div>
-                        <div class="relative">
-                            <label for="message" class="block mb-2 text-sm font-medium">متن پیام</label>
-                            <button type="button" id="ai-assist-btn" class="icon-button absolute top-9 left-2" disabled title="بهبود متن با هوش مصنوعی">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v1.046A4.993 4.993 0 0117 8c0 .346-.022.686-.065 1.016l.94 1.88a1 1 0 01-.447 1.342l-1.341.671a4.993 4.993 0 01-5.188 0l-1.341-.671a1 1 0 01-.447-1.342l.94-1.88A4.993 4.993 0 013 8c0-2.468 1.825-4.523 4.188-4.934D7.165 3.34 7 3.694V8a1 1 0 11-2 0V2a1 1 0 011-1h2.046a1 1 0 01.954.691 3.001 3.001 0 005.051-.042A1 1 0 0111.3 1.046zM10 12a4 4 0 100 8 4 4 0 000-8z" clip-rule="evenodd" /></svg>
-                            </button>
-                            <textarea id="message" name="message" rows="6" class="form-textarea" placeholder="مشکل یا سوال خود را با جزئیات کامل بنویسید..." required></textarea>
-                            <div id="ai-suggestion-box" class="hidden mt-2 p-3 rounded-lg border text-sm"></div>
-                        </div>
+                        <div><label for="subject" class="block mb-2 text-sm font-medium">موضوع</label><input type="text" id="subject" name="subject" class="form-input" placeholder="موضوع تیکت خود را وارد کنید" required></div>
+                        <div><label for="message" class="block mb-2 text-sm font-medium">متن پیام</label><textarea id="message" name="message" rows="6" class="form-textarea" placeholder="مشکل یا سوال خود را با جزئیات کامل بنویسید..." required></textarea></div>
                         <div class="flex justify-between items-center pt-2">
                             <button type="button" id="submit-new-ticket-btn" class="text-white px-4 py-2 rounded-md w-full disabled:opacity-50" style="background-color: var(--brand-light-blue);">ارسال</button>
                         </div>
                     </form>
                 </div>
             </main>
+            <!-- Navigation bar updated: text removed, buttons take up half width each -->
             <nav id="main-nav" class="nav-bar h-[80px] flex items-center justify-around">
                 <button id="nav-tickets-list" class="nav-button active flex flex-col items-center space-y-1 w-1/2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg><span class="text-xs">تیکت‌ها</span></button>
                 <button id="nav-new-ticket" class="nav-button flex flex-col items-center space-y-1 w-1/2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="text-xs">تیکت جدید</span></button>
@@ -297,17 +287,6 @@
         let hasOpenTicket = false;
         let isSubmitting = false;
 
-        let appConfig = {
-            departments: {
-                "technical": "واحد فنی",
-                "sales": "واحد فروش",
-                "marketing": "واحد بازاریابی",
-                "ideas": "ایده ها و پیشنهادات",
-                "general": "سوالات متفرقه"
-            },
-            responseTimes: {}
-        };
-
         const loadingView = document.getElementById('loading-view');
         const mainAppContainer = document.getElementById('main-app-container');
         const ticketsListView = document.getElementById('tickets-list-view');
@@ -324,19 +303,25 @@
         const conversationHeader = document.getElementById('conversation-header');
         const replyForm = document.getElementById('reply-form');
         const replyMessageInput = document.getElementById('reply-message');
+        const fileUploadInput = document.getElementById('file-upload');
+        const attachFileBtn = document.getElementById('attach-file-btn');
         const emojiBtn = document.getElementById('emoji-btn');
+        
+        // Info Modal Elements
         const infoModal = document.getElementById('info-modal');
         const infoModalCloseBtn = document.getElementById('info-modal-close-btn');
-        const emojiPickerContainer = document.getElementById('emoji-picker-container');
-        
-        const departmentSelect = document.getElementById('department');
-        const responseTimeDisplay = document.getElementById('response-time-display');
-        const messageTextarea = document.getElementById('message');
-        const subjectInput = document.getElementById('subject');
-        const aiAssistBtn = document.getElementById('ai-assist-btn');
-        const aiSuggestionBox = document.getElementById('ai-suggestion-box');
 
-        let departmentMap = {};
+        // Emoji Picker Elements
+        const emojiPickerContainer = document.getElementById('emoji-picker-container');
+        const emojiPicker = document.querySelector('emoji-picker');
+
+        const departmentMap = {
+            general: 'سوالات متفرقه',
+            technical: 'واحد فنی',
+            sales: 'واحد فروش',
+            marketing: 'واحد بازاریابی',
+            ideas: 'ایده ها و پیشنهادات'
+        };
 
         function showNotification(message, success = true) {
             const toast = document.getElementById('notification-toast');
@@ -362,43 +347,14 @@
             document.getElementById('custom-modal').classList.remove('flex');
         });
 
-        async function startApp(user) {
+        function startApp(user) {
             telegramUserId = user.id.toString();
             telegramUserName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'کاربر';
-            await fetchConfig();
             loadingView.classList.add('hidden');
             mainAppContainer.classList.remove('hidden');
             mainAppContainer.classList.add('flex');
             showView('ticketsList');
             listenToTickets();
-        }
-
-        async function fetchConfig() {
-            try {
-                const response = await fetch(`${WORKER_URL}/api/config`);
-                if (!response.ok) throw new Error('Failed to load config');
-                const result = await response.json();
-                if (result.success) {
-                    appConfig = result.data;
-                    departmentMap = appConfig.departments;
-                    populateDepartments();
-                }
-            } catch (error) {
-                console.error("Error fetching config, using fallback:", error);
-                departmentMap = appConfig.departments; // Use hardcoded fallback
-                populateDepartments();
-            }
-        }
-
-        function populateDepartments() {
-            departmentSelect.innerHTML = '';
-            for (const key in departmentMap) {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = departmentMap[key];
-                departmentSelect.appendChild(option);
-            }
-            departmentSelect.dispatchEvent(new Event('change'));
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -438,18 +394,18 @@
             try {
                 const response = await fetch(`${WORKER_URL}/tickets?telegram_id=${telegramUserId}`);
                 if (!response.ok) {
-                    const errorResult = await response.json().catch(() => ({ error: 'خطای ناشناخته' }));
-                    throw new Error(errorResult.error);
+                    const errorResult = await response.json().catch(() => ({ error: 'خطای ناشناخته در سرور' }));
+                    throw new Error(errorResult.error || 'خطا در دریافت تیکت‌ها');
                 }
                 const result = await response.json();
                 if (result.success) {
                     allTicketsData = result.data ? Object.keys(result.data).map(key => ({ id: key, ...result.data[key] })) : [];
                     renderTickets(allTicketsData);
                 } else {
-                    throw new Error(result.error);
+                    throw new Error(result.error || "پاسخ ناموفق از سرور");
                 }
             } catch (error) {
-                console.error("Error fetching tickets:", error);
+                console.error("Error fetching tickets via worker:", error);
             }
         }
 
@@ -459,8 +415,30 @@
             ticketsPollingInterval = setInterval(fetchTickets, 5000);
         }
         
+        async function deleteTicket(ticketId) {
+            if (confirm('آیا از حذف این تیکت مطمئن هستید؟')) {
+                try {
+                    const response = await fetch(`${WORKER_URL}/tickets?ticket_id=${ticketId}`, { method: 'DELETE' });
+                     if (!response.ok) {
+                        const errorResult = await response.json();
+                        throw new Error(errorResult.error || 'خطا در حذف تیکت');
+                    }
+                    const result = await response.json();
+                    if (result.success) {
+                        showNotification('تیکت با موفقیت حذف شد.');
+                        fetchTickets(); 
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (error) {
+                    showNotification(`حذف تیکت با خطا مواجه شد: ${error.message}`, false);
+                    console.error("Error deleting ticket:", error);
+                }
+            }
+        }
+
         function renderTickets(tickets) {
-            hasOpenTicket = tickets.some(ticket => ['open', 'pending_user_reply'].includes(ticket.status));
+            hasOpenTicket = tickets.some(ticket => ['open', 'in-progress', 'answered'].includes(ticket.status));
             if (tickets.length === 0) {
                 ticketsContainer.innerHTML = '';
                 noTicketsMessage.classList.remove('hidden');
@@ -469,40 +447,143 @@
                 const sortedTickets = tickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 ticketsContainer.innerHTML = sortedTickets.map(renderTicket).join('');
                 document.querySelectorAll('.ticket-card').forEach(card => { 
-                    card.addEventListener('click', () => openConversation(card.dataset.id)); 
+                    card.addEventListener('click', (e) => {
+                        if (e.target.closest('.rating-stars')) return;
+                        openConversation(card.dataset.id)
+                    }); 
+                });
+                document.querySelectorAll('.delete-ticket-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); deleteTicket(btn.dataset.id); }); });
+                
+                document.querySelectorAll('.rating-star').forEach(star => {
+                    star.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const ticketId = star.dataset.id;
+                        const ratingValue = star.dataset.ratingValue;
+                        submitRating(ticketId, parseInt(ratingValue));
+                    });
                 });
             }
         }
         
+        async function submitRating(ticketId, rating) {
+            const starContainer = document.querySelector(`.rating-stars[data-ticket-id="${ticketId}"]`);
+            if (!starContainer || starContainer.dataset.submitting === 'true' || starContainer.dataset.rated === 'true') return;
+
+            starContainer.dataset.submitting = 'true';
+            starContainer.style.opacity = '0.5';
+
+            try {
+                const response = await fetch(`${WORKER_URL}/tickets/${ticketId}/rate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rating: rating, telegram_id: telegramUserId }),
+                });
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'خطا در ثبت امتیاز');
+                }
+                showNotification('امتیاز شما با موفقیت ثبت شد.');
+                const ticket = allTicketsData.find(t => t.id === ticketId);
+                if (ticket) {
+                    ticket.rating = rating;
+                }
+                renderTickets(allTicketsData);
+            } catch (error) {
+                showNotification(`ثبت امتیاز با خطا مواجه شد: ${error.message}`, false);
+                delete starContainer.dataset.submitting;
+                starContainer.style.opacity = '1';
+            }
+        }
+
         function renderTicket(data) {
-            const statusText = {open: 'باز', pending_user_reply: 'در انتظار پاسخ', closed: 'بسته شده'}[data.status] || data.status;
+            const status = data.status;
+            const statusText = {open: 'باز', 'in-progress': 'در حال بررسی', answered: 'پاسخ داده شد', closed: 'بسته شده'}[status] || status;
             const creationDate = new Date(data.created_at).toLocaleString('fa-IR', { dateStyle: 'short', timeStyle: 'short' });
             const departmentName = departmentMap[data.department] || data.department;
+            const deleteButton = status === 'closed' ? `<button data-id="${data.id}" class="delete-ticket-btn p-1"><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>` : '';
 
-            return `<div class="ticket-card p-4 rounded-lg shadow-lg cursor-pointer" style="background-color: var(--brand-secondary-bg);" data-id="${data.id}">
+            let ratingSection = '';
+            if (status === 'closed') {
+                if (data.rating && data.rating > 0) {
+                    let stars = '';
+                    for (let i = 1; i <= 5; i++) {
+                        const starColor = i <= data.rating ? 'text-amber-400' : 'text-gray-600';
+                        stars += `<svg class="w-5 h-5 ${starColor}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
+                    }
+                    ratingSection = `
+                        <div class="mt-3 pt-3 border-t text-center" style="border-color: var(--brand-dark-blue);">
+                            <p class="text-xs text-gray-400 mb-1">امتیاز شما:</p>
+                            <div class="flex justify-center">${stars}</div>
+                        </div>`;
+                } else {
+                    ratingSection = `
+                        <div class="mt-3 pt-3 border-t text-center" style="border-color: var(--brand-dark-blue);">
+                            <p class="text-xs text-gray-400 mb-2">به کیفیت پاسخ‌دهی امتیاز دهید:</p>
+                            <div class="rating-stars flex flex-row-reverse justify-center" data-ticket-id="${data.id}">
+                                ${[5, 4, 3, 2, 1].map(i => `<svg data-id="${data.id}" data-rating-value="${i}" class="rating-star w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`).join('')}
+                            </div>
+                        </div>`;
+                }
+            }
+            
+            return `<div class="ticket-card p-4 rounded-lg shadow-lg" style="background-color: var(--brand-secondary-bg);" data-id="${data.id}">
                         <div class="flex justify-between items-start">
                             <p class="font-bold text-md">${data.subject}</p>
                             <span class="text-xs px-2 py-1 rounded-full" style="background-color: var(--brand-dark-blue);">${statusText}</span>
                         </div>
                         <div class="flex justify-between items-center text-xs mt-4 pt-2 border-t" style="border-color: var(--brand-dark-blue);">
                             <span style="color: var(--brand-text-secondary);">${departmentName}</span>
-                            <span style="color: var(--brand-text-secondary);">${creationDate}</span>
+                            <div class="flex items-center">
+                                ${deleteButton}
+                                <span style="color: var(--brand-text-secondary);">${creationDate}</span>
+                            </div>
                         </div>
+                        ${ratingSection}
                     </div>`;
         }
         
         function renderMessage(data) {
             const isUser = data.sender === 'user';
+            const isAdmin = data.sender === 'admin';
+            const isAI = isAdmin && data.source === 'ai';
+
             const messageClass = isUser ? 'message-user' : 'message-admin';
             const containerClass = isUser ? 'self-start' : 'self-end'; 
             const nameAlign = isUser ? 'text-right' : 'text-left';
-            const senderName = isUser ? telegramUserName : (departmentMap[currentTicketData.department] || 'پشتیبانی');
+            
+            let senderName = '';
+            if (isUser) {
+                senderName = telegramUserName;
+            } else if (isAI) {
+                senderName = 'دستیار هوش مصنوعی';
+            } else {
+                senderName = currentTicketData ? departmentMap[currentTicketData.department] : 'پشتیبانی';
+            }
+
             const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
             
+            let messageContent = data.text ? `<p class="whitespace-pre-wrap text-sm">${data.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-300 underline">$1</a>')}</p>` : '';
+            if (data.imageUrl) {
+                messageContent += `<a href="${data.imageUrl}" target="_blank"><img src="${data.imageUrl}" class="rounded-lg max-w-xs mt-2" alt="تصویر پیوست شده"></a>`;
+            }
+
+            let humanRequestButton = '';
+            if (isAI) {
+                humanRequestButton = `
+                    <div class="mt-3 pt-2 border-t border-white/10">
+                        <p class="text-xs text-gray-400 mb-2">اگر این پیام مشکلتان را برطرف نکرد:</p>
+                        <button class="request-human-btn text-xs w-full text-center py-2 px-3 rounded-lg border border-sky-500 text-sky-400 hover:bg-sky-500 hover:text-white transition-colors duration-200" data-ticket-id="${currentTicketId}">
+                            برای اتصال به کارشناس کلیک کنید
+                        </button>
+                    </div>
+                `;
+            }
+
             return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md">
                         <p class="sender-name ${nameAlign}" style="color: ${isUser ? '#82aaff' : '#a2a2a2'}">${senderName}</p>
                         <div class="message-bubble ${messageClass}">
-                            <p class="whitespace-pre-wrap text-sm">${data.text}</p>
+                            ${messageContent}
+                            ${humanRequestButton}
                         </div>
                         <span class="message-time px-2 w-full ${nameAlign}">${time}</span>
                     </div>`;
@@ -511,10 +592,16 @@
         function openConversation(ticketId) {
             currentTicketId = ticketId;
             currentTicketData = allTicketsData.find(t => t.id === ticketId);
-            if (!currentTicketData) return;
+            if (!currentTicketData) {
+                console.error("Could not find ticket data for ID:", ticketId);
+                showNotification("خطا: اطلاعات تیکت یافت نشد.", false);
+                return;
+            }
             
-            conversationView.classList.remove('hidden', 'translate-x-full');
+            conversationView.classList.remove('hidden');
             conversationView.classList.add('flex');
+            setTimeout(() => { conversationView.classList.remove('translate-x-full'); }, 10);
+
             conversationHeader.textContent = currentTicketData.subject;
             listenToMessages(ticketId);
         }
@@ -523,11 +610,20 @@
             if (!ticketId) return;
             try {
                 const response = await fetch(`${WORKER_URL}/messages?ticket_id=${ticketId}`);
+                if (!response.ok) throw new Error("خطا در دریافت پیام‌ها");
                 const result = await response.json();
                 if (result.success) {
                     const messagesData = result.data;
-                    const isScrolledToBottom = conversationContainer.scrollHeight - conversationContainer.clientHeight <= conversationContainer.scrollTop + 1;
-                    conversationContainer.innerHTML = messagesData ? Object.values(messagesData).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(renderMessage).join('') : '';
+                    const currentScroll = conversationContainer.scrollTop;
+                    const maxScroll = conversationContainer.scrollHeight - conversationContainer.clientHeight;
+                    const isScrolledToBottom = maxScroll - currentScroll < 50;
+
+                    conversationContainer.innerHTML = '';
+                    if (messagesData) {
+                        conversationContainer.innerHTML = Object.values(messagesData).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(renderMessage).join('');
+                        attachHumanRequestListeners();
+                    }
+                    
                     if(isScrolledToBottom) {
                         conversationContainer.scrollTop = conversationContainer.scrollHeight;
                     }
@@ -535,6 +631,43 @@
             } catch (error) {
                 console.error("Error fetching messages:", error);
             }
+        }
+
+        function attachHumanRequestListeners() {
+            document.querySelectorAll('.request-human-btn').forEach(button => {
+                if (button.dataset.listenerAttached) return;
+                button.dataset.listenerAttached = 'true';
+
+                button.addEventListener('click', async (e) => {
+                    const ticketId = e.target.dataset.ticketId;
+                    if (!ticketId) return;
+                    
+                    e.target.disabled = true;
+                    e.target.textContent = 'در حال ارسال...';
+
+                    try {
+                        const response = await fetch(`${WORKER_URL}/tickets/${ticketId}/request-human`, {
+                            method: 'POST'
+                        });
+                        if (!response.ok) {
+                            throw new Error('خطا در ارسال درخواست');
+                        }
+                        const result = await response.json();
+                        if (result.success) {
+                            showNotification('درخواست شما برای اتصال به کارشناس ثبت شد.');
+                            e.target.textContent = 'درخواست ثبت شد';
+                            e.target.classList.add('opacity-50', 'cursor-not-allowed');
+                        } else {
+                            throw new Error(result.error || 'خطا در ثبت درخواست');
+                        }
+                    } catch (error) {
+                        console.error("Error requesting human agent:", error);
+                        showNotification(error.message, false);
+                        e.target.disabled = false;
+                        e.target.textContent = 'برای اتصال به کارشناس کلیک کنید';
+                    }
+                });
+            });
         }
 
         function listenToMessages(ticketId) {
@@ -550,50 +683,79 @@
                 conversationView.classList.add('hidden');
                 conversationView.classList.remove('flex');
                 currentTicketId = null;
+                currentTicketData = null;
             }, 300);
         }
 
-        async function sendMessage(text) {
-            if (!currentTicketId || !text) return;
-            const payload = { ticket_id: currentTicketId, sender: 'user', text };
+        async function sendMessage(text, imageUrl = null) {
+            if (!currentTicketId || (!text && !imageUrl)) return;
+
+            const payload = {
+                ticket_id: currentTicketId,
+                sender: 'user',
+                text: text,
+                imageUrl: imageUrl
+            };
+
             const submitButton = replyForm.querySelector('button[type="submit"]');
+            const originalButtonContent = submitButton.innerHTML;
             submitButton.disabled = true;
+
             try {
-                const response = await fetch(`${WORKER_URL}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error((await response.json()).error);
-                replyMessageInput.value = '';
-                replyMessageInput.style.height = 'auto';
+                const response = await fetch(`${WORKER_URL}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                 if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'خطا در ارسال پیام');
+                }
+                if(text) {
+                    replyMessageInput.value = '';
+                    replyMessageInput.style.height = 'auto';
+                }
                 await fetchMessages(currentTicketId);
             } catch (error) {
+                console.error("Error sending message:", error);
                 showNotification(error.message, false);
             } finally {
                 submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonContent;
             }
         }
 
         const handleNewTicketSubmit = async () => {
             if (isSubmitting) return;
-            const subject = subjectInput.value.trim();
-            const message = messageTextarea.value.trim();
-            const department = departmentSelect.value;
+            const subject = document.getElementById('subject').value.trim();
+            const message = document.getElementById('message').value.trim();
+            const department = document.getElementById('department').value;
             if (!subject || !message) {
                 showNotification("لطفا موضوع و متن پیام را وارد کنید.", false);
                 return;
             }
+
             isSubmitting = true;
             submitNewTicketBtn.disabled = true;
             submitNewTicketBtn.textContent = 'در حال ارسال...';
+
             try {
-                const response = await fetch(`${WORKER_URL}/tickets`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ telegram_id: telegramUserId, user_name: telegramUserName, subject, department, message }) });
-                if (!response.ok) throw new Error((await response.json()).error);
+                const response = await fetch(`${WORKER_URL}/tickets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: telegramUserId, user_name: telegramUserName, subject, department, message }),
+                });
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'خطا در ارسال تیکت');
+                }
                 newTicketForm.reset();
-                aiSuggestionBox.classList.add('hidden');
-                aiAssistBtn.disabled = true;
                 showNotification('تیکت شما با موفقیت ارسال شد.');
                 fetchTickets();
                 setTimeout(() => showView('ticketsList'), 500);
             } catch (error) {
-                showNotification(`خطا: ${error.message}`, false);
+                showNotification(`ارسال تیکت با خطا مواجه شد: ${error.message}`, false);
+                console.error("Error creating ticket:", error);
             } finally {
                 isSubmitting = false;
                 submitNewTicketBtn.disabled = false;
@@ -601,115 +763,71 @@
             }
         };
         
-        async function analyzeMessage() {
-            const text = messageTextarea.value.trim();
-            if (text.length < 20 || aiAssistBtn.disabled) return;
+        replyForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            sendMessage(replyMessageInput.value.trim());
+        });
 
-            aiAssistBtn.disabled = true;
-            aiSuggestionBox.classList.remove('hidden');
-            aiSuggestionBox.innerHTML = `<div class="flex items-center justify-center text-gray-400"><svg class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg><span>در حال تحلیل...</span></div>`;
+        attachFileBtn.addEventListener('click', () => {
+            showNotification('این قابلیت بزودی اضافه می‌شود.', false);
+        });
 
-            try {
-                const response = await fetch(`${WORKER_URL}/api/analyze-message`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
-                });
-                if (!response.ok) throw new Error('خطا در ارتباط با دستیار هوشمند');
-                const result = await response.json();
-                if (result.success) {
-                    displayAiSuggestions(result.data);
-                } else {
-                    throw new Error(result.error);
-                }
-            } catch (error) {
-                aiSuggestionBox.innerHTML = `<p class="text-red-400 text-xs">${error.message}</p>`;
-            } finally {
-                aiAssistBtn.disabled = false;
+        emojiBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            emojiPickerContainer.classList.toggle('hidden');
+        });
+
+        emojiPicker.addEventListener('emoji-click', event => {
+            const emoji = event.detail.unicode;
+            const textarea = replyMessageInput;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            textarea.value = text.substring(0, start) + emoji + text.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+            textarea.focus();
+            emojiPickerContainer.classList.add('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!emojiPickerContainer.contains(e.target) && !emojiBtn.contains(e.target)) {
+                emojiPickerContainer.classList.add('hidden');
             }
-        }
+        });
 
-        function displayAiSuggestions({ suggested_department, suggested_subjects, suggested_message }) {
-            const subjectsHtml = suggested_subjects.map(s => `<button type="button" class="use-subject-btn text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-2 py-1 rounded">${s}</button>`).join('');
 
-            aiSuggestionBox.innerHTML = `
-                <div class="space-y-3">
-                    <div>
-                        <p class="text-xs font-bold text-gray-300 mb-2">دپارتمان پیشنهادی:</p>
-                        <button type="button" class="use-department-btn text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded w-full" data-department="${suggested_department}">
-                            ${departmentMap[suggested_department] || suggested_department}
-                        </button>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-gray-300 mb-2">موضوعات پیشنهادی:</p>
-                        <div class="flex flex-wrap gap-2">${subjectsHtml}</div>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-gray-300 mb-1">متن بهبود یافته:</p>
-                        <div class="bg-gray-800 p-2 rounded">
-                            <p class="text-xs text-gray-200 max-h-24 overflow-y-auto mb-2">${suggested_message}</p>
-                            <button type="button" class="use-suggestion-btn text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded w-full">جایگزینی کل متن</button>
-                        </div>
-                    </div>
-                </div>`;
-
-            aiSuggestionBox.querySelector('.use-department-btn').addEventListener('click', (e) => {
-                departmentSelect.value = e.target.dataset.department;
-                departmentSelect.dispatchEvent(new Event('change'));
-                showNotification('دپارتمان پیشنهادی اعمال شد.');
-            });
-            aiSuggestionBox.querySelectorAll('.use-subject-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    subjectInput.value = btn.textContent;
-                    showNotification('موضوع پیشنهادی اعمال شد.');
-                });
-            });
-            aiSuggestionBox.querySelector('.use-suggestion-btn').addEventListener('click', () => {
-                messageTextarea.value = suggested_message;
-                showNotification('متن پیشنهادی اعمال شد.');
-            });
-        }
+        replyMessageInput.addEventListener('input', () => {
+            replyMessageInput.style.height = 'auto';
+            replyMessageInput.style.height = (replyMessageInput.scrollHeight) + 'px';
+        });
         
         // --- Event Listeners ---
-        replyForm.addEventListener('submit', (e) => { e.preventDefault(); sendMessage(replyMessageInput.value.trim()); });
-        emojiBtn.addEventListener('click', (e) => { e.stopPropagation(); emojiPickerContainer.classList.toggle('hidden'); });
-        document.addEventListener('click', (e) => { if (emojiPickerContainer && !emojiPickerContainer.contains(e.target) && !emojiBtn.contains(e.target)) { emojiPickerContainer.classList.add('hidden'); } });
-        replyMessageInput.addEventListener('input', () => { replyMessageInput.style.height = 'auto'; replyMessageInput.style.height = (replyMessageInput.scrollHeight) + 'px'; });
         navButtons.ticketsList.addEventListener('click', () => showView('ticketsList'));
+        
         navButtons.newTicket.addEventListener('click', () => {
             if (hasOpenTicket) { 
-                showModal('امکان ایجاد تیکت جدید وجود ندارد', 'شما یک تیکت باز دارید. لطفا تا زمان بسته شدن آن منتظر بمانید.', true);
+                showModal('امکان ایجاد تیکت جدید وجود ندارد', 'شما در حال حاضر یک تیکت باز دارید. لطفا تا زمان بسته شدن آن توسط پشتیبانی منتظر بمانید.', true);
             } else { 
                 infoModal.classList.remove('hidden');
                 infoModal.classList.add('flex');
             }
         });
+        
         backToTicketsBtn.addEventListener('click', closeConversation);
+        
+        newTicketForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleNewTicketSubmit();
+        });
+        
         submitNewTicketBtn.addEventListener('click', handleNewTicketSubmit);
+
+        // --- Info Modal Listener ---
         infoModalCloseBtn.addEventListener('click', () => {
             infoModal.classList.add('hidden');
             infoModal.classList.remove('flex');
             showView('newTicket');
         });
-
-        departmentSelect.addEventListener('change', () => {
-            const selectedDept = departmentSelect.value;
-            const time = appConfig.responseTimes[selectedDept];
-            responseTimeDisplay.textContent = time ? `⏳ میانگین زمان پاسخگویی: ${time}` : '';
-        });
-
-        messageTextarea.addEventListener('input', () => {
-            const enabled = messageTextarea.value.trim().length >= 20;
-            aiAssistBtn.disabled = !enabled;
-            if(enabled) {
-                aiAssistBtn.classList.add('ai-active-pulse');
-            } else {
-                aiAssistBtn.classList.remove('ai-active-pulse');
-            }
-            aiSuggestionBox.classList.add('hidden');
-        });
-
-        aiAssistBtn.addEventListener('click', analyzeMessage);
         
     </script>
 </body>

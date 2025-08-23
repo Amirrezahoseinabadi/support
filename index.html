@@ -186,33 +186,7 @@
                             </select>
                         </div>
                         <div><label for="subject" class="block mb-2 text-sm font-medium">موضوع</label><input type="text" id="subject" name="subject" class="form-input" placeholder="موضوع تیکت خود را وارد کنید" required></div>
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label for="message" class="block text-sm font-medium">متن پیام</label>
-                                <button type="button" id="ai-enhance-btn" class="flex items-center text-xs px-2 py-1 rounded-md disabled:opacity-50 disabled:cursor-not-allowed" style="background-color: var(--brand-admin-message); color: var(--brand-text-secondary);">
-                                    <svg id="ai-enhance-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-                                    <svg id="ai-enhance-spinner" class="animate-spin h-4 w-4 ml-1 hidden" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                    <span>بهبود با هوش مصنوعی</span>
-                                </button>
-                            </div>
-                            <textarea id="message" name="message" rows="6" class="form-textarea" placeholder="مشکل یا سوال خود را با جزئیات کامل بنویسید..." required></textarea>
-                        </div>
-                        <!-- AI Suggestion Box -->
-                        <div id="ai-suggestion-box" class="hidden p-3 mt-2 rounded-lg" style="background-color: var(--brand-secondary-bg); border: 1px solid var(--brand-admin-message);">
-                            <h4 class="text-sm font-bold text-white mb-2">✨ پیشنهاد هوش مصنوعی</h4>
-                            <div class="mb-3">
-                                <label class="block text-xs text-gray-400 mb-1">موضوع پیشنهادی:</label>
-                                <p id="ai-suggested-subject" class="text-sm p-2 rounded" style="background-color: var(--brand-dark-blue);"></p>
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-xs text-gray-400 mb-1">متن پیام بهبودیافته:</label>
-                                <p id="ai-improved-message" class="text-sm p-2 rounded whitespace-pre-wrap max-h-40 overflow-y-auto" style="background-color: var(--brand-dark-blue);"></p>
-                            </div>
-                            <div class="flex justify-end space-x-2 space-x-reverse">
-                                <button type="button" id="ai-apply-btn" class="text-xs text-white px-3 py-1.5 rounded-md" style="background-color: var(--brand-light-blue);">استفاده از این متن</button>
-                                <button type="button" id="ai-discard-btn" class="text-xs px-3 py-1.5 rounded-md" style="background-color: var(--brand-admin-message);">لغو</button>
-                            </div>
-                        </div>
+                        <div><label for="message" class="block mb-2 text-sm font-medium">متن پیام</label><textarea id="message" name="message" rows="6" class="form-textarea" placeholder="مشکل یا سوال خود را با جزئیات کامل بنویسید..." required></textarea></div>
                         <div class="flex justify-between items-center pt-2">
                             <button type="button" id="submit-new-ticket-btn" class="text-white px-4 py-2 rounded-md w-full disabled:opacity-50" style="background-color: var(--brand-light-blue);">ارسال</button>
                         </div>
@@ -299,10 +273,6 @@
             messagingSenderId: "220983533006",
             appId: "1:220983533006:web:87f404486afb9f6a06df9f"
         };
-        
-        // --- AI ENHANCEMENT CONSTANTS ---
-        const GPT_API_KEY = '7135477742:xpbZ0YO92loHaRu@Api_ManagerRoBot'; 
-        const AI_ENHANCE_ENDPOINT = '/enhance'; 
 
         firebase.initializeApp(firebaseConfig);
         const storage = firebase.storage();
@@ -344,18 +314,6 @@
         // Emoji Picker Elements
         const emojiPickerContainer = document.getElementById('emoji-picker-container');
         const emojiPicker = document.querySelector('emoji-picker');
-        
-        // AI Enhancement Elements
-        const messageTextarea = document.getElementById('message');
-        const subjectInput = document.getElementById('subject');
-        const aiEnhanceBtn = document.getElementById('ai-enhance-btn');
-        const aiEnhanceIcon = document.getElementById('ai-enhance-icon');
-        const aiEnhanceSpinner = document.getElementById('ai-enhance-spinner');
-        const aiSuggestionBox = document.getElementById('ai-suggestion-box');
-        const aiSuggestedSubject = document.getElementById('ai-suggested-subject');
-        const aiImprovedMessage = document.getElementById('ai-improved-message');
-        const aiApplyBtn = document.getElementById('ai-apply-btn');
-        const aiDiscardBtn = document.getElementById('ai-discard-btn');
 
         const departmentMap = {
             general: 'سوالات متفرقه',
@@ -457,34 +415,22 @@
             ticketsPollingInterval = setInterval(fetchTickets, 5000);
         }
         
-        // [MODIFIED] Improved error handling for delete operation
         async function deleteTicket(ticketId) {
             if (confirm('آیا از حذف این تیکت مطمئن هستید؟')) {
                 try {
                     const response = await fetch(`${WORKER_URL}/tickets?ticket_id=${ticketId}`, { method: 'DELETE' });
-                    
-                    if (!response.ok) {
-                        // Try to get a meaningful error message from the worker
-                        let errorMsg = 'خطا در حذف تیکت';
-                        try {
-                            const errorResult = await response.json();
-                            errorMsg = errorResult.error || errorMsg;
-                        } catch (e) {
-                            // If the response is not JSON, use the status text
-                            errorMsg = await response.text() || errorMsg;
-                        }
-                        throw new Error(errorMsg);
+                     if (!response.ok) {
+                        const errorResult = await response.json();
+                        throw new Error(errorResult.error || 'خطا در حذف تیکت');
                     }
-
                     const result = await response.json();
                     if (result.success) {
                         showNotification('تیکت با موفقیت حذف شد.');
                         fetchTickets(); 
                     } else {
-                        throw new Error(result.error || 'حذف تیکت با خطای ناشناخته مواجه شد');
+                        throw new Error(result.error);
                     }
                 } catch (error) {
-                    // This will now catch network errors like "Failed to fetch" and server errors
                     showNotification(`حذف تیکت با خطا مواجه شد: ${error.message}`, false);
                     console.error("Error deleting ticket:", error);
                 }
@@ -602,7 +548,7 @@
             const isAI = isAdmin && data.source === 'ai';
 
             const messageClass = isUser ? 'message-user' : 'message-admin';
-            const containerClass = isUser ? 'self-end' : 'self-start'; 
+            const containerClass = isUser ? 'self-start' : 'self-end'; 
             const nameAlign = isUser ? 'text-right' : 'text-left';
             
             let senderName = '';
@@ -816,88 +762,6 @@
                 submitNewTicketBtn.textContent = 'ارسال';
             }
         };
-        
-        // --- AI Enhancement Logic ---
-
-        // Disable the AI button initially
-        aiEnhanceBtn.disabled = true;
-
-        // Add event listener to the message textarea to enable/disable the AI button
-        messageTextarea.addEventListener('input', () => {
-            aiEnhanceBtn.disabled = messageTextarea.value.trim().length < 10; // Enable after 10 characters
-            aiSuggestionBox.classList.add('hidden'); // Hide suggestions if user edits text
-        });
-
-        // Main function to call the AI service
-        const handleAIEnhance = async () => {
-            const userInput = messageTextarea.value.trim();
-            if (userInput.length < 10) {
-                showNotification("برای تحلیل، لطفا حداقل ۱۰ کلمه بنویسید.", false);
-                return;
-            }
-
-            aiEnhanceBtn.disabled = true;
-            aiEnhanceIcon.classList.add('hidden');
-            aiEnhanceSpinner.classList.remove('hidden');
-            aiSuggestionBox.classList.add('hidden');
-
-            const prompt = `You are an expert support assistant. A user has written a support ticket message in Persian. Your task is to:
-1.  Generate a concise, relevant subject line in Persian for this ticket.
-2.  Rewrite the user's message in formal, clear, and polite Persian. Correct any grammatical errors and improve the structure, but keep the original meaning intact.
-Please return ONLY a valid JSON object with two keys: "suggested_subject" and "improved_message". Do not include any markdown, explanations, or any text outside of the JSON object.
-
-Original message:
-"${userInput}"`;
-
-            try {
-                const response = await fetch(`${WORKER_URL}${AI_ENHANCE_ENDPOINT}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: prompt, apiKey: GPT_API_KEY }),
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ error: 'خطای ناشناخته از سرور هوش مصنوعی' }));
-                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-                }
-                
-                const aiData = await response.json();
-
-                if (aiData.suggested_subject && aiData.improved_message) {
-                    displayAISuggestions(aiData.suggested_subject, aiData.improved_message);
-                } else {
-                    throw new Error("پاسخ هوش مصنوعی کامل نبود.");
-                }
-
-            } catch (error) {
-                console.error("AI enhancement failed:", error);
-                showNotification(`خطا در بهبود متن: ${error.message}`, false);
-            } finally {
-                aiEnhanceBtn.disabled = messageTextarea.value.trim().length < 10;
-                aiEnhanceIcon.classList.remove('hidden');
-                aiEnhanceSpinner.classList.add('hidden');
-            }
-        };
-
-        function displayAISuggestions(subject, message) {
-            aiSuggestedSubject.textContent = subject;
-            aiImprovedMessage.textContent = message;
-            aiSuggestionBox.classList.remove('hidden');
-        }
-
-        aiEnhanceBtn.addEventListener('click', handleAIEnhance);
-
-        aiApplyBtn.addEventListener('click', () => {
-            subjectInput.value = aiSuggestedSubject.textContent;
-            messageTextarea.value = aiImprovedMessage.textContent;
-            aiSuggestionBox.classList.add('hidden');
-            messageTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-            showNotification("پیشنهاد هوش مصنوعی اعمال شد.");
-        });
-
-        aiDiscardBtn.addEventListener('click', () => {
-            aiSuggestionBox.classList.add('hidden');
-        });
         
         replyForm.addEventListener('submit', (e) => {
             e.preventDefault();

@@ -6,11 +6,9 @@
     <title>پشتیبانی</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-    <!-- Emoji Picker Library -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -83,7 +81,7 @@
             color: var(--brand-text-secondary);
             margin-top: 2px;
         }
-        
+
         /* START: Animation Styles */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -141,7 +139,7 @@
             border-radius: 1rem;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
-        
+
         /* Emoji Picker Style */
         #emoji-picker-container emoji-picker {
             --background: var(--brand-secondary-bg);
@@ -152,11 +150,11 @@
 
         /* Rating Stars Style - CORRECTED */
         .rating-stars {
-            direction: ltr; 
+            direction: ltr;
         }
         .rating-star {
             cursor: pointer;
-            color: #6b7280; 
+            color: #6b7280;
             transition: color 0.2s;
         }
         .rating-stars:hover .rating-star {
@@ -186,7 +184,6 @@
             </header>
             <main id="app-container" class="flex-grow overflow-y-auto">
                 <div id="tickets-list-view" class="p-4">
-                    <!-- START: Smart Card -->
                     <div id="smart-card" class="p-4 rounded-lg shadow-lg mb-4 fade-in-item" style="background: linear-gradient(135deg, #3D5A80 0%, #274059 100%);">
                         <div class="flex items-center mb-3">
                             <h3 id="smart-card-greeting" class="text-lg font-bold text-white">سلام کاربر عزیز! 👋</h3>
@@ -198,7 +195,6 @@
                             <button id="faq-button" class="w-full text-white text-sm px-4 py-2.5 rounded-md" style="background-color: var(--brand-light-blue);">مشاهده سوالات متداول</button>
                         </div>
                     </div>
-                    <!-- END: Smart Card -->
                     <div id="tickets-container" class="space-y-3"></div>
                     <div id="no-tickets-message" class="hidden text-center text-gray-400 mt-16">
                         <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
@@ -225,7 +221,6 @@
                     </form>
                 </div>
             </main>
-            <!-- Navigation bar updated: text removed, buttons take up half width each -->
             <nav id="main-nav" class="nav-bar h-[80px] flex items-center justify-around">
                 <button id="nav-tickets-list" class="nav-button active flex flex-col items-center space-y-1 w-1/2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg><span class="text-xs">تیکت‌ها</span></button>
                 <button id="nav-new-ticket" class="nav-button flex flex-col items-center space-y-1 w-1/2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="text-xs">تیکت جدید</span></button>
@@ -258,15 +253,14 @@
         </div>
     </div>
 
-    <!-- Info Modal -->
     <div id="info-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4 transition-opacity duration-300">
         <div class="glass-modal-content p-6 w-full max-w-md flex flex-col max-h-[90vh]">
             <h3 class="text-xl font-bold mb-4 text-white text-center">❗️ راهنمای ارسال تیکت</h3>
             <div class="overflow-y-auto pr-2 space-y-4 text-sm text-[var(--brand-text-secondary)]">
                 <div>
                     <h4 class="font-bold text-white mb-2">💡 قبل از ارسال تیکت:</h4>
-                    <p>لطفا ابتدا <a href="https://faqhub.amiruserbot7.workers.dev/" target="_blank" class="text-blue-300 hover:underline">صفحه سوالات متداول</a> را بررسی کنید. شاید پاسخ سوال شما آنجا باشد!</p>
-                </div>
+                    <p>لطفا ابتدا <a href="#" id="faq-link-modal" class="text-blue-300 hover:underline">صفحه سوالات متداول</a> را بررسی کنید. شاید پاسخ سوال شما آنجا باشد!</p>
+                    </div>
                 <div>
                     <h4 class="font-bold text-white mb-2">📋 نمونه الگوریتم ارسال تیکت:</h4>
                     <div class="p-3 rounded-lg text-xs" style="background-color: var(--brand-dark-blue);">
@@ -291,7 +285,7 @@
             <button id="modal-close-btn" class="text-white px-6 py-2 rounded-md w-full" style="background-color: var(--brand-light-blue);">باشه</button>
         </div>
     </div>
-    
+
     <div id="notification-toast" class="fixed top-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-50"></div>
 
     <script>
@@ -338,7 +332,7 @@
         const fileUploadInput = document.getElementById('file-upload');
         const attachFileBtn = document.getElementById('attach-file-btn');
         const emojiBtn = document.getElementById('emoji-btn');
-        
+
         // Info Modal Elements
         const infoModal = document.getElementById('info-modal');
         const infoModalCloseBtn = document.getElementById('info-modal-close-btn');
@@ -389,7 +383,7 @@
         function startApp(user) {
             telegramUserId = user.id.toString();
             telegramUserName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'کاربر';
-            
+
             document.getElementById('smart-card-greeting').textContent = `سلام ${telegramUserName}! 👋`;
 
             loadingView.classList.add('hidden');
@@ -407,9 +401,9 @@
                     startApp(tg.initDataUnsafe.user);
                 } else {
                     console.warn("Telegram user data not found. Using mock user.");
-                    startApp({id: "319237991", first_name: "Amir", last_name: "Hoseinabadi"}); 
+                    startApp({id: "319237991", first_name: "Amir", last_name: "Hoseinabadi"});
                 }
-            } catch (error) { 
+            } catch (error) {
                 console.error("Could not initialize Telegram Web App:", error);
                 showModal('خطای راه‌اندازی', 'امکان برقراری ارتباط با تلگرام وجود ندارد. لطفا از داخل تلگرام این صفحه را باز کنید.', true);
             }
@@ -418,7 +412,7 @@
         function showView(viewName) {
             ticketsListView.classList.add('hidden');
             newTicketView.classList.add('hidden');
-            
+
             if (viewName === 'ticketsList') {
                 ticketsListView.classList.remove('hidden');
                 headerTitle.textContent = 'تیکت‌ها';
@@ -426,7 +420,7 @@
                 newTicketView.classList.remove('hidden');
                 headerTitle.textContent = 'تیکت جدید';
             }
-            
+
             Object.values(navButtons).forEach(btn => btn.classList.remove('active'));
             if (navButtons[viewName]) navButtons[viewName].classList.add('active');
         }
@@ -456,7 +450,7 @@
             if (ticketsPollingInterval) clearInterval(ticketsPollingInterval);
             ticketsPollingInterval = setInterval(fetchTickets, 5000);
         }
-        
+
         async function deleteTicket(ticketId) {
             if (confirm('آیا از حذف این تیکت مطمئن هستید؟')) {
                 try {
@@ -468,7 +462,7 @@
                     const result = await response.json();
                     if (result.success) {
                         showNotification('تیکت با موفقیت حذف شد.');
-                        fetchTickets(); 
+                        fetchTickets();
                     } else {
                         throw new Error(result.error);
                     }
@@ -488,14 +482,14 @@
                 noTicketsMessage.classList.add('hidden');
                 const sortedTickets = tickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 ticketsContainer.innerHTML = sortedTickets.map((ticket, index) => renderTicket(ticket, index)).join('');
-                document.querySelectorAll('.ticket-card').forEach(card => { 
+                document.querySelectorAll('.ticket-card').forEach(card => {
                     card.addEventListener('click', (e) => {
                         if (e.target.closest('.rating-stars')) return;
                         openConversation(card.dataset.id)
-                    }); 
+                    });
                 });
                 document.querySelectorAll('.delete-ticket-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); deleteTicket(btn.dataset.id); }); });
-                
+
                 document.querySelectorAll('.rating-star').forEach(star => {
                     star.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -506,7 +500,7 @@
                 });
             }
         }
-        
+
         async function submitRating(ticketId, rating) {
             const starContainer = document.querySelector(`.rating-stars[data-ticket-id="${ticketId}"]`);
             if (!starContainer || starContainer.dataset.submitting === 'true' || starContainer.dataset.rated === 'true') return;
@@ -567,13 +561,13 @@
                         </div>`;
                 }
             }
-            
+
             const statusBadge = `
                 <span class="flex items-center text-xs px-2 py-1 rounded-full" style="background-color: var(--brand-dark-blue);">
                     <span class="w-2 h-2 rounded-full ml-2 ${statusDetails.colorClass}"></span>
                     <span>${statusDetails.text}</span>
                 </span>`;
-            
+
             const animationDelay = index * 80;
             return `<div class="ticket-card p-4 rounded-lg shadow-lg fade-in-item" style="animation-delay: ${animationDelay}ms; background-color: var(--brand-secondary-bg);" data-id="${data.id}">
                         <div class="flex justify-between items-start">
@@ -590,16 +584,16 @@
                         ${ratingSection}
                     </div>`;
         }
-        
+
         function renderMessage(data) {
             const isUser = data.sender === 'user';
             const isAdmin = data.sender === 'admin';
             const isAI = isAdmin && data.source === 'ai';
 
             const messageClass = isUser ? 'message-user' : 'message-admin';
-            const containerClass = isUser ? 'self-start' : 'self-end'; 
+            const containerClass = isUser ? 'self-start' : 'self-end';
             const nameAlign = isUser ? 'text-right' : 'text-left';
-            
+
             let senderName = '';
             if (isUser) {
                 senderName = telegramUserName;
@@ -610,7 +604,7 @@
             }
 
             const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
-            
+
             let messageContent = data.text ? `<p class="whitespace-pre-wrap text-sm">${data.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-300 underline">$1</a>')}</p>` : '';
             if (data.imageUrl) {
                 messageContent += `<a href="${data.imageUrl}" target="_blank"><img src="${data.imageUrl}" class="rounded-lg max-w-xs mt-2" alt="تصویر پیوست شده"></a>`;
@@ -646,7 +640,7 @@
                 showNotification("خطا: اطلاعات تیکت یافت نشد.", false);
                 return;
             }
-            
+
             conversationView.classList.remove('hidden');
             conversationView.classList.add('flex');
             setTimeout(() => { conversationView.classList.add('is-open'); }, 10);
@@ -672,7 +666,7 @@
                         conversationContainer.innerHTML = Object.values(messagesData).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(renderMessage).join('');
                         attachHumanRequestListeners();
                     }
-                    
+
                     if(isScrolledToBottom) {
                         conversationContainer.scrollTop = conversationContainer.scrollHeight;
                     }
@@ -690,7 +684,7 @@
                 button.addEventListener('click', async (e) => {
                     const ticketId = e.target.dataset.ticketId;
                     if (!ticketId) return;
-                    
+
                     e.target.disabled = true;
                     e.target.textContent = 'در حال ارسال...';
 
@@ -811,7 +805,7 @@
                 submitNewTicketBtn.textContent = 'ارسال';
             }
         };
-        
+
         replyForm.addEventListener('submit', (e) => {
             e.preventDefault();
             sendMessage(replyMessageInput.value.trim());
@@ -849,26 +843,26 @@
             replyMessageInput.style.height = 'auto';
             replyMessageInput.style.height = (replyMessageInput.scrollHeight) + 'px';
         });
-        
+
         // --- Event Listeners ---
         navButtons.ticketsList.addEventListener('click', () => showView('ticketsList'));
-        
+
         navButtons.newTicket.addEventListener('click', () => {
-            if (hasOpenTicket) { 
+            if (hasOpenTicket) {
                 showModal('امکان ایجاد تیکت جدید وجود ندارد', 'شما در حال حاضر یک تیکت باز دارید. لطفا تا زمان بسته شدن آن توسط پشتیبانی منتظر بمانید.', true);
-            } else { 
+            } else {
                 infoModal.classList.remove('hidden');
                 infoModal.classList.add('flex');
             }
         });
-        
+
         backToTicketsBtn.addEventListener('click', closeConversation);
-        
+
         newTicketForm.addEventListener('submit', (e) => {
             e.preventDefault();
             handleNewTicketSubmit();
         });
-        
+
         submitNewTicketBtn.addEventListener('click', handleNewTicketSubmit);
 
         // --- Info Modal Listener ---
@@ -877,16 +871,36 @@
             infoModal.classList.remove('flex');
             showView('newTicket');
         });
-        
+
         // --- Smart Card Button Listeners ---
+        
+        // START: MODIFICATION FOR TELEGRAM MINI APP
         const faqButton = document.getElementById('faq-button');
         if (faqButton) {
             faqButton.addEventListener('click', () => {
-                window.open('https://faqhub.amiruserbot7.workers.dev/', '_blank');
+                const faqUrl = 'https://faqhub.amiruserbot7.workers.dev/';
+                if (window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.openLink(faqUrl);
+                } else {
+                    window.open(faqUrl, '_blank');
+                }
             });
         }
+
+        const faqLinkModal = document.getElementById('faq-link-modal');
+        if (faqLinkModal) {
+            faqLinkModal.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                const faqUrl = 'https://faqhub.amiruserbot7.workers.dev/';
+                if (window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.openLink(faqUrl);
+                } else {
+                    window.open(faqUrl, '_blank');
+                }
+            });
+        }
+        // END: MODIFICATION FOR TELEGRAM MINI APP
 
     </script>
 </body>
 </html>
-

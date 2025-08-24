@@ -167,6 +167,23 @@
             </header>
             <main id="app-container" class="flex-grow overflow-y-auto">
                 <div id="tickets-list-view" class="p-4">
+                    <!-- START: Smart Card -->
+                    <div id="smart-card" class="p-4 rounded-lg shadow-lg mb-4" style="background-color: var(--brand-secondary-bg);">
+                        <div class="flex items-center mb-3">
+                            <h3 id="smart-card-greeting" class="text-lg font-bold text-white">سلام کاربر عزیز! 👋</h3>
+                        </div>
+                        <p class="text-sm mb-4" style="color: var(--brand-text-secondary);">
+                            شما در <span class="font-bold text-white">سطح برنزی</span> 🥉 قرار دارید.
+                        </p>
+                        <div class="p-3 rounded-lg text-sm mb-4" style="background-color: var(--brand-dark-blue);">
+                            <p><span class="text-xl">💡</span> <span class="font-bold">نکته امروز:</span> آیا می‌دانستید، با مراجعه به بخش سوالات متداول، پاسخ ۹۰٪ از سوالات خود را فوراً پیدا می کنید؟</p>
+                        </div>
+                        <div class="flex space-x-2 space-x-reverse">
+                            <button id="faq-button" class="flex-1 text-white text-sm px-4 py-2 rounded-md" style="background-color: var(--brand-admin-message);">مشاهده سوالات متداول</button>
+                            <button id="new-ticket-from-card-btn" class="flex-1 text-white text-sm px-4 py-2 rounded-md" style="background-color: var(--brand-light-blue);">ثبت تیکت جدید</button>
+                        </div>
+                    </div>
+                    <!-- END: Smart Card -->
                     <div id="tickets-container" class="space-y-3"></div>
                     <div id="no-tickets-message" class="hidden text-center text-gray-400 mt-16">
                         <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
@@ -323,6 +340,15 @@
             ideas: 'ایده ها و پیشنهادات'
         };
 
+        // START: Status Styles for colored icons
+        const statusInfo = {
+            open: { text: 'باز', colorClass: 'bg-green-500' },
+            'in-progress': { text: 'در حال بررسی', colorClass: 'bg-amber-500' },
+            answered: { text: 'پاسخ داده شد', colorClass: 'bg-blue-500' },
+            closed: { text: 'بسته شده', colorClass: 'bg-gray-600' }
+        };
+        // END: Status Styles
+
         function showNotification(message, success = true) {
             const toast = document.getElementById('notification-toast');
             toast.textContent = message;
@@ -350,6 +376,10 @@
         function startApp(user) {
             telegramUserId = user.id.toString();
             telegramUserName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'کاربر';
+            
+            // Update smart card greeting
+            document.getElementById('smart-card-greeting').textContent = `سلام ${telegramUserName}! 👋`;
+
             loadingView.classList.add('hidden');
             mainAppContainer.classList.remove('hidden');
             mainAppContainer.classList.add('flex');
@@ -497,7 +527,8 @@
 
         function renderTicket(data) {
             const status = data.status;
-            const statusText = {open: 'باز', 'in-progress': 'در حال بررسی', answered: 'پاسخ داده شد', closed: 'بسته شده'}[status] || status;
+            // UPDATED: Use statusInfo object for text and color
+            const statusDetails = statusInfo[status] || { text: status, colorClass: 'bg-gray-500' };
             const creationDate = new Date(data.created_at).toLocaleString('fa-IR', { dateStyle: 'short', timeStyle: 'short' });
             const departmentName = departmentMap[data.department] || data.department;
             const deleteButton = status === 'closed' ? `<button data-id="${data.id}" class="delete-ticket-btn p-1"><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>` : '';
@@ -526,10 +557,17 @@
                 }
             }
             
+            // UPDATED: New status badge with colored dot
+            const statusBadge = `
+                <span class="flex items-center text-xs px-2 py-1 rounded-full" style="background-color: var(--brand-dark-blue);">
+                    <span class="w-2 h-2 rounded-full ml-2 ${statusDetails.colorClass}"></span>
+                    <span>${statusDetails.text}</span>
+                </span>`;
+
             return `<div class="ticket-card p-4 rounded-lg shadow-lg" style="background-color: var(--brand-secondary-bg);" data-id="${data.id}">
                         <div class="flex justify-between items-start">
                             <p class="font-bold text-md">${data.subject}</p>
-                            <span class="text-xs px-2 py-1 rounded-full" style="background-color: var(--brand-dark-blue);">${statusText}</span>
+                            ${statusBadge}
                         </div>
                         <div class="flex justify-between items-center text-xs mt-4 pt-2 border-t" style="border-color: var(--brand-dark-blue);">
                             <span style="color: var(--brand-text-secondary);">${departmentName}</span>
@@ -829,6 +867,21 @@
             showView('newTicket');
         });
         
+        // --- Smart Card Button Listeners ---
+        const newTicketFromCardBtn = document.getElementById('new-ticket-from-card-btn');
+        if (newTicketFromCardBtn) {
+            newTicketFromCardBtn.addEventListener('click', () => {
+                navButtons.newTicket.click(); // Simulate a click on the main nav button
+            });
+        }
+
+        const faqButton = document.getElementById('faq-button');
+        if (faqButton) {
+            faqButton.addEventListener('click', () => {
+                window.open('https://faqhub.amiruserbot7.workers.dev/', '_blank');
+            });
+        }
+
     </script>
 </body>
 </html>

@@ -227,6 +227,9 @@
                     </button>
                 </form>
             </div>
+            <div id="closed-ticket-banner" class="p-4 text-center bg-[var(--brand-secondary-bg)] text-[var(--brand-text-secondary)] text-sm hidden">
+                <p>این گفتگو توسط پشتیبانی بسته شده است.</p>
+            </div>
         </div>
     </div>
 
@@ -254,7 +257,6 @@
         </div>
     </div>
     
-    <!-- *** [مهم] مودال از اینجا به بیرون منتقل شد *** -->
     <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-50 p-4">
         <div class="bg-[var(--brand-secondary-bg)] rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
             <div id="modal-icon" class="mx-auto mb-4"></div>
@@ -303,6 +305,8 @@
         const backToTicketsBtn = document.getElementById('back-to-tickets');
         const conversationContainer = document.getElementById('conversation-container');
         const conversationHeader = document.getElementById('conversation-header');
+        const replyBox = document.getElementById('reply-box');
+        const closedTicketBanner = document.getElementById('closed-ticket-banner');
         const replyForm = document.getElementById('reply-form');
         const replyMessageInput = document.getElementById('reply-message');
         const fileUploadInput = document.getElementById('file-upload');
@@ -408,6 +412,15 @@
                 const result = await response.json();
                 if (result.success) {
                     allTicketsData = result.data ? Object.keys(result.data).map(key => ({ id: key, ...result.data[key] })) : [];
+                    
+                    if (currentTicketId) {
+                        const updatedTicketData = allTicketsData.find(t => t.id === currentTicketId);
+                        if (updatedTicketData && currentTicketData && updatedTicketData.status !== currentTicketData.status) {
+                            currentTicketData = updatedTicketData;
+                            updateConversationViewUI();
+                        }
+                    }
+                    
                     renderTickets(allTicketsData);
                 } else {
                     throw new Error(result.error || "پاسخ ناموفق از سرور");
@@ -524,7 +537,6 @@
             return `<div class="ticket-card p-4 rounded-lg shadow-lg fade-in-item" style="animation-delay: ${animationDelay}ms; background-color: var(--brand-secondary-bg);" data-id="${data.id}"><div class="flex justify-between items-start"><p class="font-bold text-md">${data.subject}</p>${statusBadge}</div><div class="flex justify-between items-center text-xs mt-4 pt-2 border-t" style="border-color: var(--brand-dark-blue);"><span style="color: var(--brand-text-secondary);">${departmentName}</span><div class="flex items-center">${deleteButton}<span style="color: var(--brand-text-secondary);">${creationDate}</span></div></div>${ratingSection}</div>`;
         }
         
-        // *** [مهم] تابع رندر پیام به‌روز شد ***
         function renderMessage(data) {
             const isUser = data.sender === 'user';
             const isAdmin = data.sender === 'admin';
@@ -546,7 +558,6 @@
             const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
 
             let messageContent = '';
-            // *** [جدید] بلاک برای نمایش کادر عکس ***
             if (data.type === 'image_placeholder') {
                 messageContent = `
                     <div class="flex items-center space-x-2 space-x-reverse italic opacity-80">
@@ -556,7 +567,6 @@
                         <p class="text-sm">تصویر ارسال شد</p>
                     </div>`;
             } 
-            // بلاک برای پیام‌های متنی (با حفظ نمایش عکس‌های قبلی)
             else {
                 if (data.text) {
                     messageContent += `<p class="whitespace-pre-wrap text-sm">${data.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-300 underline">$1</a>')}</p>`;
@@ -593,6 +603,17 @@
             setTimeout(() => { conversationView.classList.add('is-open'); }, 10);
             conversationHeader.textContent = currentTicketData.subject;
             listenToMessages(ticketId);
+            updateConversationViewUI();
+        }
+
+        function updateConversationViewUI() {
+            if (currentTicketData && currentTicketData.status === 'closed') {
+                replyBox.classList.add('hidden');
+                closedTicketBanner.classList.remove('hidden');
+            } else {
+                replyBox.classList.remove('hidden');
+                closedTicketBanner.classList.add('hidden');
+            }
         }
 
         async function fetchMessages(ticketId) {
@@ -665,7 +686,6 @@
             }, 300);
         }
 
-        // *** [جدید] تابع ارسال پیام متنی (بهبود یافته) ***
         async function sendTextMessage(text) {
              if (!currentTicketId || !text) return;
              const payload = { ticket_id: currentTicketId, sender: 'user', text: text };
@@ -696,7 +716,6 @@
              }
         }
         
-        // *** [جدید] تابع ارسال عکس ***
         async function handleImageUpload(file) {
             if (!file) return;
             if (file.size > 50 * 1024 * 1024) { // 50MB
@@ -735,22 +754,16 @@
                     throw new Error(result.error || "سرور پاسخی ناموفق داد.");
                 }
                 
-                // *** [مهم] این خط، پیام موقت "تصویر ارسال شد" را به دیتابیس هم اضافه می‌کند ***
                 const placeholderPayload = {
                     ticket_id: currentTicketId,
                     sender: 'user',
-                    text: 'تصویر ارسال شد.', // متنی که در دیتابیس ذخیره می‌شود
-                    type: 'image_placeholder' // نوع پیام برای تفکیک در UI
+                    text: 'تصویر ارسال شد.',
+                    type: 'image_placeholder'
                 };
-                await fetch(`${WORKER_URL}/messages`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(placeholderPayload),
-                });
                 
+                // Do not save this to Firebase, just show in UI
                 appendMessageToUI({ ...placeholderPayload, created_at: new Date().toISOString() });
                 showNotification("تصویر با موفقیت ارسال شد.", true);
-                fetchMessages(currentTicketId); // همگام‌سازی با دیتابیس
 
             } catch (error) {
                 console.error("Image send failed:", error);
@@ -804,7 +817,6 @@
             if(text) sendTextMessage(text);
         });
 
-        // *** [مهم] Listener دکمه سنجاق به‌روز شد ***
         attachFileBtn.addEventListener('click', () => {
             if (!currentTicketId) {
                 return showNotification("لطفا ابتدا یک گفتگو را باز کنید.", false);
@@ -812,7 +824,6 @@
             fileUploadInput.click();
         });
         
-        // *** [جدید] Listener برای انتخاب فایل ***
         fileUploadInput.addEventListener('change', (e) => {
             if (e.target.files && e.target.files[0]) {
                 handleImageUpload(e.target.files[0]);

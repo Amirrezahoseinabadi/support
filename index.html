@@ -8,12 +8,10 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* New Color Palette Inspired by Logo */
             --brand-dark-blue: #1A2E40;
             --brand-light-blue: #0091D5;
             --brand-secondary-bg: #274059;
@@ -22,32 +20,30 @@
             --brand-user-message: #005A8D;
             --brand-admin-message: #3D5A80;
         }
-        body { 
-            font-family: 'Vazirmatn', sans-serif; 
-            background-color: var(--brand-dark-blue); 
-            color: var(--brand-text-primary); 
-            overflow: hidden; 
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--brand-dark-blue);
+            color: var(--brand-text-primary);
+            overflow: hidden;
         }
-        .nav-bar { 
-            background-color: var(--brand-secondary-bg); 
-            color: var(--brand-text-primary); 
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.2); 
+        .nav-bar {
+            background-color: var(--brand-secondary-bg);
+            color: var(--brand-text-primary);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
         }
         .nav-button.active { color: var(--brand-light-blue); }
-        .form-input, .form-select, .form-textarea { 
-            background-color: transparent; 
-            border: 1px solid var(--brand-text-secondary); 
-            color: var(--brand-text-primary); 
-            border-radius: 0.5rem; 
-            padding: 0.75rem; 
-            width: 100%; 
+        .form-input, .form-select, .form-textarea {
+            background-color: transparent;
+            border: 1px solid var(--brand-text-secondary);
+            color: var(--brand-text-primary);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            width: 100%;
         }
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: var(--brand-light-blue);
         }
-        
-        /* New Chat Styles */
         #conversation-container {
             background-color: #0e1621;
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
@@ -63,12 +59,12 @@
         .message-user {
             background-color: var(--brand-user-message);
             color: white;
-            border-bottom-right-radius: 4px; /* Tail points outwards (right) */
+            border-bottom-right-radius: 4px;
         }
         .message-admin {
             background-color: var(--brand-admin-message);
             color: white;
-            border-bottom-left-radius: 4px; /* Tail points outwards (left) */
+            border-bottom-left-radius: 4px;
         }
         .sender-name {
             font-size: 0.8rem;
@@ -81,15 +77,13 @@
             color: var(--brand-text-secondary);
             margin-top: 2px;
         }
-
-        /* START: Animation Styles */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .fade-in-item {
             animation: fadeIn 0.5s ease-out forwards;
-            opacity: 0; /* Start hidden and let animation show it */
+            opacity: 0;
         }
         #conversation-view {
             transform: translateX(100%);
@@ -100,9 +94,6 @@
             transform: translateX(0%);
             opacity: 1;
         }
-        /* END: Animation Styles */
-
-        /* Reply box styles */
         #reply-box {
             background-color: var(--brand-secondary-bg);
         }
@@ -129,43 +120,29 @@
         .icon-button:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
-
-        /* Glassmorphism Modal Style */
         .glass-modal-content {
-            background: rgba(39, 64, 89, 0.6); /* --brand-secondary-bg with opacity */
+            background: rgba(39, 64, 89, 0.6);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 1rem;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
-
-        /* Emoji Picker Style */
         #emoji-picker-container emoji-picker {
             --background: var(--brand-secondary-bg);
             --border-color: var(--brand-dark-blue);
             --text-color: var(--brand-text-primary);
             --secondary-text-color: var(--brand-text-secondary);
         }
-
-        /* Rating Stars Style - CORRECTED */
-        .rating-stars {
-            direction: ltr;
-        }
+        .rating-stars { direction: ltr; }
         .rating-star {
             cursor: pointer;
             color: #6b7280;
             transition: color 0.2s;
         }
-        .rating-stars:hover .rating-star {
-            color: #f59e0b;
-        }
-        .rating-stars .rating-star:hover ~ .rating-star {
-            color: #6b7280;
-        }
-        .rating-stars[data-rated="true"] .rating-star {
-            cursor: default;
-        }
+        .rating-stars:hover .rating-star { color: #f59e0b; }
+        .rating-stars .rating-star:hover ~ .rating-star { color: #6b7280; }
+        .rating-stars[data-rated="true"] .rating-star { cursor: default; }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -276,7 +253,8 @@
             </div>
         </div>
     </div>
-
+    
+    <!-- *** [مهم] مودال از اینجا به بیرون منتقل شد *** -->
     <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-50 p-4">
         <div class="bg-[var(--brand-secondary-bg)] rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
             <div id="modal-icon" class="mx-auto mb-4"></div>
@@ -295,14 +273,12 @@
             authDomain: "support-app-final.firebaseapp.com",
             databaseURL: "https://support-app-final-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "support-app-final",
-            storageBucket: "support-app-final.appspot.com",
             messagingSenderId: "220983533006",
             appId: "1:220983533006:web:87f404486afb9f6a06df9f"
         };
 
         firebase.initializeApp(firebaseConfig);
-        const storage = firebase.storage();
-
+        
         let telegramUserId = null;
         let telegramUserName = 'کاربر';
         let currentTicketId = null;
@@ -332,12 +308,8 @@
         const fileUploadInput = document.getElementById('file-upload');
         const attachFileBtn = document.getElementById('attach-file-btn');
         const emojiBtn = document.getElementById('emoji-btn');
-
-        // Info Modal Elements
         const infoModal = document.getElementById('info-modal');
         const infoModalCloseBtn = document.getElementById('info-modal-close-btn');
-
-        // Emoji Picker Elements
         const emojiPickerContainer = document.getElementById('emoji-picker-container');
         const emojiPicker = document.querySelector('emoji-picker');
 
@@ -355,15 +327,19 @@
             answered: { text: 'در انتظار پاسخ شما', colorClass: 'bg-blue-500' },
             closed: { text: 'بسته شده', colorClass: 'bg-gray-600' }
         };
-
-        function showNotification(message, success = true) {
+        
+        let activeToastTimeout = null;
+        function showNotification(message, success = true, duration = 3000) {
             const toast = document.getElementById('notification-toast');
             toast.textContent = message;
             toast.className = `fixed top-5 right-5 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300 z-50 ${success ? 'bg-green-500' : 'bg-red-500'}`;
+            if(activeToastTimeout) clearTimeout(activeToastTimeout);
             toast.classList.remove('opacity-0');
-            setTimeout(() => {
-                toast.classList.add('opacity-0');
-            }, 3000);
+            if (duration > 0) {
+                activeToastTimeout = setTimeout(() => {
+                    toast.classList.add('opacity-0');
+                }, duration);
+            }
         }
 
         function showModal(title, message, isError = false) {
@@ -383,9 +359,7 @@
         function startApp(user) {
             telegramUserId = user.id.toString();
             telegramUserName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'کاربر';
-
             document.getElementById('smart-card-greeting').textContent = `سلام ${telegramUserName}! 👋`;
-
             loadingView.classList.add('hidden');
             mainAppContainer.classList.remove('hidden');
             mainAppContainer.classList.add('flex');
@@ -412,7 +386,6 @@
         function showView(viewName) {
             ticketsListView.classList.add('hidden');
             newTicketView.classList.add('hidden');
-
             if (viewName === 'ticketsList') {
                 ticketsListView.classList.remove('hidden');
                 headerTitle.textContent = 'تیکت‌ها';
@@ -420,7 +393,6 @@
                 newTicketView.classList.remove('hidden');
                 headerTitle.textContent = 'تیکت جدید';
             }
-
             Object.values(navButtons).forEach(btn => btn.classList.remove('active'));
             if (navButtons[viewName]) navButtons[viewName].classList.add('active');
         }
@@ -489,7 +461,6 @@
                     });
                 });
                 document.querySelectorAll('.delete-ticket-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); deleteTicket(btn.dataset.id); }); });
-
                 document.querySelectorAll('.rating-star').forEach(star => {
                     star.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -504,10 +475,8 @@
         async function submitRating(ticketId, rating) {
             const starContainer = document.querySelector(`.rating-stars[data-ticket-id="${ticketId}"]`);
             if (!starContainer || starContainer.dataset.submitting === 'true' || starContainer.dataset.rated === 'true') return;
-
             starContainer.dataset.submitting = 'true';
             starContainer.style.opacity = '0.5';
-
             try {
                 const response = await fetch(`${WORKER_URL}/tickets/${ticketId}/rate`, {
                     method: 'POST',
@@ -537,7 +506,6 @@
             const creationDate = new Date(data.created_at).toLocaleString('fa-IR', { dateStyle: 'short', timeStyle: 'short' });
             const departmentName = departmentMap[data.department] || data.department;
             const deleteButton = status === 'closed' ? `<button data-id="${data.id}" class="delete-ticket-btn p-1"><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>` : '';
-
             let ratingSection = '';
             if (status === 'closed') {
                 if (data.rating && data.rating > 0) {
@@ -546,45 +514,17 @@
                         const starColor = i <= data.rating ? 'text-amber-400' : 'text-gray-600';
                         stars += `<svg class="w-5 h-5 ${starColor}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
                     }
-                    ratingSection = `
-                        <div class="mt-3 pt-3 border-t text-center" style="border-color: var(--brand-dark-blue);">
-                            <p class="text-xs text-gray-400 mb-1">امتیاز شما:</p>
-                            <div class="flex justify-center">${stars}</div>
-                        </div>`;
+                    ratingSection = `<div class="mt-3 pt-3 border-t text-center" style="border-color: var(--brand-dark-blue);"><p class="text-xs text-gray-400 mb-1">امتیاز شما:</p><div class="flex justify-center">${stars}</div></div>`;
                 } else {
-                    ratingSection = `
-                        <div class="mt-3 pt-3 border-t text-center" style="border-color: var(--brand-dark-blue);">
-                            <p class="text-xs text-gray-400 mb-2">به کیفیت پاسخ‌دهی امتیاز دهید:</p>
-                            <div class="rating-stars flex flex-row-reverse justify-center" data-ticket-id="${data.id}">
-                                ${[5, 4, 3, 2, 1].map(i => `<svg data-id="${data.id}" data-rating-value="${i}" class="rating-star w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`).join('')}
-                            </div>
-                        </div>`;
+                    ratingSection = `<div class="mt-3 pt-3 border-t text-center" style="border-color: var(--brand-dark-blue);"><p class="text-xs text-gray-400 mb-2">به کیفیت پاسخ‌دهی امتیاز دهید:</p><div class="rating-stars flex flex-row-reverse justify-center" data-ticket-id="${data.id}">${[5, 4, 3, 2, 1].map(i => `<svg data-id="${data.id}" data-rating-value="${i}" class="rating-star w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`).join('')}</div></div>`;
                 }
             }
-
-            const statusBadge = `
-                <span class="flex items-center text-xs px-2 py-1 rounded-full" style="background-color: var(--brand-dark-blue);">
-                    <span class="w-2 h-2 rounded-full ml-2 ${statusDetails.colorClass}"></span>
-                    <span>${statusDetails.text}</span>
-                </span>`;
-
+            const statusBadge = `<span class="flex items-center text-xs px-2 py-1 rounded-full" style="background-color: var(--brand-dark-blue);"><span class="w-2 h-2 rounded-full ml-2 ${statusDetails.colorClass}"></span><span>${statusDetails.text}</span></span>`;
             const animationDelay = index * 80;
-            return `<div class="ticket-card p-4 rounded-lg shadow-lg fade-in-item" style="animation-delay: ${animationDelay}ms; background-color: var(--brand-secondary-bg);" data-id="${data.id}">
-                        <div class="flex justify-between items-start">
-                            <p class="font-bold text-md">${data.subject}</p>
-                            ${statusBadge}
-                        </div>
-                        <div class="flex justify-between items-center text-xs mt-4 pt-2 border-t" style="border-color: var(--brand-dark-blue);">
-                            <span style="color: var(--brand-text-secondary);">${departmentName}</span>
-                            <div class="flex items-center">
-                                ${deleteButton}
-                                <span style="color: var(--brand-text-secondary);">${creationDate}</span>
-                            </div>
-                        </div>
-                        ${ratingSection}
-                    </div>`;
+            return `<div class="ticket-card p-4 rounded-lg shadow-lg fade-in-item" style="animation-delay: ${animationDelay}ms; background-color: var(--brand-secondary-bg);" data-id="${data.id}"><div class="flex justify-between items-start"><p class="font-bold text-md">${data.subject}</p>${statusBadge}</div><div class="flex justify-between items-center text-xs mt-4 pt-2 border-t" style="border-color: var(--brand-dark-blue);"><span style="color: var(--brand-text-secondary);">${departmentName}</span><div class="flex items-center">${deleteButton}<span style="color: var(--brand-text-secondary);">${creationDate}</span></div></div>${ratingSection}</div>`;
         }
-
+        
+        // *** [مهم] تابع رندر پیام به‌روز شد ***
         function renderMessage(data) {
             const isUser = data.sender === 'user';
             const isAdmin = data.sender === 'admin';
@@ -605,31 +545,39 @@
 
             const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
 
-            let messageContent = data.text ? `<p class="whitespace-pre-wrap text-sm">${data.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-300 underline">$1</a>')}</p>` : '';
-            if (data.imageUrl) {
-                messageContent += `<a href="${data.imageUrl}" target="_blank"><img src="${data.imageUrl}" class="rounded-lg max-w-xs mt-2" alt="تصویر پیوست شده"></a>`;
+            let messageContent = '';
+            // *** [جدید] بلاک برای نمایش کادر عکس ***
+            if (data.type === 'image_placeholder') {
+                messageContent = `
+                    <div class="flex items-center space-x-2 space-x-reverse italic opacity-80">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                        </svg>
+                        <p class="text-sm">تصویر ارسال شد</p>
+                    </div>`;
+            } 
+            // بلاک برای پیام‌های متنی (با حفظ نمایش عکس‌های قبلی)
+            else {
+                if (data.text) {
+                    messageContent += `<p class="whitespace-pre-wrap text-sm">${data.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-300 underline">$1</a>')}</p>`;
+                }
+                if (data.imageUrl) {
+                    messageContent += `<a href="${data.imageUrl}" target="_blank"><img src="${data.imageUrl}" class="rounded-lg max-w-xs mt-2" alt="تصویر پیوست شده"></a>`;
+                }
             }
+
 
             let humanRequestButton = '';
             if (isAI) {
-                humanRequestButton = `
-                    <div class="mt-3 pt-2 border-t border-white/10">
-                        <p class="text-xs text-gray-400 mb-2">اگر این پیام مشکلتان را برطرف نکرد:</p>
-                        <button class="request-human-btn text-xs w-full text-center py-2 px-3 rounded-lg border border-sky-500 text-sky-400 hover:bg-sky-500 hover:text-white transition-colors duration-200" data-ticket-id="${currentTicketId}">
-                            برای اتصال به کارشناس کلیک کنید
-                        </button>
-                    </div>
-                `;
+                humanRequestButton = `<div class="mt-3 pt-2 border-t border-white/10"><p class="text-xs text-gray-400 mb-2">اگر این پیام مشکلتان را برطرف نکرد:</p><button class="request-human-btn text-xs w-full text-center py-2 px-3 rounded-lg border border-sky-500 text-sky-400 hover:bg-sky-500 hover:text-white transition-colors duration-200" data-ticket-id="${currentTicketId}">برای اتصال به کارشناس کلیک کنید</button></div>`;
             }
 
-            return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md">
-                        <p class="sender-name ${nameAlign}" style="color: ${isUser ? '#82aaff' : '#a2a2a2'}">${senderName}</p>
-                        <div class="message-bubble ${messageClass}">
-                            ${messageContent}
-                            ${humanRequestButton}
-                        </div>
-                        <span class="message-time px-2 w-full ${nameAlign}">${time}</span>
-                    </div>`;
+            return `<div class="flex flex-col ${containerClass} max-w-xs md:max-w-md"><p class="sender-name ${nameAlign}" style="color: ${isUser ? '#82aaff' : '#a2a2a2'}">${senderName}</p><div class="message-bubble ${messageClass}">${messageContent}${humanRequestButton}</div><span class="message-time px-2 w-full ${nameAlign}">${time}</span></div>`;
+        }
+        
+        function appendMessageToUI(messageData) {
+            conversationContainer.innerHTML += renderMessage(messageData);
+            conversationContainer.scrollTop = conversationContainer.scrollHeight;
         }
 
         function openConversation(ticketId) {
@@ -640,11 +588,9 @@
                 showNotification("خطا: اطلاعات تیکت یافت نشد.", false);
                 return;
             }
-
             conversationView.classList.remove('hidden');
             conversationView.classList.add('flex');
             setTimeout(() => { conversationView.classList.add('is-open'); }, 10);
-
             conversationHeader.textContent = currentTicketData.subject;
             listenToMessages(ticketId);
         }
@@ -657,16 +603,12 @@
                 const result = await response.json();
                 if (result.success) {
                     const messagesData = result.data;
-                    const currentScroll = conversationContainer.scrollTop;
-                    const maxScroll = conversationContainer.scrollHeight - conversationContainer.clientHeight;
-                    const isScrolledToBottom = maxScroll - currentScroll < 50;
-
+                    const isScrolledToBottom = conversationContainer.scrollHeight - conversationContainer.clientHeight <= conversationContainer.scrollTop + 50;
                     conversationContainer.innerHTML = '';
                     if (messagesData) {
                         conversationContainer.innerHTML = Object.values(messagesData).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(renderMessage).join('');
                         attachHumanRequestListeners();
                     }
-
                     if(isScrolledToBottom) {
                         conversationContainer.scrollTop = conversationContainer.scrollHeight;
                     }
@@ -680,21 +622,14 @@
             document.querySelectorAll('.request-human-btn').forEach(button => {
                 if (button.dataset.listenerAttached) return;
                 button.dataset.listenerAttached = 'true';
-
                 button.addEventListener('click', async (e) => {
                     const ticketId = e.target.dataset.ticketId;
                     if (!ticketId) return;
-
                     e.target.disabled = true;
                     e.target.textContent = 'در حال ارسال...';
-
                     try {
-                        const response = await fetch(`${WORKER_URL}/tickets/${ticketId}/request-human`, {
-                            method: 'POST'
-                        });
-                        if (!response.ok) {
-                            throw new Error('خطا در ارسال درخواست');
-                        }
+                        const response = await fetch(`${WORKER_URL}/tickets/${ticketId}/request-human`, { method: 'POST' });
+                        if (!response.ok) { throw new Error('خطا در ارسال درخواست'); }
                         const result = await response.json();
                         if (result.success) {
                             showNotification('درخواست شما برای اتصال به کارشناس ثبت شد.');
@@ -730,41 +665,100 @@
             }, 300);
         }
 
-        async function sendMessage(text, imageUrl = null) {
-            if (!currentTicketId || (!text && !imageUrl)) return;
+        // *** [جدید] تابع ارسال پیام متنی (بهبود یافته) ***
+        async function sendTextMessage(text) {
+             if (!currentTicketId || !text) return;
+             const payload = { ticket_id: currentTicketId, sender: 'user', text: text };
+             const submitButton = replyForm.querySelector('button[type="submit"]');
+             submitButton.disabled = true;
+             
+             appendMessageToUI({ ...payload, created_at: new Date().toISOString() });
+             replyMessageInput.value = '';
+             replyMessageInput.style.height = 'auto';
 
-            const payload = {
-                ticket_id: currentTicketId,
-                sender: 'user',
-                text: text,
-                imageUrl: imageUrl
-            };
+             try {
+                 const response = await fetch(`${WORKER_URL}/messages`, {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify(payload),
+                 });
+                 if (!response.ok) {
+                     const err = await response.json();
+                     throw new Error(err.error || 'خطا در ارسال پیام');
+                 }
+                 fetchMessages(currentTicketId);
+             } catch (error) {
+                 console.error("Error sending message:", error);
+                 showNotification(error.message, false);
+                 fetchMessages(currentTicketId);
+             } finally {
+                 submitButton.disabled = false;
+             }
+        }
+        
+        // *** [جدید] تابع ارسال عکس ***
+        async function handleImageUpload(file) {
+            if (!file) return;
+            if (file.size > 50 * 1024 * 1024) { // 50MB
+                return showNotification("حجم فایل نباید بیشتر از 50 مگابایت باشد.", false);
+            }
 
             const submitButton = replyForm.querySelector('button[type="submit"]');
-            const originalButtonContent = submitButton.innerHTML;
+            attachFileBtn.disabled = true;
             submitButton.disabled = true;
+            showNotification("در حال ارسال تصویر...", true, 0);
 
             try {
+                const formData = new FormData();
+                formData.append('ticket_id', currentTicketId);
+                formData.append('sender', 'user');
+                formData.append('image', file, file.name);
+
                 const response = await fetch(`${WORKER_URL}/messages`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
+                    body: formData,
                 });
-                 if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.error || 'خطا در ارسال پیام');
+
+                if (!response.ok) {
+                    let errorText;
+                    try {
+                        const errJson = await response.json();
+                        errorText = errJson.error || 'خطای ناشناخته سرور.';
+                    } catch (e) {
+                        errorText = await response.text();
+                    }
+                    throw new Error(errorText);
                 }
-                if(text) {
-                    replyMessageInput.value = '';
-                    replyMessageInput.style.height = 'auto';
+                
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.error || "سرور پاسخی ناموفق داد.");
                 }
-                await fetchMessages(currentTicketId);
+                
+                // *** [مهم] این خط، پیام موقت "تصویر ارسال شد" را به دیتابیس هم اضافه می‌کند ***
+                const placeholderPayload = {
+                    ticket_id: currentTicketId,
+                    sender: 'user',
+                    text: 'تصویر ارسال شد.', // متنی که در دیتابیس ذخیره می‌شود
+                    type: 'image_placeholder' // نوع پیام برای تفکیک در UI
+                };
+                await fetch(`${WORKER_URL}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(placeholderPayload),
+                });
+                
+                appendMessageToUI({ ...placeholderPayload, created_at: new Date().toISOString() });
+                showNotification("تصویر با موفقیت ارسال شد.", true);
+                fetchMessages(currentTicketId); // همگام‌سازی با دیتابیس
+
             } catch (error) {
-                console.error("Error sending message:", error);
-                showNotification(error.message, false);
+                console.error("Image send failed:", error);
+                showNotification(`ارسال تصویر ناموفق بود: ${error.message}`, false);
             } finally {
+                attachFileBtn.disabled = false;
                 submitButton.disabled = false;
-                submitButton.innerHTML = originalButtonContent;
+                fileUploadInput.value = '';
             }
         }
 
@@ -777,11 +771,9 @@
                 showNotification("لطفا موضوع و متن پیام را وارد کنید.", false);
                 return;
             }
-
             isSubmitting = true;
             submitNewTicketBtn.disabled = true;
             submitNewTicketBtn.textContent = 'در حال ارسال...';
-
             try {
                 const response = await fetch(`${WORKER_URL}/tickets`, {
                     method: 'POST',
@@ -808,11 +800,23 @@
 
         replyForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            sendMessage(replyMessageInput.value.trim());
+            const text = replyMessageInput.value.trim();
+            if(text) sendTextMessage(text);
         });
 
+        // *** [مهم] Listener دکمه سنجاق به‌روز شد ***
         attachFileBtn.addEventListener('click', () => {
-            showNotification('این قابلیت بزودی اضافه می‌شود.', false);
+            if (!currentTicketId) {
+                return showNotification("لطفا ابتدا یک گفتگو را باز کنید.", false);
+            }
+            fileUploadInput.click();
+        });
+        
+        // *** [جدید] Listener برای انتخاب فایل ***
+        fileUploadInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleImageUpload(e.target.files[0]);
+            }
         });
 
         emojiBtn.addEventListener('click', (e) => {
@@ -838,15 +842,12 @@
             }
         });
 
-
         replyMessageInput.addEventListener('input', () => {
             replyMessageInput.style.height = 'auto';
             replyMessageInput.style.height = (replyMessageInput.scrollHeight) + 'px';
         });
 
-        // --- Event Listeners ---
         navButtons.ticketsList.addEventListener('click', () => showView('ticketsList'));
-
         navButtons.newTicket.addEventListener('click', () => {
             if (hasOpenTicket) {
                 showModal('امکان ایجاد تیکت جدید وجود ندارد', 'شما در حال حاضر یک تیکت باز دارید. لطفا تا زمان بسته شدن آن توسط پشتیبانی منتظر بمانید.', true);
@@ -857,24 +858,14 @@
         });
 
         backToTicketsBtn.addEventListener('click', closeConversation);
-
-        newTicketForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleNewTicketSubmit();
-        });
-
+        newTicketForm.addEventListener('submit', (e) => { e.preventDefault(); handleNewTicketSubmit(); });
         submitNewTicketBtn.addEventListener('click', handleNewTicketSubmit);
-
-        // --- Info Modal Listener ---
         infoModalCloseBtn.addEventListener('click', () => {
             infoModal.classList.add('hidden');
             infoModal.classList.remove('flex');
             showView('newTicket');
         });
 
-        // --- Smart Card Button Listeners ---
-        
-        // START: MODIFICATION FOR TELEGRAM MINI APP
         const faqButton = document.getElementById('faq-button');
         if (faqButton) {
             faqButton.addEventListener('click', () => {
@@ -886,7 +877,6 @@
                 }
             });
         }
-
         const faqLinkModal = document.getElementById('faq-link-modal');
         if (faqLinkModal) {
             faqLinkModal.addEventListener('click', (e) => {
@@ -899,8 +889,6 @@
                 }
             });
         }
-        // END: MODIFICATION FOR TELEGRAM MINI APP
-
     </script>
 </body>
 </html>

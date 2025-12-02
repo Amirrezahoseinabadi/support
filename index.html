@@ -18,12 +18,12 @@
                         brand: {
                             bg: '#f0f4f8',       
                             surface: '#ffffff',  
-                            primary: '#0ea5e9',  
+                            primary: '#0ea5e9',  // Sky 500
                             primaryHover: '#0284c7', 
-                            secondary: '#84cc16', 
-                            text: '#1e293b',     
+                            secondary: '#84cc16', // Lime
+                            text: '#1e293b',     // Slate 800
                             muted: '#64748b',
-                            ai: '#8b5cf6',       
+                            ai: '#8b5cf6',       // Violet
                         }
                     },
                     fontFamily: {
@@ -72,21 +72,24 @@
 
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         
-        /* Standard Glass */
+        /* Glass Blue Effect */
         .glass-blue {
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.05);
+            box-shadow: 
+                0 4px 6px -1px rgba(14, 165, 233, 0.05), 
+                0 10px 15px -3px rgba(14, 165, 233, 0.1),
+                inset 0 0 20px rgba(224, 242, 254, 0.4);
         }
         
-        /* New Animated Glass for Smart Card */
+        /* Animated Glass for Smart Card */
         .glass-animated {
-            background: rgba(255, 255, 255, 0.2); /* More transparent to show colors */
+            background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
         }
         
@@ -130,9 +133,10 @@
             box-shadow: 0 4px 8px rgba(14, 165, 233, 0.2);
         }
 
+        /* Chat Background */
         #conversation-container {
             background-color: #e0f2fe; 
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230ea5e9' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230ea5e9' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2V6h4V4H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
         
         .message-bubble {
@@ -184,7 +188,6 @@
             background-color: rgba(15, 23, 42, 0.3);
         }
         
-        /* Blob Animation Utility */
         .animation-delay-2000 { animation-delay: 2s; }
         .animation-delay-4000 { animation-delay: 4s; }
     </style>
@@ -207,12 +210,14 @@
         
         <!-- Header -->
         <header class="glass-blue sticky top-0 z-20 px-4 h-16 flex items-center justify-between pt-safe shadow-sm transition-shadow">
-            <div class="w-20"></div>
+            <div class="w-24"></div> <!-- Spacer -->
             <h1 id="header-title" class="text-slate-800 text-lg font-bold tracking-tight">تیکت‌های من</h1>
             
             <!-- Online Admin Status -->
-            <div class="w-20 flex justify-end items-center gap-2">
-                 <span id="admin-count" class="text-[10px] font-bold text-brand-secondary opacity-0 animate-fade-in whitespace-nowrap"></span>
+            <div class="w-24 flex justify-end items-center gap-2">
+                 <span id="admin-count" class="text-[10px] font-bold text-brand-secondary opacity-0 animate-fade-in whitespace-nowrap transition-opacity duration-1000">
+                     <!-- Populated by JS -->
+                 </span>
                  <span class="flex h-2.5 w-2.5 relative flex-shrink-0">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-secondary opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-secondary"></span>

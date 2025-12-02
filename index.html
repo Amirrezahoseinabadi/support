@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
     <title>پشتیبانی</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -27,6 +27,9 @@
                     },
                     fontFamily: {
                         sans: ['Vazirmatn', 'sans-serif'],
+                    },
+                    screens: {
+                        'xs': '375px',
                     }
                 }
             }
@@ -35,41 +38,41 @@
     <style>
         body {
             background-color: #0f172a;
+            /* Subtle pattern tailored for mobile screens */
             background-image: radial-gradient(#1e293b 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-size: 16px 16px; 
             color: #f8fafc;
             overflow: hidden;
             -webkit-tap-highlight-color: transparent;
+            /* Safe area handling */
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-
-        /* Glassmorphism Utilities */
+        /* Hide Scrollbar but allow scrolling */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        
+        /* Glassmorphism optimized for performance on mobile */
         .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         .glass-nav {
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .glass-card {
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(4px);
+            background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* Form Elements */
+        /* Input Optimization for Mobile: 16px prevents iOS zoom on focus */
         .form-input, .form-select, .form-textarea {
             background-color: rgba(15, 23, 42, 0.5);
             border: 1px solid #334155;
@@ -77,31 +80,31 @@
             border-radius: 0.75rem;
             padding: 0.75rem 1rem;
             width: 100%;
+            font-size: 16px; 
             transition: all 0.2s;
+            -webkit-appearance: none; /* Remove native shadow/styles */
         }
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-            background-color: rgba(15, 23, 42, 0.8);
+            background-color: rgba(15, 23, 42, 0.9);
         }
 
-        /* Chat Styles */
+        /* Chat Background */
         #conversation-container {
             background-color: #0b1120;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231e293b' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%231e293b' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
         }
         
         .message-bubble {
-            padding: 10px 14px;
-            border-radius: 16px;
-            max-width: 85%;
+            padding: 8px 12px;
+            border-radius: 14px;
+            max-width: 88%;
             width: fit-content;
             word-wrap: break-word;
-            position: relative;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
         }
         
         .message-user {
@@ -117,268 +120,204 @@
             border-bottom-left-radius: 2px;
         }
 
-        /* Navigation */
-        .nav-button {
-            position: relative;
-            transition: all 0.3s ease;
-            opacity: 0.6;
-        }
-        .nav-button.active {
-            opacity: 1;
-            color: #3b82f6;
-        }
-        .nav-button.active::after {
-            content: '';
-            position: absolute;
-            top: -12px;
-            width: 20px;
-            height: 4px;
-            background: #3b82f6;
-            border-radius: 0 0 4px 4px;
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.5);
-        }
+        /* Navigation Animations */
+        .nav-button { opacity: 0.5; transition: all 0.2s; }
+        .nav-button.active { opacity: 1; color: #3b82f6; }
+        .nav-button.active svg { transform: translateY(-2px); filter: drop-shadow(0 4px 6px rgba(59, 130, 246, 0.4)); }
 
-        /* Animations */
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .fade-in-item {
-            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
-        }
+        .fade-in-item { animation: slideInUp 0.3s ease-out forwards; opacity: 0; }
         
+        /* Views Transition */
         #conversation-view {
-            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
             transform: translateX(100%);
-            opacity: 0;
         }
-        #conversation-view.is-open {
-            transform: translateX(0%);
-            opacity: 1;
-        }
+        #conversation-view.is-open { transform: translateX(0%); }
 
-        /* Smart Card Gradient */
-        .smart-card-gradient {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        .smart-card-gradient::before {
-            content: '';
-            position: absolute;
-            top: 0; right: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.15), transparent 60%);
-            pointer-events: none;
-        }
-
-        /* Rating Stars */
-        .rating-star { cursor: pointer; color: #475569; transition: color 0.2s; }
-        .rating-stars:hover .rating-star { color: #f59e0b; }
-        .rating-stars .rating-star:hover ~ .rating-star { color: #475569; }
+        /* Rating Stars - larger touch target */
+        .rating-star { padding: 2px; }
+        
+        /* Safe Area Utilities */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .pt-safe { padding-top: env(safe-area-inset-top); }
     </style>
 </head>
-<body class="flex flex-col h-screen font-sans selection:bg-brand-primary selection:text-white">
+<body class="flex flex-col h-screen font-sans overflow-hidden">
 
     <input type="file" id="file-upload" class="hidden" accept="image/*">
 
     <!-- Loading View -->
-    <div id="loading-view" class="flex flex-col items-center justify-center h-full text-center p-4">
-        <div class="relative w-16 h-16 mb-4">
-            <div class="absolute inset-0 rounded-full border-4 border-brand-surface"></div>
-            <div class="absolute inset-0 rounded-full border-4 border-brand-primary border-t-transparent animate-spin"></div>
-        </div>
-        <p class="text-brand-muted text-sm font-medium animate-pulse">در حال برقراری ارتباط امن...</p>
+    <div id="loading-view" class="flex flex-col items-center justify-center h-full text-center p-4 z-50 bg-brand-bg absolute inset-0">
+        <div class="w-12 h-12 border-4 border-brand-surface border-t-brand-primary rounded-full animate-spin mb-4"></div>
+        <p class="text-brand-muted text-xs animate-pulse">در حال اتصال...</p>
     </div>
 
     <!-- Main App -->
     <div id="main-app-container" class="hidden h-full flex-col relative w-full">
-        <div id="main-content" class="flex-grow flex flex-col">
+        
+        <!-- Header -->
+        <header class="glass sticky top-0 z-20 px-4 h-14 flex items-center justify-center pt-safe">
+            <h1 id="header-title" class="text-white text-base font-bold">تیکت‌ها</h1>
+            <div class="absolute right-4 top-1/2 -translate-y-1/2 pt-safe">
+                 <!-- Status indicator can go here -->
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="app-container" class="flex-grow overflow-y-auto w-full pb-20"> <!-- Added padding for bottom nav -->
             
-            <!-- Header -->
-            <header class="glass sticky top-0 z-20 px-4 py-3 flex items-center justify-center">
-                <div class="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-                <h1 id="header-title" class="text-white text-lg font-bold tracking-wide">تیکت‌ها</h1>
-            </header>
-
-            <!-- Scrollable Content -->
-            <main id="app-container" class="flex-grow overflow-y-auto pb-24">
+            <!-- Tickets List -->
+            <div id="tickets-list-view" class="p-3 w-full">
                 
-                <!-- Tickets List View -->
-                <div id="tickets-list-view" class="p-4 max-w-2xl mx-auto w-full">
+                <!-- Compact Smart Card -->
+                <div id="smart-card" class="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 p-4 rounded-xl shadow-lg mb-4 fade-in-item relative overflow-hidden">
+                    <!-- Decorational Glow -->
+                    <div class="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/20 rounded-full blur-xl pointer-events-none"></div>
                     
-                    <!-- Smart Card -->
-                    <div id="smart-card" class="smart-card-gradient p-5 rounded-2xl shadow-xl mb-6 fade-in-item">
-                        <div class="flex items-center justify-between mb-4 relative z-10">
-                            <h3 id="smart-card-greeting" class="text-xl font-bold text-white">سلام! 👋</h3>
-                            <div class="bg-brand-primary/20 text-brand-primary px-3 py-1 rounded-full text-xs font-medium border border-brand-primary/20">نسخه حرفه‌ای</div>
-                        </div>
-                        <div class="p-4 rounded-xl bg-black/20 text-sm mb-4 border border-white/5 backdrop-blur-sm">
-                            <p class="leading-relaxed text-brand-text/90"><span class="text-lg align-middle ml-1">💡</span> <span class="font-bold text-brand-primary">نکته:</span> پاسخ بسیاری از سوالات در پایگاه دانش موجود است.</p>
-                        </div>
-                        <button id="faq-button" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-white text-sm font-medium px-4 py-3 rounded-xl transition-all shadow-lg shadow-blue-500/20 active:scale-[0.98]">مشاهده سوالات متداول</button>
+                    <div class="flex items-center justify-between mb-3 relative z-10">
+                        <h3 id="smart-card-greeting" class="text-lg font-bold text-white">سلام! 👋</h3>
+                        <!-- Pro Version Removed -->
                     </div>
-
-                    <!-- Tickets Container -->
-                    <div id="tickets-container" class="space-y-3"></div>
-
-                    <!-- Empty State -->
-                    <div id="no-tickets-message" class="hidden flex flex-col items-center justify-center mt-20 text-brand-muted fade-in-item">
-                        <div class="bg-brand-surface p-6 rounded-full mb-4 border border-brand-border">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
-                        </div>
-                        <p class="text-lg font-medium">هیچ تیکتی یافت نشد</p>
-                        <p class="text-sm opacity-60 mt-1">اولین تیکت خود را ایجاد کنید</p>
+                    <div class="p-3 rounded-lg bg-black/30 text-xs mb-3 border border-white/5 backdrop-blur-sm">
+                        <p class="leading-relaxed text-slate-300">💡 پاسخ سریع‌تر در <span class="text-brand-primary font-bold">پایگاه دانش</span> موجود است.</p>
                     </div>
+                    <button id="faq-button" class="w-full bg-brand-primary active:bg-brand-primaryHover text-white text-sm font-medium py-2.5 rounded-lg shadow-lg shadow-blue-500/10 transition-transform active:scale-[0.98]">
+                        سوالات متداول
+                    </button>
                 </div>
 
-                <!-- New Ticket View -->
-                <div id="new-ticket-view" class="p-4 hidden max-w-2xl mx-auto w-full">
-                    <form id="new-ticket-form" class="space-y-5 fade-in-item">
-                        <div class="glass-card p-5 rounded-2xl space-y-4">
-                            <div>
-                                <label for="department" class="block mb-2 text-sm font-medium text-brand-muted">دپارتمان مربوطه</label>
-                                <div class="relative">
-                                    <select id="department" name="department" class="form-select appearance-none">
-                                        <option value="general">سوالات متفرقه</option>
-                                        <option value="technical">واحد فنی و پشتیبانی</option>
-                                        <option value="sales">امور مالی و فروش</option>
-                                        <option value="marketing">بازاریابی و همکاری</option>
-                                        <option value="ideas">انتقادات و پیشنهادات</option>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-3 text-brand-muted">
-                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <label for="subject" class="block mb-2 text-sm font-medium text-brand-muted">موضوع درخواست</label>
-                                <input type="text" id="subject" name="subject" class="form-input" placeholder="مثلا: مشکل در ورود به پنل" required>
-                            </div>
-                        </div>
+                <div id="tickets-container" class="space-y-2.5"></div>
 
-                        <div class="glass-card p-5 rounded-2xl">
-                            <label for="message" class="block mb-2 text-sm font-medium text-brand-muted">شرح درخواست</label>
-                            <textarea id="message" name="message" rows="6" class="form-textarea" placeholder="توضیحات کامل خود را اینجا بنویسید..." required></textarea>
-                        </div>
-
-                        <button type="button" id="submit-new-ticket-btn" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-white py-3.5 rounded-xl font-bold text-lg shadow-lg shadow-blue-500/25 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
-                            ارسال تیکت
-                        </button>
-                    </form>
-                </div>
-            </main>
-
-            <!-- Navigation Bar -->
-            <nav id="main-nav" class="glass-nav fixed bottom-0 w-full h-[80px] flex items-center justify-around z-30 pb-2">
-                <button id="nav-tickets-list" class="nav-button active flex flex-col items-center justify-center space-y-1.5 w-1/2 h-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                    <span class="text-[11px] font-medium">تیکت‌های من</span>
-                </button>
-                <div class="w-px h-8 bg-brand-border"></div>
-                <button id="nav-new-ticket" class="nav-button flex flex-col items-center justify-center space-y-1.5 w-1/2 h-full">
-                    <div class="bg-brand-primary/10 p-1 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                <div id="no-tickets-message" class="hidden flex flex-col items-center justify-center mt-12 text-brand-muted fade-in-item">
+                    <div class="bg-brand-surface/50 p-5 rounded-full mb-3 border border-dashed border-brand-border">
+                        <svg class="h-8 w-8 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                     </div>
-                    <span class="text-[11px] font-medium">تیکت جدید</span>
-                </button>
-            </nav>
-        </div>
-
-        <!-- Conversation View -->
-        <div id="conversation-view" class="fixed inset-0 z-40 flex flex-col bg-brand-bg">
-             <header class="glass sticky top-0 z-10 p-3 flex items-center shadow-lg shadow-black/5">
-                <button id="back-to-tickets" class="p-2 rounded-full hover:bg-white/5 transition-colors active:scale-95 text-white transform rotate-180">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                </button>
-                <div class="flex flex-col mr-3">
-                    <h2 id="conversation-header" class="text-white font-bold text-base leading-tight">گفتگو</h2>
-                    <span class="text-xs text-brand-muted mt-0.5 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> آنلاین
-                    </span>
+                    <p class="text-sm font-medium">هنوز تیکتی ندارید</p>
                 </div>
-             </header>
-
-            <div id="conversation-container" class="p-4 space-y-3 flex flex-col flex-grow overflow-y-auto pb-4"></div>
-
-            <!-- Emoji Picker -->
-            <div id="emoji-picker-container" class="absolute bottom-[80px] right-4 z-50 hidden shadow-2xl rounded-xl overflow-hidden border border-brand-border">
-                <emoji-picker></emoji-picker>
             </div>
 
-            <!-- Reply Box -->
-             <div id="reply-box" class="p-3 sticky bottom-0 glass-nav">
-                <form id="reply-form" class="flex items-end gap-2 bg-brand-surface border border-brand-border rounded-2xl p-2 focus-within:border-brand-primary focus-within:ring-1 focus-within:ring-brand-primary/50 transition-all">
-                    <button type="button" id="attach-file-btn" class="icon-button text-brand-muted hover:text-brand-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
-                    </button>
-                    <textarea id="reply-message" rows="1" class="flex-grow bg-transparent border-none text-white placeholder-brand-muted/50 py-2.5 max-h-[100px] resize-none focus:ring-0 text-sm" placeholder="پیام خود را بنویسید..." required></textarea>
-                    <button type="button" id="emoji-btn" class="icon-button text-brand-muted hover:text-brand-primary mb-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </button>
-                    <button type="submit" class="bg-brand-primary hover:bg-brand-primaryHover text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/20 transition-transform active:scale-95 mb-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+            <!-- New Ticket Form -->
+            <div id="new-ticket-view" class="p-3 hidden w-full">
+                <form id="new-ticket-form" class="space-y-4 fade-in-item">
+                    <div class="glass-card p-4 rounded-xl space-y-3">
+                        <div>
+                            <label class="block mb-1.5 text-xs font-medium text-brand-muted">واحد مربوطه</label>
+                            <div class="relative">
+                                <select id="department" name="department" class="form-select appearance-none">
+                                    <option value="general">سوالات متفرقه</option>
+                                    <option value="technical">فنی و پشتیبانی</option>
+                                    <option value="sales">فروش و مالی</option>
+                                    <option value="ideas">پیشنهادات</option>
+                                </select>
+                                <svg class="w-4 h-4 absolute left-3 top-3.5 text-brand-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block mb-1.5 text-xs font-medium text-brand-muted">موضوع</label>
+                            <input type="text" id="subject" class="form-input" placeholder="عنوان کوتاه..." required>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-4 rounded-xl">
+                        <label class="block mb-1.5 text-xs font-medium text-brand-muted">متن پیام</label>
+                        <textarea id="message" rows="5" class="form-textarea" placeholder="توضیحات خود را بنویسید..." required></textarea>
+                    </div>
+
+                    <button type="button" id="submit-new-ticket-btn" class="w-full bg-brand-primary active:bg-brand-primaryHover text-white py-3 rounded-xl font-bold text-base shadow-lg shadow-blue-500/20 transition-transform active:scale-[0.98]">
+                        ارسال تیکت
                     </button>
                 </form>
             </div>
-            
-            <div id="closed-ticket-banner" class="p-4 text-center bg-brand-surface border-t border-brand-border text-brand-muted text-sm hidden">
-                <p class="flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    این گفتگو بسته شده است.
-                </p>
+        </main>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav id="main-nav" class="glass-nav fixed bottom-0 w-full z-30 flex items-start justify-around pb-safe pt-2 h-[calc(60px+env(safe-area-inset-bottom))]">
+            <button id="nav-tickets-list" class="nav-button active flex flex-col items-center justify-center w-1/2 h-full -mt-1">
+                <svg class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                <span class="text-[10px] font-medium">تیکت‌ها</span>
+            </button>
+            <button id="nav-new-ticket" class="nav-button flex flex-col items-center justify-center w-1/2 h-full -mt-1">
+                <svg class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                <span class="text-[10px] font-medium">جدید</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Conversation View (Full Screen Overlay) -->
+    <div id="conversation-view" class="fixed inset-0 z-40 flex flex-col bg-brand-bg h-[100dvh]"> <!-- 100dvh handles mobile browser bars better -->
+         <header class="glass sticky top-0 z-10 px-3 h-14 flex items-center shadow-md pt-safe">
+            <button id="back-to-tickets" class="p-2 -mr-2 rounded-full active:bg-white/10 text-white transform rotate-180">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+            </button>
+            <div class="flex flex-col mr-2 overflow-hidden">
+                <h2 id="conversation-header" class="text-white font-bold text-sm truncate">گفتگو</h2>
+                <span class="text-[10px] text-green-400 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> آنلاین
+                </span>
             </div>
+         </header>
+
+        <div id="conversation-container" class="p-3 space-y-3 flex flex-col flex-grow overflow-y-auto"></div>
+
+        <!-- Emoji Picker -->
+        <div id="emoji-picker-container" class="absolute bottom-[70px] right-2 z-50 hidden shadow-2xl rounded-xl border border-brand-border">
+            <emoji-picker style="width: 300px; height: 350px; --font-size: 14px;"></emoji-picker>
+        </div>
+
+        <!-- Reply Area -->
+         <div id="reply-box" class="p-2 sticky bottom-0 glass-nav pb-safe">
+            <form id="reply-form" class="flex items-end gap-2 bg-brand-surface border border-brand-border rounded-xl p-1.5">
+                <button type="button" id="attach-file-btn" class="p-2 text-brand-muted active:text-brand-primary">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                </button>
+                <textarea id="reply-message" rows="1" class="flex-grow bg-transparent border-none text-white placeholder-slate-500 py-2.5 max-h-[80px] resize-none focus:ring-0 text-sm" placeholder="پیام..." required style="min-height: 40px;"></textarea>
+                <button type="button" id="emoji-btn" class="p-2 text-brand-muted active:text-brand-primary">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </button>
+                <button type="submit" class="bg-brand-primary active:bg-brand-primaryHover text-white p-2 rounded-lg shadow-md transition-transform active:scale-95">
+                    <svg class="h-5 w-5 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                </button>
+            </form>
+        </div>
+        
+        <div id="closed-ticket-banner" class="p-4 text-center bg-brand-surface pb-safe border-t border-brand-border text-brand-muted text-xs hidden">
+            <p>این گفتگو بسته شده است.</p>
         </div>
     </div>
 
-    <!-- Info Modal -->
-    <div id="info-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4 transition-all duration-300">
-        <div class="bg-brand-surface border border-brand-border p-6 rounded-2xl w-full max-w-md flex flex-col max-h-[90vh] shadow-2xl">
-            <div class="text-center mb-6">
-                <div class="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg class="w-6 h-6 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <h3 class="text-xl font-bold text-white">راهنمای ثبت تیکت</h3>
+    <!-- Modals -->
+    <div id="info-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-6">
+        <div class="bg-brand-surface border border-brand-border p-5 rounded-2xl w-full max-w-sm flex flex-col shadow-2xl animate-[slideInUp_0.3s_ease-out]">
+            <div class="text-center mb-4">
+                <h3 class="text-lg font-bold text-white">راهنما</h3>
             </div>
-            <div class="overflow-y-auto space-y-4 text-sm text-brand-muted leading-relaxed">
-                <div class="bg-brand-bg p-4 rounded-xl border border-brand-border">
-                    <h4 class="font-bold text-white mb-2 flex items-center gap-2"><svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM17.414 10a1 1 0 100-2h-1a1 1 0 100 2h1zM14.95 14.95a1 1 0 00-1.414 1.414l.707.707a1 1 0 001.414-1.414l-.707-.707zM10 17.414a1 1 0 100-2v1a1 1 0 100 2v-1zM6.464 15.657a1 1 0 00-1.414 1.414l.707.707a1 1 0 001.414-1.414l-.707-.707zM3.586 10a1 1 0 100-2H4.586a1 1 0 100 2H3.586zM4.95 4.95a1 1 0 00-1.414 1.414l.707.707a1 1 0 001.414-1.414l-.707-.707z"></path></svg> نکته مهم:</h4>
-                    <p>لطفاً قبل از ارسال، <a href="#" id="faq-link-modal" class="text-brand-primary hover:underline font-medium">سوالات متداول</a> را مطالعه کنید.</p>
-                </div>
-                <div>
-                    <h4 class="font-bold text-white mb-2">ساختار پیشنهادی پیام:</h4>
-                    <div class="p-3 rounded-lg bg-black/20 font-mono text-xs border border-white/5">
-                        <p class="whitespace-pre-wrap opacity-80">موضوع: [عنوان کوتاه مشکل]
-شرح: [توضیحات دقیق + اقدامات انجام شده]
-اگر خطایی دریافت می‌کنید، متن خطا را بنویسید.</p>
-                    </div>
+            <div class="space-y-3 text-xs text-slate-300 leading-6 mb-5">
+                <p>💡 قبل از ارسال، <span id="faq-link-modal" class="text-blue-400 font-bold underline">سوالات متداول</span> را چک کنید.</p>
+                <div class="bg-black/20 p-3 rounded-lg border border-white/5">
+                    <p class="opacity-80">لطفا مشکل خود را شفاف و در یک پیام بنویسید.</p>
                 </div>
             </div>
-            <div class="mt-6 pt-4 border-t border-brand-border">
-                <button id="info-modal-close-btn" class="w-full bg-brand-surface hover:bg-brand-border border border-brand-border text-white px-6 py-2.5 rounded-xl transition-all">متوجه شدم</button>
-            </div>
+            <button id="info-modal-close-btn" class="w-full bg-brand-primary text-white py-2.5 rounded-xl text-sm font-medium">متوجه شدم</button>
         </div>
     </div>
     
-    <!-- Custom Alert Modal -->
-    <div id="custom-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-brand-surface border border-brand-border rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center transform transition-all scale-100">
-            <div id="modal-icon" class="mx-auto mb-4 p-3 bg-brand-bg rounded-full w-fit"></div>
-            <h3 id="modal-title" class="text-lg font-bold mb-2 text-white"></h3>
-            <p id="modal-message" class="text-brand-muted mb-6 text-sm"></p>
-            <button id="modal-close-btn" class="bg-brand-primary hover:bg-brand-primaryHover text-white px-6 py-2.5 rounded-xl w-full shadow-lg shadow-blue-500/20">باشه</button>
+    <div id="custom-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden items-center justify-center z-50 p-6">
+        <div class="bg-brand-surface border border-brand-border rounded-2xl shadow-2xl p-5 w-full max-w-sm text-center">
+            <div id="modal-icon" class="mx-auto mb-3"></div>
+            <h3 id="modal-title" class="text-base font-bold mb-2 text-white"></h3>
+            <p id="modal-message" class="text-slate-400 mb-5 text-xs"></p>
+            <button id="modal-close-btn" class="bg-brand-primary text-white w-full py-2.5 rounded-xl text-sm">باشه</button>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="notification-toast" class="fixed top-6 right-1/2 translate-x-1/2 max-w-[90%] w-auto min-w-[300px] bg-brand-surface border border-brand-border text-white px-4 py-3 rounded-xl shadow-2xl opacity-0 transition-all duration-300 z-50 flex items-center gap-3"></div>
+    <div id="notification-toast" class="fixed top-4 left-4 right-4 bg-brand-surface border border-brand-border text-white px-4 py-3 rounded-xl shadow-2xl opacity-0 transition-all duration-300 z-[60] flex items-center gap-3 text-xs"></div>
 
     <script>
-        // --- Note: This worker URL is from the original template and might be external. ---
         const WORKER_URL = 'https://support-api-worker.amiruserbot7.workers.dev';
-        
-        // --- Firebase Config from original template ---
         const firebaseConfig = {
             apiKey: "AIzaSyAjBkdCe-kJK2VFfM3lSFyFiFNXElOCPSg",
             authDomain: "support-app-final.firebaseapp.com",
@@ -401,6 +340,15 @@
         let messagesPollingInterval = null;
         let hasOpenTicket = false;
         let isSubmitting = false;
+
+        // Ensure Telegram WebApp is expanded and colors are set
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.expand();
+            tg.setHeaderColor('#0f172a');
+            tg.setBackgroundColor('#0f172a');
+            tg.enableClosingConfirmation();
+        }
 
         const loadingView = document.getElementById('loading-view');
         const mainAppContainer = document.getElementById('main-app-container');
@@ -430,38 +378,34 @@
 
         const departmentMap = {
             general: 'سوالات متفرقه',
-            technical: 'واحد فنی',
-            sales: 'واحد فروش',
-            marketing: 'واحد بازاریابی',
-            ideas: 'ایده ها و پیشنهادات'
+            technical: 'فنی',
+            sales: 'فروش',
+            ideas: 'ایده ها'
         };
 
         const statusInfo = {
             open: { text: 'باز', colorClass: 'bg-green-500', bgClass: 'bg-green-500/10 text-green-400' },
-            'in-progress': { text: 'در حال بررسی', colorClass: 'bg-amber-500', bgClass: 'bg-amber-500/10 text-amber-400' },
-            answered: { text: 'پاسخ داده شده', colorClass: 'bg-blue-500', bgClass: 'bg-blue-500/10 text-blue-400' },
-            closed: { text: 'بسته شده', colorClass: 'bg-slate-500', bgClass: 'bg-slate-500/10 text-slate-400' }
+            'in-progress': { text: 'بررسی', colorClass: 'bg-amber-500', bgClass: 'bg-amber-500/10 text-amber-400' },
+            answered: { text: 'پاسخ داده', colorClass: 'bg-blue-500', bgClass: 'bg-blue-500/10 text-blue-400' },
+            closed: { text: 'بسته', colorClass: 'bg-slate-500', bgClass: 'bg-slate-500/10 text-slate-400' }
         };
         
         let activeToastTimeout = null;
-        function showNotification(message, success = true, duration = 3000) {
+        function showNotification(message, success = true, duration = 2500) {
             const toast = document.getElementById('notification-toast');
-            
-            // Icon
             const icon = success 
-                ? `<svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
-                : `<svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                ? `<svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`
+                : `<svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
 
-            toast.innerHTML = `${icon} <span class="font-medium text-sm">${message}</span>`;
-            
-            toast.className = `fixed top-6 right-1/2 translate-x-1/2 max-w-[90%] w-auto min-w-[300px] border px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 z-50 flex items-center gap-3 backdrop-blur-md ${success ? 'bg-slate-800/90 border-green-500/30 text-white' : 'bg-slate-800/90 border-red-500/30 text-white'}`;
+            toast.innerHTML = `${icon} <span class="font-medium">${message}</span>`;
+            toast.className = `fixed top-4 left-4 right-4 border px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 z-[60] flex items-center gap-3 backdrop-blur-md text-xs ${success ? 'bg-slate-800/95 border-green-500/20 text-white' : 'bg-slate-800/95 border-red-500/20 text-white'}`;
             
             if(activeToastTimeout) clearTimeout(activeToastTimeout);
-            toast.classList.remove('opacity-0', 'translate-y-[-20px]');
+            toast.classList.remove('opacity-0', '-translate-y-4');
             
             if (duration > 0) {
                 activeToastTimeout = setTimeout(() => {
-                    toast.classList.add('opacity-0', 'translate-y-[-20px]');
+                    toast.classList.add('opacity-0', '-translate-y-4');
                 }, duration);
             }
         }
@@ -470,8 +414,8 @@
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
             const icon = isError 
-                ? `<svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`
-                : `<svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                ? `<svg class="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`
+                : `<svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
             document.getElementById('modal-icon').innerHTML = icon;
             document.getElementById('custom-modal').classList.remove('hidden');
             document.getElementById('custom-modal').classList.add('flex');
@@ -495,24 +439,17 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             try {
-                // Mock Telegram WebApp check for browser testing
                 const tg = window.Telegram ? window.Telegram.WebApp : null;
                 
                 if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
                     tg.ready();
-                    tg.expand(); // Expand to full height
-                    // Set header color
-                    tg.setHeaderColor('#0f172a'); 
-                    tg.setBackgroundColor('#0f172a');
                     startApp(tg.initDataUnsafe.user);
                 } else {
                     console.warn("Telegram user data not found. Using mock user.");
-                    // Start with mock user for preview purposes
                     startApp({id: "319237991", first_name: "Amir", last_name: "Hoseinabadi"});
                 }
             } catch (error) {
                 console.error("Could not initialize Telegram Web App:", error);
-                // Even on error, try to start with mock to show UI
                 startApp({id: "319237991", first_name: "Amir", last_name: "Hoseinabadi"});
             }
         });
@@ -525,7 +462,7 @@
                 headerTitle.textContent = 'تیکت‌های من';
             } else if (viewName === 'newTicket') {
                 newTicketView.classList.remove('hidden');
-                headerTitle.textContent = 'ثبت تیکت جدید';
+                headerTitle.textContent = 'ثبت تیکت';
             }
             Object.values(navButtons).forEach(btn => btn.classList.remove('active'));
             if (navButtons[viewName]) navButtons[viewName].classList.add('active');
@@ -535,14 +472,10 @@
             if (!telegramUserId) return;
             try {
                 const response = await fetch(`${WORKER_URL}/tickets?telegram_id=${telegramUserId}`);
-                if (!response.ok) {
-                   // console.warn('Server error, using mock data for display only');
-                    return; 
-                }
+                if (!response.ok) return;
                 const result = await response.json();
                 if (result.success) {
                     allTicketsData = result.data ? Object.keys(result.data).map(key => ({ id: key, ...result.data[key] })) : [];
-                    
                     if (currentTicketId) {
                         const updatedTicketData = allTicketsData.find(t => t.id === currentTicketId);
                         if (updatedTicketData && currentTicketData && updatedTicketData.status !== currentTicketData.status) {
@@ -550,12 +483,9 @@
                             updateConversationViewUI();
                         }
                     }
-                    
                     renderTickets(allTicketsData);
                 }
-            } catch (error) {
-                console.error("Error fetching tickets:", error);
-            }
+            } catch (error) { console.error("Error fetching tickets:", error); }
         }
 
         function listenToTickets() {
@@ -565,23 +495,17 @@
         }
 
         async function deleteTicket(ticketId) {
-            // Use custom modal for confirmation later, for now native confirm
-            if (confirm('آیا از حذف تاریخچه این تیکت اطمینان دارید؟')) {
+            if (confirm('حذف تیکت؟')) {
                 try {
                     const response = await fetch(`${WORKER_URL}/tickets?ticket_id=${ticketId}`, { method: 'DELETE' });
-                     if (!response.ok) {
-                        throw new Error('خطا در حذف تیکت');
-                    }
+                     if (!response.ok) throw new Error('خطا');
                     const result = await response.json();
                     if (result.success) {
-                        showNotification('تیکت با موفقیت حذف شد.');
+                        showNotification('حذف شد.');
                         fetchTickets();
-                    } else {
-                        throw new Error(result.error);
                     }
                 } catch (error) {
-                    showNotification(`حذف تیکت با خطا مواجه شد`, false);
-                    console.error("Error deleting ticket:", error);
+                    showNotification(`خطا در حذف`, false);
                 }
             }
         }
@@ -596,7 +520,6 @@
                 const sortedTickets = tickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 ticketsContainer.innerHTML = sortedTickets.map((ticket, index) => renderTicket(ticket, index)).join('');
                 
-                // Event Listeners
                 document.querySelectorAll('.ticket-card').forEach(card => {
                     card.addEventListener('click', (e) => {
                         if (e.target.closest('.rating-stars') || e.target.closest('.delete-ticket-btn')) return;
@@ -604,17 +527,12 @@
                     });
                 });
                 document.querySelectorAll('.delete-ticket-btn').forEach(btn => { 
-                    btn.addEventListener('click', (e) => { 
-                        e.stopPropagation(); 
-                        deleteTicket(btn.dataset.id); 
-                    }); 
+                    btn.addEventListener('click', (e) => { e.stopPropagation(); deleteTicket(btn.dataset.id); }); 
                 });
                 document.querySelectorAll('.rating-star').forEach(star => {
                     star.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        const ticketId = star.dataset.id;
-                        const ratingValue = star.dataset.ratingValue;
-                        submitRating(ticketId, parseInt(ratingValue));
+                        submitRating(star.dataset.id, parseInt(star.dataset.ratingValue));
                     });
                 });
             }
@@ -631,16 +549,13 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ rating: rating, telegram_id: telegramUserId }),
                 });
-                if (!response.ok) throw new Error('خطا در ثبت امتیاز');
-                
-                showNotification('امتیاز شما با موفقیت ثبت شد.');
+                if (!response.ok) throw new Error('Error');
+                showNotification('ثبت شد.');
                 const ticket = allTicketsData.find(t => t.id === ticketId);
-                if (ticket) {
-                    ticket.rating = rating;
-                }
+                if (ticket) ticket.rating = rating;
                 renderTickets(allTicketsData);
             } catch (error) {
-                showNotification(`ثبت امتیاز با خطا مواجه شد`, false);
+                showNotification(`خطا`, false);
                 delete starContainer.dataset.submitting;
                 starContainer.style.opacity = '1';
             }
@@ -653,10 +568,7 @@
             const departmentName = departmentMap[data.department] || data.department;
             
             const deleteButton = status === 'closed' 
-                ? `<button data-id="${data.id}" class="delete-ticket-btn p-2 rounded-full hover:bg-red-500/10 text-brand-muted hover:text-red-400 transition-colors z-10 ml-2">
-                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                   </button>` 
-                : '';
+                ? `<button data-id="${data.id}" class="delete-ticket-btn p-2 text-slate-500 hover:text-red-400 z-10 -ml-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>` : '';
 
             let ratingSection = '';
             if (status === 'closed') {
@@ -664,39 +576,25 @@
                     let stars = '';
                     for (let i = 1; i <= 5; i++) {
                         const starColor = i <= data.rating ? 'text-amber-400' : 'text-slate-600';
-                        stars += `<svg class="w-4 h-4 ${starColor}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
+                        stars += `<svg class="w-3 h-3 ${starColor}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
                     }
-                    ratingSection = `
-                        <div class="mt-3 pt-3 border-t border-dashed border-white/5 flex items-center justify-between">
-                            <span class="text-xs text-brand-muted">امتیاز ثبت شده:</span>
-                            <div class="flex gap-0.5">${stars}</div>
-                        </div>`;
+                    ratingSection = `<div class="mt-2 pt-2 border-t border-dashed border-white/5 flex items-center justify-between"><span class="text-[10px] text-slate-500">امتیاز:</span><div class="flex">${stars}</div></div>`;
                 } else {
-                    ratingSection = `
-                        <div class="mt-3 pt-3 border-t border-dashed border-white/5 flex items-center justify-between">
-                            <span class="text-xs text-brand-muted">ثبت امتیاز:</span>
-                            <div class="rating-stars flex flex-row-reverse gap-1" data-ticket-id="${data.id}">
-                                ${[5, 4, 3, 2, 1].map(i => `<svg data-id="${data.id}" data-rating-value="${i}" class="rating-star w-5 h-5 hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`).join('')}
-                            </div>
-                        </div>`;
+                    ratingSection = `<div class="mt-2 pt-2 border-t border-dashed border-white/5 flex items-center justify-between"><span class="text-[10px] text-slate-500">ثبت نظر:</span><div class="rating-stars flex flex-row-reverse" data-ticket-id="${data.id}">${[5, 4, 3, 2, 1].map(i => `<svg data-id="${data.id}" data-rating-value="${i}" class="rating-star w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`).join('')}</div></div>`;
                 }
             }
 
-            const animationDelay = index * 80;
             return `
-            <div class="ticket-card glass-card p-4 rounded-xl fade-in-item cursor-pointer hover:bg-brand-surface transition-all mb-3 relative overflow-hidden group" style="animation-delay: ${animationDelay}ms;" data-id="${data.id}">
+            <div class="ticket-card glass-card p-3 rounded-xl fade-in-item active:scale-[0.99] transition-transform mb-2 relative overflow-hidden group" style="animation-delay: ${index * 50}ms;" data-id="${data.id}">
                 <div class="absolute top-0 right-0 w-1 h-full ${statusDetails.colorClass}"></div>
-                <div class="flex justify-between items-start mb-2 pl-2">
-                    <h4 class="font-bold text-base text-white truncate max-w-[65%]">${data.subject}</h4>
-                    <span class="flex items-center text-[10px] px-2.5 py-1 rounded-full border border-white/5 ${statusDetails.bgClass}">
-                        <span class="w-1.5 h-1.5 rounded-full ml-1.5 ${statusDetails.colorClass} animate-pulse"></span>
-                        ${statusDetails.text}
-                    </span>
+                <div class="flex justify-between items-start mb-1 pl-1">
+                    <h4 class="font-bold text-sm text-white truncate max-w-[60%]">${data.subject}</h4>
+                    <span class="flex items-center text-[9px] px-2 py-0.5 rounded-full border border-white/5 ${statusDetails.bgClass}">${statusDetails.text}</span>
                 </div>
-                <div class="flex justify-between items-end text-xs text-brand-muted mt-2">
-                    <div class="flex flex-col gap-1">
-                        <span class="flex items-center gap-1 opacity-80"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg> ${departmentName}</span>
-                        <span class="flex items-center gap-1 opacity-60"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> ${creationDate}</span>
+                <div class="flex justify-between items-end text-[10px] text-slate-400 mt-1">
+                    <div class="flex flex-col gap-0.5">
+                        <span>${departmentName}</span>
+                        <span>${creationDate}</span>
                     </div>
                     ${deleteButton}
                 </div>
@@ -708,62 +606,25 @@
             const isUser = data.sender === 'user';
             const isAdmin = data.sender === 'admin';
             const isAI = isAdmin && data.source === 'ai';
-
             const messageClass = isUser ? 'message-user' : 'message-admin';
-            const containerClass = isUser ? 'self-start items-start' : 'self-end items-end'; // Fixed alignment
-            const nameAlign = isUser ? 'text-right' : 'text-left';
-
-            let senderName = '';
-            if (isUser) {
-                senderName = telegramUserName;
-            } else if (isAI) {
-                senderName = 'پاسخ هوشمند';
-            } else {
-                senderName = currentTicketData ? departmentMap[currentTicketData.department] : 'پشتیبانی';
-            }
-
+            const containerClass = isUser ? 'self-start items-start' : 'self-end items-end';
+            const senderName = isUser ? telegramUserName : (isAI ? 'هوش مصنوعی' : 'پشتیبان');
             const time = new Date(data.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit'});
 
-            let messageContent = '';
+            let content = '';
             if (data.type === 'image_placeholder') {
-                messageContent = `
-                    <div class="flex items-center space-x-2 space-x-reverse italic opacity-90">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
-                        </svg>
-                        <span class="text-sm">تصویر ارسال شد</span>
-                    </div>`;
-            } 
-            else {
-                if (data.text) {
-                    messageContent += `<p class="whitespace-pre-wrap text-sm leading-relaxed">${data.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-300 underline decoration-dotted underline-offset-4">$1</a>')}</p>`;
-                }
-                if (data.imageUrl) {
-                    messageContent += `<a href="${data.imageUrl}" target="_blank" class="block mt-2"><img src="${data.imageUrl}" class="rounded-lg max-w-full border border-white/10" alt="پیوست" loading="lazy"></a>`;
-                }
+                content = `<div class="flex items-center gap-1 italic opacity-80"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg><span>تصویر</span></div>`;
+            } else {
+                if (data.text) content += `<p class="whitespace-pre-wrap">${data.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-200 underline">$1</a>')}</p>`;
+                if (data.imageUrl) content += `<a href="${data.imageUrl}" target="_blank" class="block mt-2"><img src="${data.imageUrl}" class="rounded-lg max-w-full border border-white/10"></a>`;
             }
-
-
-            let humanRequestButton = '';
+            
+            let aiBtn = '';
             if (isAI) {
-                humanRequestButton = `
-                <div class="mt-3 pt-2 border-t border-white/10">
-                    <p class="text-[10px] text-white/50 mb-2">آیا پاسخ مفید بود؟</p>
-                    <button class="request-human-btn w-full text-xs py-2 px-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all flex items-center justify-center gap-2" data-ticket-id="${currentTicketId}">
-                        <span>اتصال به اپراتور انسانی</span>
-                    </button>
-                </div>`;
+                aiBtn = `<div class="mt-2 pt-2 border-t border-white/10"><button class="request-human-btn w-full text-[10px] py-1.5 px-2 rounded bg-white/5 active:bg-white/10 text-white flex justify-center" data-ticket-id="${currentTicketId}">اتصال به اپراتور</button></div>`;
             }
 
-            return `
-            <div class="flex flex-col ${containerClass} max-w-[85%] md:max-w-md group animate-fade-in-up">
-                <span class="text-[10px] text-brand-muted mb-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity">${senderName}</span>
-                <div class="message-bubble ${messageClass}">
-                    ${messageContent}
-                    ${humanRequestButton}
-                </div>
-                <span class="text-[10px] text-brand-muted mt-1 px-1 opacity-60">${time}</span>
-            </div>`;
+            return `<div class="flex flex-col ${containerClass} max-w-[85%] group"><span class="text-[9px] text-slate-500 mb-0.5 px-1">${senderName}</span><div class="message-bubble ${messageClass}">${content}${aiBtn}</div><span class="text-[9px] text-slate-500 mt-0.5 px-1 opacity-70">${time}</span></div>`;
         }
         
         function appendMessageToUI(messageData) {
@@ -774,16 +635,10 @@
         function openConversation(ticketId) {
             currentTicketId = ticketId;
             currentTicketData = allTicketsData.find(t => t.id === ticketId);
-            if (!currentTicketData) {
-                console.error("Could not find ticket data for ID:", ticketId);
-                showNotification("خطا: اطلاعات تیکت یافت نشد.", false);
-                return;
-            }
-            conversationView.classList.remove('hidden');
-            conversationView.classList.add('flex');
-            // Small delay to allow display:flex to apply before opacity transition
-            setTimeout(() => { conversationView.classList.add('is-open'); }, 50);
+            if (!currentTicketData) return showNotification("یافت نشد", false);
             
+            conversationView.classList.remove('hidden');
+            setTimeout(() => { conversationView.classList.add('is-open'); }, 10);
             conversationHeader.textContent = currentTicketData.subject;
             listenToMessages(ticketId);
             updateConversationViewUI();
@@ -803,25 +658,15 @@
             if (!ticketId) return;
             try {
                 const response = await fetch(`${WORKER_URL}/messages?ticket_id=${ticketId}`);
-                if (!response.ok) throw new Error("خطا در دریافت پیام‌ها");
+                if (!response.ok) return;
                 const result = await response.json();
-                if (result.success) {
-                    const messagesData = result.data;
-                    const isScrolledToBottom = conversationContainer.scrollHeight - conversationContainer.clientHeight <= conversationContainer.scrollTop + 100;
-                    
-                    // Smart update: only replace if needed or empty (simplified for this demo)
-                    conversationContainer.innerHTML = '';
-                    if (messagesData) {
-                        conversationContainer.innerHTML = Object.values(messagesData).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(renderMessage).join('');
-                        attachHumanRequestListeners();
-                    }
-                    if(isScrolledToBottom) {
-                        conversationContainer.scrollTop = conversationContainer.scrollHeight;
-                    }
+                if (result.success && result.data) {
+                    const isBottom = conversationContainer.scrollHeight - conversationContainer.clientHeight <= conversationContainer.scrollTop + 150;
+                    conversationContainer.innerHTML = Object.values(result.data).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(renderMessage).join('');
+                    attachHumanRequestListeners();
+                    if(isBottom) conversationContainer.scrollTop = conversationContainer.scrollHeight;
                 }
-            } catch (error) {
-                console.error("Error fetching messages:", error);
-            }
+            } catch (error) {}
         }
 
         function attachHumanRequestListeners() {
@@ -829,30 +674,18 @@
                 if (button.dataset.listenerAttached) return;
                 button.dataset.listenerAttached = 'true';
                 button.addEventListener('click', async (e) => {
-                    const btn = e.currentTarget; // use currentTarget
-                    const ticketId = btn.dataset.ticketId;
-                    if (!ticketId) return;
-                    
+                    const btn = e.currentTarget;
                     btn.disabled = true;
-                    const originalText = btn.innerHTML;
-                    btn.innerHTML = `<svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> در حال پردازش...`;
-                    
+                    btn.innerText = '...';
                     try {
-                        const response = await fetch(`${WORKER_URL}/tickets/${ticketId}/request-human`, { method: 'POST' });
-                        if (!response.ok) { throw new Error('خطا در ارسال درخواست'); }
-                        const result = await response.json();
-                        if (result.success) {
-                            showNotification('درخواست شما برای اتصال به کارشناس ثبت شد.');
-                            btn.innerHTML = 'درخواست ثبت شد ✓';
-                            btn.classList.add('opacity-50', 'cursor-not-allowed', 'bg-green-500/20', 'border-green-500/30');
-                        } else {
-                            throw new Error(result.error || 'خطا در ثبت درخواست');
-                        }
+                        const response = await fetch(`${WORKER_URL}/tickets/${btn.dataset.ticketId}/request-human`, { method: 'POST' });
+                        if (!response.ok) throw new Error();
+                        showNotification('درخواست ثبت شد');
+                        btn.innerText = '✓';
                     } catch (error) {
-                        console.error("Error requesting human agent:", error);
-                        showNotification('خطا در ارسال درخواست', false);
+                        showNotification('خطا', false);
                         btn.disabled = false;
-                        btn.innerHTML = originalText;
+                        btn.innerText = 'اتصال به اپراتور';
                     }
                 });
             });
@@ -869,86 +702,39 @@
             conversationView.classList.remove('is-open');
             setTimeout(() => {
                 conversationView.classList.add('hidden');
-                conversationView.classList.remove('flex');
                 currentTicketId = null;
-                currentTicketData = null;
-                conversationContainer.innerHTML = ''; // Clean up
+                conversationContainer.innerHTML = '';
             }, 300);
         }
 
         async function sendTextMessage(text) {
              if (!currentTicketId || !text) return;
              const payload = { ticket_id: currentTicketId, sender: 'user', text: text };
-             const submitButton = replyForm.querySelector('button[type="submit"]');
-             submitButton.disabled = true;
-             
-             // Optimistic UI update
              appendMessageToUI({ ...payload, created_at: new Date().toISOString() });
              replyMessageInput.value = '';
              replyMessageInput.style.height = 'auto';
 
              try {
-                 const response = await fetch(`${WORKER_URL}/messages`, {
-                     method: 'POST',
-                     headers: { 'Content-Type': 'application/json' },
-                     body: JSON.stringify(payload),
-                 });
-                 if (!response.ok) throw new Error('خطا در ارسال پیام');
-                 
+                 await fetch(`${WORKER_URL}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                  fetchMessages(currentTicketId);
-             } catch (error) {
-                 console.error("Error sending message:", error);
-                 showNotification('ارسال پیام با خطا مواجه شد', false);
-             } finally {
-                 submitButton.disabled = false;
-             }
+             } catch (error) { showNotification('خطا در ارسال', false); }
         }
         
         async function handleImageUpload(file) {
             if (!file) return;
-            if (file.size > 50 * 1024 * 1024) { 
-                return showNotification("حجم فایل نباید بیشتر از 50 مگابایت باشد.", false);
-            }
-
-            const submitButton = replyForm.querySelector('button[type="submit"]');
-            attachFileBtn.disabled = true;
-            submitButton.disabled = true;
-            showNotification("در حال ارسال تصویر...", true, 0);
-
+            if (file.size > 50 * 1024 * 1024) return showNotification("حجم زیاد", false);
+            showNotification("ارسال تصویر...", true);
             try {
                 const formData = new FormData();
                 formData.append('ticket_id', currentTicketId);
                 formData.append('sender', 'user');
                 formData.append('image', file, file.name);
-
-                const response = await fetch(`${WORKER_URL}/messages`, {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                if (!response.ok) throw new Error('خطای سرور');
-                
-                const result = await response.json();
-                if (!result.success) throw new Error(result.error);
-                
-                const placeholderPayload = {
-                    ticket_id: currentTicketId,
-                    sender: 'user',
-                    text: 'تصویر ارسال شد.',
-                    type: 'image_placeholder'
-                };
-                
-                appendMessageToUI({ ...placeholderPayload, created_at: new Date().toISOString() });
-                showNotification("تصویر با موفقیت ارسال شد.", true);
-
-            } catch (error) {
-                console.error("Image send failed:", error);
-                showNotification(`ارسال تصویر ناموفق بود`, false);
-            } finally {
-                attachFileBtn.disabled = false;
-                submitButton.disabled = false;
-                fileUploadInput.value = '';
-            }
+                const res = await fetch(`${WORKER_URL}/messages`, { method: 'POST', body: formData });
+                if (!res.ok) throw new Error();
+                appendMessageToUI({ ticket_id: currentTicketId, sender: 'user', type: 'image_placeholder', created_at: new Date().toISOString() });
+                showNotification("ارسال شد", true);
+            } catch (error) { showNotification('خطا', false); }
+            fileUploadInput.value = '';
         }
 
         const handleNewTicketSubmit = async () => {
@@ -957,126 +743,56 @@
             const message = document.getElementById('message').value.trim();
             const department = document.getElementById('department').value;
             
-            if (!subject || !message) {
-                showNotification("لطفا موضوع و شرح درخواست را تکمیل کنید.", false);
-                return;
-            }
+            if (!subject || !message) return showNotification("لطفا پر کنید", false);
             
             isSubmitting = true;
             submitNewTicketBtn.disabled = true;
-            submitNewTicketBtn.innerHTML = '<span class="animate-pulse">در حال ارسال...</span>';
+            submitNewTicketBtn.innerText = '...';
             
             try {
-                const response = await fetch(`${WORKER_URL}/tickets`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ telegram_id: telegramUserId, user_name: telegramUserName, subject, department, message }),
-                });
-                if (!response.ok) throw new Error('خطا در ارسال تیکت');
-                
+                const res = await fetch(`${WORKER_URL}/tickets`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ telegram_id: telegramUserId, user_name: telegramUserName, subject, department, message }) });
+                if (!res.ok) throw new Error();
                 newTicketForm.reset();
-                showNotification('تیکت شما با موفقیت ثبت شد.');
+                showNotification('ثبت شد');
                 fetchTickets();
                 setTimeout(() => showView('ticketsList'), 500);
-            } catch (error) {
-                showNotification(`ارسال تیکت با خطا مواجه شد`, false);
-                console.error("Error creating ticket:", error);
-            } finally {
+            } catch (error) { showNotification('خطا', false); }
+            finally {
                 isSubmitting = false;
                 submitNewTicketBtn.disabled = false;
-                submitNewTicketBtn.textContent = 'ارسال تیکت';
+                submitNewTicketBtn.innerText = 'ارسال تیکت';
             }
         };
 
-        replyForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const text = replyMessageInput.value.trim();
-            if(text) sendTextMessage(text);
-        });
-
-        attachFileBtn.addEventListener('click', () => {
-            if (!currentTicketId) {
-                return showNotification("لطفا ابتدا یک گفتگو را باز کنید.", false);
-            }
-            fileUploadInput.click();
-        });
+        replyForm.addEventListener('submit', (e) => { e.preventDefault(); sendTextMessage(replyMessageInput.value.trim()); });
+        attachFileBtn.addEventListener('click', () => { if (!currentTicketId) return; fileUploadInput.click(); });
+        fileUploadInput.addEventListener('change', (e) => { if (e.target.files[0]) handleImageUpload(e.target.files[0]); });
         
-        fileUploadInput.addEventListener('change', (e) => {
-            if (e.target.files && e.target.files[0]) {
-                handleImageUpload(e.target.files[0]);
-            }
-        });
-
-        emojiBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            emojiPickerContainer.classList.toggle('hidden');
-        });
-
-        emojiPicker.addEventListener('emoji-click', event => {
-            const emoji = event.detail.unicode;
-            const textarea = replyMessageInput;
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const text = textarea.value;
-            textarea.value = text.substring(0, start) + emoji + text.substring(end);
-            textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
-            textarea.focus();
+        emojiBtn.addEventListener('click', (e) => { e.stopPropagation(); emojiPickerContainer.classList.toggle('hidden'); });
+        emojiPicker.addEventListener('emoji-click', e => {
+            const input = replyMessageInput;
+            const text = input.value;
+            const pos = input.selectionStart;
+            input.value = text.slice(0, pos) + e.detail.unicode + text.slice(pos);
+            input.focus();
             emojiPickerContainer.classList.add('hidden');
         });
-
-        document.addEventListener('click', (e) => {
-            if (!emojiPickerContainer.contains(e.target) && !emojiBtn.contains(e.target)) {
-                emojiPickerContainer.classList.add('hidden');
-            }
-        });
-
-        replyMessageInput.addEventListener('input', () => {
-            replyMessageInput.style.height = 'auto';
-            replyMessageInput.style.height = Math.min(replyMessageInput.scrollHeight, 100) + 'px';
-        });
+        document.addEventListener('click', (e) => { if (!emojiPickerContainer.contains(e.target) && !emojiBtn.contains(e.target)) emojiPickerContainer.classList.add('hidden'); });
+        
+        replyMessageInput.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 80) + 'px'; });
 
         navButtons.ticketsList.addEventListener('click', () => showView('ticketsList'));
-        navButtons.newTicket.addEventListener('click', () => {
-            if (hasOpenTicket) {
-                showModal('تیکت باز دارید', 'شما در حال حاضر یک تیکت فعال دارید. لطفاً تا بسته شدن آن منتظر بمانید.', true);
-            } else {
-                infoModal.classList.remove('hidden');
-                infoModal.classList.add('flex');
-            }
-        });
+        navButtons.newTicket.addEventListener('click', () => { hasOpenTicket ? showModal('تیکت باز دارید', 'لطفا صبر کنید', true) : (infoModal.classList.remove('hidden'), infoModal.classList.add('flex')); });
 
         backToTicketsBtn.addEventListener('click', closeConversation);
         newTicketForm.addEventListener('submit', (e) => { e.preventDefault(); handleNewTicketSubmit(); });
         submitNewTicketBtn.addEventListener('click', handleNewTicketSubmit);
-        infoModalCloseBtn.addEventListener('click', () => {
-            infoModal.classList.add('hidden');
-            infoModal.classList.remove('flex');
-            showView('newTicket');
-        });
+        infoModalCloseBtn.addEventListener('click', () => { infoModal.classList.add('hidden'); infoModal.classList.remove('flex'); showView('newTicket'); });
 
         const faqButton = document.getElementById('faq-button');
-        if (faqButton) {
-            faqButton.addEventListener('click', () => {
-                const faqUrl = 'https://faqhub.amiruserbot7.workers.dev/';
-                if (window.Telegram && window.Telegram.WebApp) {
-                    window.Telegram.WebApp.openLink(faqUrl);
-                } else {
-                    window.open(faqUrl, '_blank');
-                }
-            });
-        }
-        const faqLinkModal = document.getElementById('faq-link-modal');
-        if (faqLinkModal) {
-            faqLinkModal.addEventListener('click', (e) => {
-                e.preventDefault(); 
-                const faqUrl = 'https://faqhub.amiruserbot7.workers.dev/';
-                if (window.Telegram && window.Telegram.WebApp) {
-                    window.Telegram.WebApp.openLink(faqUrl);
-                } else {
-                    window.open(faqUrl, '_blank');
-                }
-            });
-        }
+        if (faqButton) faqButton.addEventListener('click', () => { const url = 'https://faqhub.amiruserbot7.workers.dev/'; window.Telegram?.WebApp ? window.Telegram.WebApp.openLink(url) : window.open(url); });
+        
+        document.getElementById('faq-link-modal')?.addEventListener('click', () => { const url = 'https://faqhub.amiruserbot7.workers.dev/'; window.Telegram?.WebApp ? window.Telegram.WebApp.openLink(url) : window.open(url); });
     </script>
 </body>
 </html>

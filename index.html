@@ -16,13 +16,14 @@
                 extend: {
                     colors: {
                         brand: {
-                            bg: '#0f172a',       // Slate 900
-                            surface: '#1e293b',  // Slate 800
-                            border: '#334155',   // Slate 700
-                            primary: '#3b82f6',  // Blue 500
-                            primaryHover: '#2563eb',
-                            text: '#f8fafc',     // Slate 50
-                            muted: '#94a3b8',    // Slate 400
+                            bg: '#0f172a',       // Slate 900 (Background)
+                            surface: '#1e293b',  // Slate 800 (Cards/Surfaces)
+                            border: 'rgba(255, 255, 255, 0.1)', // Subtle white border
+                            primary: '#22d3ee',  // Cyan 400 (Turquoise Blue - Primary Action)
+                            primaryHover: '#06b6d4', // Cyan 500
+                            secondary: '#a3e635', // Lime 400 (Lime Green - Highlights)
+                            text: '#f8fafc',     // Slate 50 (Main Text - White-ish)
+                            muted: '#94a3b8',    // Slate 400 (Muted Text)
                         }
                     },
                     fontFamily: {
@@ -30,6 +31,9 @@
                     },
                     screens: {
                         'xs': '375px',
+                    },
+                    fontSize: {
+                        'xxs': '0.65rem',
                     }
                 }
             }
@@ -38,62 +42,65 @@
     <style>
         body {
             background-color: #0f172a;
-            /* Subtle pattern tailored for mobile screens */
-            background-image: radial-gradient(#1e293b 1px, transparent 1px);
-            background-size: 16px 16px; 
+            /* Subtle pattern with a touch of the new primary color */
+            background-image: radial-gradient(rgba(34, 211, 238, 0.15) 1px, transparent 1px);
+            background-size: 20px 20px; 
             color: #f8fafc;
             overflow: hidden;
             -webkit-tap-highlight-color: transparent;
-            /* Safe area handling */
             padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* Hide Scrollbar but allow scrolling */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         
-        /* Glassmorphism optimized for performance on mobile */
+        /* Updated Glassmorphism with new tint */
         .glass {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .glass-nav {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
-        /* Input Optimization for Mobile: 16px prevents iOS zoom on focus */
+        /* Updated Input Styles */
         .form-input, .form-select, .form-textarea {
-            background-color: rgba(15, 23, 42, 0.5);
-            border: 1px solid #334155;
+            background-color: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             color: #f8fafc;
-            border-radius: 0.75rem;
-            padding: 0.75rem 1rem;
+            border-radius: 0.5rem; /* Slightly smaller radius */
+            padding: 0.5rem 0.75rem; /* Compact padding */
             width: 100%;
-            font-size: 16px; 
+            font-size: 14px; /* Smaller font for compactness */
             transition: all 0.2s;
-            -webkit-appearance: none; /* Remove native shadow/styles */
+            -webkit-appearance: none;
         }
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
-            border-color: #3b82f6;
-            background-color: rgba(15, 23, 42, 0.9);
+            border-color: #22d3ee; /* Turquoise focus */
+            background-color: rgba(15, 23, 42, 0.7);
+            box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
+        }
+        /* Placeholder color */
+        .form-input::placeholder, .form-textarea::placeholder {
+            color: rgba(148, 163, 184, 0.6); /* Slate 400 with opacity */
         }
 
         /* Chat Background */
         #conversation-container {
             background-color: #0b1120;
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%231e293b' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2322d3ee' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
         }
         
         .message-bubble {
@@ -104,26 +111,29 @@
             word-wrap: break-word;
             font-size: 0.9rem;
             line-height: 1.4;
-            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         
+        /* User Message Gradient (Turquoise) */
         .message-user {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
+            background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%);
+            color: #0f172a; /* Dark text on bright background for contrast */
+            font-weight: 500;
             border-bottom-right-radius: 2px;
         }
         
+        /* Admin Message (Dark) */
         .message-admin {
             background-color: #1e293b;
-            border: 1px solid #334155;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: #f1f5f9;
             border-bottom-left-radius: 2px;
         }
 
-        /* Navigation Animations */
+        /* Navigation Animations - Removed the top border effect */
         .nav-button { opacity: 0.5; transition: all 0.2s; }
-        .nav-button.active { opacity: 1; color: #3b82f6; }
-        .nav-button.active svg { transform: translateY(-2px); filter: drop-shadow(0 4px 6px rgba(59, 130, 246, 0.4)); }
+        .nav-button.active { opacity: 1; color: #22d3ee; } /* Turquoise active state */
+        .nav-button.active svg { transform: translateY(-2px); filter: drop-shadow(0 4px 6px rgba(34, 211, 238, 0.4)); }
 
         @keyframes slideInUp {
             from { opacity: 0; transform: translateY(15px); }
@@ -131,28 +141,34 @@
         }
         .fade-in-item { animation: slideInUp 0.3s ease-out forwards; opacity: 0; }
         
-        /* Views Transition */
         #conversation-view {
             transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
             transform: translateX(100%);
         }
         #conversation-view.is-open { transform: translateX(0%); }
 
-        /* Rating Stars - larger touch target */
         .rating-star { padding: 2px; }
         
-        /* Safe Area Utilities */
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
         .pt-safe { padding-top: env(safe-area-inset-top); }
+
+        /* Custom styling for the detailed info modal */
+        .info-modal-content p { margin-bottom: 0.5rem; }
+        .info-modal-content ul { list-style-type: disc; padding-right: 1.2rem; margin-bottom: 0.5rem; }
+        .info-modal-content li { margin-bottom: 0.25rem; }
     </style>
 </head>
-<body class="flex flex-col h-screen font-sans overflow-hidden">
+<body class="flex flex-col h-screen font-sans overflow-hidden text-sm">
 
     <input type="file" id="file-upload" class="hidden" accept="image/*">
 
     <!-- Loading View -->
     <div id="loading-view" class="flex flex-col items-center justify-center h-full text-center p-4 z-50 bg-brand-bg absolute inset-0">
-        <div class="w-12 h-12 border-4 border-brand-surface border-t-brand-primary rounded-full animate-spin mb-4"></div>
+        <div class="relative w-16 h-16 mb-4">
+            <div class="absolute inset-0 rounded-full border-4 border-brand-surface"></div>
+            <!-- Turquoise spinner -->
+            <div class="absolute inset-0 rounded-full border-4 border-brand-primary border-t-transparent animate-spin"></div>
+        </div>
         <p class="text-brand-muted text-xs animate-pulse">در حال اتصال...</p>
     </div>
 
@@ -161,102 +177,115 @@
         
         <!-- Header -->
         <header class="glass sticky top-0 z-20 px-4 h-14 flex items-center justify-center pt-safe">
-            <h1 id="header-title" class="text-white text-base font-bold">تیکت‌ها</h1>
+            <h1 id="header-title" class="text-white text-base font-bold">تیکت‌های من</h1>
+            <!-- Lime green online indicator -->
             <div class="absolute right-4 top-1/2 -translate-y-1/2 pt-safe">
-                 <!-- Status indicator can go here -->
+                 <span class="flex h-2.5 w-2.5 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-secondary opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-secondary"></span>
+                  </span>
             </div>
         </header>
 
         <!-- Main Content Area -->
-        <main id="app-container" class="flex-grow overflow-y-auto w-full pb-20"> <!-- Added padding for bottom nav -->
+        <main id="app-container" class="flex-grow overflow-y-auto w-full pb-20">
             
             <!-- Tickets List -->
-            <div id="tickets-list-view" class="p-3 w-full">
+            <div id="tickets-list-view" class="p-4 w-full max-w-lg mx-auto">
                 
-                <!-- Compact Smart Card -->
-                <div id="smart-card" class="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 p-4 rounded-xl shadow-lg mb-4 fade-in-item relative overflow-hidden">
-                    <!-- Decorational Glow -->
-                    <div class="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/20 rounded-full blur-xl pointer-events-none"></div>
+                <!-- Smart Card with restored full text & new colors -->
+                <div id="smart-card" class="bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 p-4 rounded-2xl shadow-xl mb-5 fade-in-item relative overflow-hidden group">
+                    <!-- Decorational Glows (Turquoise & Lime) -->
+                    <div class="absolute -top-12 -right-12 w-32 h-32 bg-brand-primary/20 rounded-full blur-2xl pointer-events-none group-hover:bg-brand-primary/30 transition-all"></div>
+                    <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-brand-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
                     
                     <div class="flex items-center justify-between mb-3 relative z-10">
-                        <h3 id="smart-card-greeting" class="text-lg font-bold text-white">سلام! 👋</h3>
-                        <!-- Pro Version Removed -->
+                        <h3 id="smart-card-greeting" class="text-base font-bold text-white">سلام کاربر عزیز! 👋</h3>
                     </div>
-                    <div class="p-3 rounded-lg bg-black/30 text-xs mb-3 border border-white/5 backdrop-blur-sm">
-                        <p class="leading-relaxed text-slate-300">💡 پاسخ سریع‌تر در <span class="text-brand-primary font-bold">پایگاه دانش</span> موجود است.</p>
+                    <!-- Restored full text -->
+                    <div class="p-3 rounded-xl bg-white/5 text-xs mb-4 border border-white/10 backdrop-blur-sm leading-relaxed relative z-10">
+                        <p><span class="text-lg align-middle ml-1">💡</span> <span class="font-bold text-brand-secondary">نکته امروز:</span> آیا میدانستید با مراجعه به <span class="font-bold text-brand-primary">پایـگاه دانــش</span>، پاسخ 90% سوالات خود را پیدا می‌کنید؟</p>
                     </div>
-                    <button id="faq-button" class="w-full bg-brand-primary active:bg-brand-primaryHover text-white text-sm font-medium py-2.5 rounded-lg shadow-lg shadow-blue-500/10 transition-transform active:scale-[0.98]">
-                        سوالات متداول
+                    <button id="faq-button" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-slate-900 text-sm font-bold py-3 rounded-xl shadow-lg shadow-cyan-500/20 transition-all active:scale-[0.98] relative z-10">
+                        مشاهده سوالات متداول
                     </button>
                 </div>
 
-                <div id="tickets-container" class="space-y-2.5"></div>
+                <div id="tickets-container" class="space-y-3"></div>
 
-                <div id="no-tickets-message" class="hidden flex flex-col items-center justify-center mt-12 text-brand-muted fade-in-item">
-                    <div class="bg-brand-surface/50 p-5 rounded-full mb-3 border border-dashed border-brand-border">
-                        <svg class="h-8 w-8 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                <div id="no-tickets-message" class="hidden flex flex-col items-center justify-center mt-16 text-brand-muted fade-in-item">
+                    <div class="bg-brand-surface/50 p-6 rounded-full mb-4 border border-dashed border-brand-border">
+                        <svg class="h-10 w-10 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                     </div>
-                    <p class="text-sm font-medium">هنوز تیکتی ندارید</p>
+                    <p class="text-sm font-medium">هنوز تیکتی ثبت نکرده‌اید</p>
                 </div>
             </div>
 
-            <!-- New Ticket Form -->
-            <div id="new-ticket-view" class="p-3 hidden w-full">
-                <form id="new-ticket-form" class="space-y-4 fade-in-item">
-                    <div class="glass-card p-4 rounded-xl space-y-3">
+            <!-- New Ticket Form - Compact & Redesigned -->
+            <div id="new-ticket-view" class="p-4 hidden w-full max-w-lg mx-auto">
+                <form id="new-ticket-form" class="space-y-3 fade-in-item">
+                    <!-- Compact Container -->
+                    <div class="glass-card p-3 rounded-xl space-y-3">
                         <div>
-                            <label class="block mb-1.5 text-xs font-medium text-brand-muted">واحد مربوطه</label>
+                            <label for="department" class="block mb-1 text-xs font-medium text-brand-muted ml-1">دپارتمان</label>
                             <div class="relative">
                                 <select id="department" name="department" class="form-select appearance-none">
                                     <option value="general">سوالات متفرقه</option>
-                                    <option value="technical">فنی و پشتیبانی</option>
-                                    <option value="sales">فروش و مالی</option>
-                                    <option value="ideas">پیشنهادات</option>
+                                    <option value="technical">واحد فنی</option>
+                                    <option value="sales">واحد فروش</option>
+                                    <option value="marketing">واحد بازاریابی</option>
+                                    <option value="ideas">ایده‌ها و پیشنهادات</option>
                                 </select>
-                                <svg class="w-4 h-4 absolute left-3 top-3.5 text-brand-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <!-- Custom Arrow -->
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-2 text-brand-muted">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
                             </div>
                         </div>
                         <div>
-                            <label class="block mb-1.5 text-xs font-medium text-brand-muted">موضوع</label>
-                            <input type="text" id="subject" class="form-input" placeholder="عنوان کوتاه..." required>
+                            <label for="subject" class="block mb-1 text-xs font-medium text-brand-muted ml-1">موضوع</label>
+                            <input type="text" id="subject" name="subject" class="form-input" placeholder="عنوان کوتاه درخواست..." required>
                         </div>
                     </div>
 
-                    <div class="glass-card p-4 rounded-xl">
-                        <label class="block mb-1.5 text-xs font-medium text-brand-muted">متن پیام</label>
-                        <textarea id="message" rows="5" class="form-textarea" placeholder="توضیحات خود را بنویسید..." required></textarea>
+                    <div class="glass-card p-3 rounded-xl">
+                        <label for="message" class="block mb-1 text-xs font-medium text-brand-muted ml-1">متن پیام</label>
+                        <textarea id="message" name="message" rows="5" class="form-textarea resize-none" placeholder="توضیحات کامل خود را اینجا بنویسید..." required></textarea>
                     </div>
 
-                    <button type="button" id="submit-new-ticket-btn" class="w-full bg-brand-primary active:bg-brand-primaryHover text-white py-3 rounded-xl font-bold text-base shadow-lg shadow-blue-500/20 transition-transform active:scale-[0.98]">
-                        ارسال تیکت
-                    </button>
+                    <div class="pt-2">
+                        <button type="submit" id="submit-new-ticket-btn" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-slate-900 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-cyan-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
+                            ارسال تیکت
+                        </button>
+                    </div>
                 </form>
             </div>
         </main>
 
         <!-- Mobile Bottom Navigation -->
         <nav id="main-nav" class="glass-nav fixed bottom-0 w-full z-30 flex items-start justify-around pb-safe pt-2 h-[calc(60px+env(safe-area-inset-bottom))]">
-            <button id="nav-tickets-list" class="nav-button active flex flex-col items-center justify-center w-1/2 h-full -mt-1">
-                <svg class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+            <button id="nav-tickets-list" class="nav-button active flex flex-col items-center justify-center w-1/2 h-full -mt-1 group">
+                <svg class="h-6 w-6 mb-1 transition-transform group-active:scale-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                 <span class="text-[10px] font-medium">تیکت‌ها</span>
             </button>
-            <button id="nav-new-ticket" class="nav-button flex flex-col items-center justify-center w-1/2 h-full -mt-1">
-                <svg class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+            <button id="nav-new-ticket" class="nav-button flex flex-col items-center justify-center w-1/2 h-full -mt-1 group">
+                <svg class="h-6 w-6 mb-1 transition-transform group-active:scale-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
                 <span class="text-[10px] font-medium">جدید</span>
             </button>
         </nav>
     </div>
 
-    <!-- Conversation View (Full Screen Overlay) -->
-    <div id="conversation-view" class="fixed inset-0 z-40 flex flex-col bg-brand-bg h-[100dvh]"> <!-- 100dvh handles mobile browser bars better -->
-         <header class="glass sticky top-0 z-10 px-3 h-14 flex items-center shadow-md pt-safe">
-            <button id="back-to-tickets" class="p-2 -mr-2 rounded-full active:bg-white/10 text-white transform rotate-180">
+    <!-- Conversation View -->
+    <div id="conversation-view" class="fixed inset-0 z-40 flex flex-col bg-brand-bg h-[100dvh]">
+         <header class="glass sticky top-0 z-10 px-3 h-14 flex items-center shadow-sm pt-safe border-b border-white/5">
+            <button id="back-to-tickets" class="p-2 -mr-2 rounded-full active:bg-white/10 text-white transform rotate-180 transition-colors">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </button>
             <div class="flex flex-col mr-2 overflow-hidden">
                 <h2 id="conversation-header" class="text-white font-bold text-sm truncate">گفتگو</h2>
-                <span class="text-[10px] text-green-400 flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> آنلاین
+                <!-- Lime green online status -->
+                <span class="text-[10px] text-brand-secondary flex items-center gap-1 font-medium">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-secondary animate-pulse"></span> آنلاین
                 </span>
             </div>
          </header>
@@ -264,57 +293,95 @@
         <div id="conversation-container" class="p-3 space-y-3 flex flex-col flex-grow overflow-y-auto"></div>
 
         <!-- Emoji Picker -->
-        <div id="emoji-picker-container" class="absolute bottom-[70px] right-2 z-50 hidden shadow-2xl rounded-xl border border-brand-border">
-            <emoji-picker style="width: 300px; height: 350px; --font-size: 14px;"></emoji-picker>
+        <div id="emoji-picker-container" class="absolute bottom-[70px] right-2 z-50 hidden shadow-2xl rounded-2xl overflow-hidden border border-white/10">
+            <emoji-picker style="width: 300px; height: 350px; --font-size: 14px; --background: #1e293b; --text-color: #f8fafc; --border-color: rgba(255,255,255,0.1);"></emoji-picker>
         </div>
 
         <!-- Reply Area -->
          <div id="reply-box" class="p-2 sticky bottom-0 glass-nav pb-safe">
-            <form id="reply-form" class="flex items-end gap-2 bg-brand-surface border border-brand-border rounded-xl p-1.5">
-                <button type="button" id="attach-file-btn" class="p-2 text-brand-muted active:text-brand-primary">
+            <form id="reply-form" class="flex items-end gap-2 bg-brand-surface/80 border border-white/10 rounded-2xl p-1.5 focus-within:border-brand-primary/50 transition-colors">
+                <button type="button" id="attach-file-btn" class="p-2 text-brand-muted active:text-brand-primary hover:bg-white/5 rounded-xl transition-colors">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                 </button>
-                <textarea id="reply-message" rows="1" class="flex-grow bg-transparent border-none text-white placeholder-slate-500 py-2.5 max-h-[80px] resize-none focus:ring-0 text-sm" placeholder="پیام..." required style="min-height: 40px;"></textarea>
-                <button type="button" id="emoji-btn" class="p-2 text-brand-muted active:text-brand-primary">
+                <textarea id="reply-message" rows="1" class="flex-grow bg-transparent border-none text-white placeholder-slate-500 py-2.5 max-h-[100px] resize-none focus:ring-0 text-sm" placeholder="پیام خود را بنویسید..." required style="min-height: 40px;"></textarea>
+                <button type="button" id="emoji-btn" class="p-2 text-brand-muted active:text-brand-primary hover:bg-white/5 rounded-xl transition-colors">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </button>
-                <button type="submit" class="bg-brand-primary active:bg-brand-primaryHover text-white p-2 rounded-lg shadow-md transition-transform active:scale-95">
+                <button type="submit" class="bg-brand-primary hover:bg-brand-primaryHover text-slate-900 p-2 rounded-xl shadow-md shadow-cyan-500/20 transition-transform active:scale-95">
                     <svg class="h-5 w-5 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                 </button>
             </form>
         </div>
         
-        <div id="closed-ticket-banner" class="p-4 text-center bg-brand-surface pb-safe border-t border-brand-border text-brand-muted text-xs hidden">
-            <p>این گفتگو بسته شده است.</p>
+        <div id="closed-ticket-banner" class="p-3 text-center bg-brand-surface/90 pb-safe border-t border-white/10 text-brand-muted text-xs hidden backdrop-blur-md">
+            <p class="flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                این گفتگو بسته شده است و امکان ارسال پیام وجود ندارد.
+            </p>
         </div>
     </div>
 
-    <!-- Modals -->
-    <div id="info-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-6">
-        <div class="bg-brand-surface border border-brand-border p-5 rounded-2xl w-full max-w-sm flex flex-col shadow-2xl animate-[slideInUp_0.3s_ease-out]">
-            <div class="text-center mb-4">
-                <h3 class="text-lg font-bold text-white">راهنما</h3>
+    <!-- Info Modal (Redesigned & Restored Content) -->
+    <div id="info-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-5 transition-all duration-300">
+        <!-- Glassmorphism Modal Container -->
+        <div class="bg-slate-800/80 border border-white/10 p-5 rounded-2xl w-full max-w-md flex flex-col shadow-2xl animate-[slideInUp_0.3s_ease-out] backdrop-blur-md max-h-[85vh]">
+            
+            <!-- Modal Header -->
+            <div class="text-center mb-4 relative">
+                 <div class="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 ring-4 ring-brand-primary/5">
+                    <svg class="w-6 h-6 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-white">راهنمای ارسال تیکت</h3>
             </div>
-            <div class="space-y-3 text-xs text-slate-300 leading-6 mb-5">
-                <p>💡 قبل از ارسال، <span id="faq-link-modal" class="text-blue-400 font-bold underline">سوالات متداول</span> را چک کنید.</p>
-                <div class="bg-black/20 p-3 rounded-lg border border-white/5">
-                    <p class="opacity-80">لطفا مشکل خود را شفاف و در یک پیام بنویسید.</p>
+
+            <!-- Modal Content (Restored Detailed Version) -->
+            <div class="overflow-y-auto space-y-4 text-xs text-slate-300 leading-relaxed pr-1 info-modal-content">
+                <div>
+                    <h4 class="font-bold text-white mb-2 flex items-center gap-2">
+                        <span class="text-lg">💡</span> قبل از ارسال تیکت:
+                    </h4>
+                    <p>لطفا ابتدا <a href="#" id="faq-link-modal" class="text-brand-primary hover:underline font-medium">صفحه سوالات متداول</a> را بررسی کنید. شاید پاسخ سوال شما آنجا باشد!</p>
+                </div>
+                
+                <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                     <h4 class="font-bold text-white mb-2 flex items-center gap-2">
+                        <span class="text-lg">📋</span> نمونه الگوریتم ارسال تیکت:
+                    </h4>
+                    <div class="p-2.5 rounded-lg bg-black/20 font-mono text-[11px] border border-white/5 text-slate-400">
+                        <p class="whitespace-pre-wrap mb-0"><span class="text-brand-primary">دپارتمان:</span> (نسبت به موضوع تیکت تنظیم شود)
+<span class="text-brand-primary">موضوع:</span> عدم دریافت پسورد پنل
+<span class="text-brand-primary">متن پیام:</span> سلام و وقت بخیر، بنده در پنل مدیریت سرویس امکان تغییر/ایجاد پسورد پنلم را ندارم.
+لطفا درخواست دارم این مورد را بررسی و رفع بفرمایید.</p>
+                    </div>
+                </div>
+                 <div>
+                    <h4 class="font-bold text-white mb-1">نکات مهم:</h4>
+                    <ul class="list-disc list-inside opacity-80 space-y-1">
+                        <li>لطفاً مشکل خود را شفاف و در یک پیام بنویسید.</li>
+                        <li>از ارسال تیکت‌های تکراری خودداری کنید.</li>
+                    </ul>
                 </div>
             </div>
-            <button id="info-modal-close-btn" class="w-full bg-brand-primary text-white py-2.5 rounded-xl text-sm font-medium">متوجه شدم</button>
+
+            <!-- Modal Footer -->
+            <div class="mt-5 pt-4 border-t border-white/10">
+                <button id="info-modal-close-btn" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-slate-900 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-cyan-500/20 active:scale-[0.98]">متوجه شدم</button>
+            </div>
         </div>
     </div>
     
-    <div id="custom-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden items-center justify-center z-50 p-6">
-        <div class="bg-brand-surface border border-brand-border rounded-2xl shadow-2xl p-5 w-full max-w-sm text-center">
-            <div id="modal-icon" class="mx-auto mb-3"></div>
+    <!-- Custom Alert Modal -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-6">
+        <div class="bg-slate-800/90 border border-white/10 rounded-2xl shadow-2xl p-5 w-full max-w-sm text-center backdrop-blur-md">
+            <div id="modal-icon" class="mx-auto mb-3 p-2 bg-white/5 rounded-full w-fit"></div>
             <h3 id="modal-title" class="text-base font-bold mb-2 text-white"></h3>
-            <p id="modal-message" class="text-slate-400 mb-5 text-xs"></p>
-            <button id="modal-close-btn" class="bg-brand-primary text-white w-full py-2.5 rounded-xl text-sm">باشه</button>
+            <p id="modal-message" class="text-slate-400 mb-5 text-xs leading-relaxed"></p>
+            <button id="modal-close-btn" class="bg-brand-primary hover:bg-brand-primaryHover text-slate-900 w-full py-2.5 rounded-xl text-sm font-bold transition-all active:scale-[0.98]">باشه</button>
         </div>
     </div>
 
-    <div id="notification-toast" class="fixed top-4 left-4 right-4 bg-brand-surface border border-brand-border text-white px-4 py-3 rounded-xl shadow-2xl opacity-0 transition-all duration-300 z-[60] flex items-center gap-3 text-xs"></div>
+    <!-- Toast Notification -->
+    <div id="notification-toast" class="fixed top-4 left-4 right-4 bg-slate-800/90 border border-white/10 text-white px-4 py-3 rounded-xl shadow-2xl opacity-0 transition-all duration-300 z-[60] flex items-center gap-3 text-xs backdrop-blur-md font-medium"></div>
 
     <script>
         const WORKER_URL = 'https://support-api-worker.amiruserbot7.workers.dev';
@@ -341,7 +408,6 @@
         let hasOpenTicket = false;
         let isSubmitting = false;
 
-        // Ensure Telegram WebApp is expanded and colors are set
         if (window.Telegram && window.Telegram.WebApp) {
             const tg = window.Telegram.WebApp;
             tg.expand();
@@ -378,27 +444,31 @@
 
         const departmentMap = {
             general: 'سوالات متفرقه',
-            technical: 'فنی',
-            sales: 'فروش',
-            ideas: 'ایده ها'
+            technical: 'فنی و پشتیبانی',
+            sales: 'فروش و مالی',
+            marketing: 'بازاریابی',
+            ideas: 'ایده‌ها و پیشنهادات'
         };
 
+        // Updated Status Colors for new palette
         const statusInfo = {
-            open: { text: 'باز', colorClass: 'bg-green-500', bgClass: 'bg-green-500/10 text-green-400' },
-            'in-progress': { text: 'بررسی', colorClass: 'bg-amber-500', bgClass: 'bg-amber-500/10 text-amber-400' },
-            answered: { text: 'پاسخ داده', colorClass: 'bg-blue-500', bgClass: 'bg-blue-500/10 text-blue-400' },
-            closed: { text: 'بسته', colorClass: 'bg-slate-500', bgClass: 'bg-slate-500/10 text-slate-400' }
+            open: { text: 'باز', colorClass: 'bg-brand-secondary', bgClass: 'bg-brand-secondary/10 text-brand-secondary' }, // Lime
+            'in-progress': { text: 'در حال بررسی', colorClass: 'bg-amber-400', bgClass: 'bg-amber-400/10 text-amber-400' },
+            answered: { text: 'پاسخ داده شده', colorClass: 'bg-brand-primary', bgClass: 'bg-brand-primary/10 text-brand-primary' }, // Cyan
+            closed: { text: 'بسته شده', colorClass: 'bg-slate-500', bgClass: 'bg-slate-500/10 text-slate-400' }
         };
         
         let activeToastTimeout = null;
-        function showNotification(message, success = true, duration = 2500) {
+        function showNotification(message, success = true, duration = 3000) {
             const toast = document.getElementById('notification-toast');
+            // Using new brand colors for success/error icons
             const icon = success 
-                ? `<svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`
+                ? `<svg class="w-5 h-5 text-brand-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`
                 : `<svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
 
-            toast.innerHTML = `${icon} <span class="font-medium">${message}</span>`;
-            toast.className = `fixed top-4 left-4 right-4 border px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 z-[60] flex items-center gap-3 backdrop-blur-md text-xs ${success ? 'bg-slate-800/95 border-green-500/20 text-white' : 'bg-slate-800/95 border-red-500/20 text-white'}`;
+            toast.innerHTML = `${icon} <span>${message}</span>`;
+            // Updated toast styling
+            toast.className = `fixed top-4 left-4 right-4 border px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 z-[60] flex items-center gap-3 backdrop-blur-md text-xs font-medium ${success ? 'bg-slate-800/95 border-brand-secondary/20 text-white' : 'bg-slate-800/95 border-red-500/20 text-white'}`;
             
             if(activeToastTimeout) clearTimeout(activeToastTimeout);
             toast.classList.remove('opacity-0', '-translate-y-4');
@@ -413,9 +483,10 @@
         function showModal(title, message, isError = false) {
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
+            // Using new brand colors for modal icons
             const icon = isError 
                 ? `<svg class="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`
-                : `<svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                : `<svg class="w-10 h-10 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
             document.getElementById('modal-icon').innerHTML = icon;
             document.getElementById('custom-modal').classList.remove('hidden');
             document.getElementById('custom-modal').classList.add('flex');
@@ -462,7 +533,7 @@
                 headerTitle.textContent = 'تیکت‌های من';
             } else if (viewName === 'newTicket') {
                 newTicketView.classList.remove('hidden');
-                headerTitle.textContent = 'ثبت تیکت';
+                headerTitle.textContent = 'ثبت تیکت جدید';
             }
             Object.values(navButtons).forEach(btn => btn.classList.remove('active'));
             if (navButtons[viewName]) navButtons[viewName].classList.add('active');
@@ -495,17 +566,17 @@
         }
 
         async function deleteTicket(ticketId) {
-            if (confirm('حذف تیکت؟')) {
+            if (confirm('آیا از حذف این تیکت اطمینان دارید؟')) {
                 try {
                     const response = await fetch(`${WORKER_URL}/tickets?ticket_id=${ticketId}`, { method: 'DELETE' });
                      if (!response.ok) throw new Error('خطا');
                     const result = await response.json();
                     if (result.success) {
-                        showNotification('حذف شد.');
+                        showNotification('تیکت با موفقیت حذف شد.');
                         fetchTickets();
                     }
                 } catch (error) {
-                    showNotification(`خطا در حذف`, false);
+                    showNotification(`خطا در حذف تیکت`, false);
                 }
             }
         }
@@ -550,12 +621,12 @@
                     body: JSON.stringify({ rating: rating, telegram_id: telegramUserId }),
                 });
                 if (!response.ok) throw new Error('Error');
-                showNotification('ثبت شد.');
+                showNotification('امتیاز شما ثبت شد.');
                 const ticket = allTicketsData.find(t => t.id === ticketId);
                 if (ticket) ticket.rating = rating;
                 renderTickets(allTicketsData);
             } catch (error) {
-                showNotification(`خطا`, false);
+                showNotification(`خطا در ثبت امتیاز`, false);
                 delete starContainer.dataset.submitting;
                 starContainer.style.opacity = '1';
             }
@@ -568,9 +639,10 @@
             const departmentName = departmentMap[data.department] || data.department;
             
             const deleteButton = status === 'closed' 
-                ? `<button data-id="${data.id}" class="delete-ticket-btn p-2 text-slate-500 hover:text-red-400 z-10 -ml-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>` : '';
+                ? `<button data-id="${data.id}" class="delete-ticket-btn p-2 text-slate-500 hover:text-red-400 z-10 -ml-2 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>` : '';
 
             let ratingSection = '';
+            // Updated rating stars colors
             if (status === 'closed') {
                 if (data.rating && data.rating > 0) {
                     let stars = '';
@@ -578,23 +650,30 @@
                         const starColor = i <= data.rating ? 'text-amber-400' : 'text-slate-600';
                         stars += `<svg class="w-3 h-3 ${starColor}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
                     }
-                    ratingSection = `<div class="mt-2 pt-2 border-t border-dashed border-white/5 flex items-center justify-between"><span class="text-[10px] text-slate-500">امتیاز:</span><div class="flex">${stars}</div></div>`;
+                    ratingSection = `<div class="mt-2 pt-2 border-t border-dashed border-white/5 flex items-center justify-between"><span class="text-[10px] text-slate-500">امتیاز:</span><div class="flex gap-0.5">${stars}</div></div>`;
                 } else {
-                    ratingSection = `<div class="mt-2 pt-2 border-t border-dashed border-white/5 flex items-center justify-between"><span class="text-[10px] text-slate-500">ثبت نظر:</span><div class="rating-stars flex flex-row-reverse" data-ticket-id="${data.id}">${[5, 4, 3, 2, 1].map(i => `<svg data-id="${data.id}" data-rating-value="${i}" class="rating-star w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`).join('')}</div></div>`;
+                    ratingSection = `<div class="mt-2 pt-2 border-t border-dashed border-white/5 flex items-center justify-between"><span class="text-[10px] text-slate-500">ثبت نظر:</span><div class="rating-stars flex flex-row-reverse gap-1" data-ticket-id="${data.id}">${[5, 4, 3, 2, 1].map(i => `<svg data-id="${data.id}" data-rating-value="${i}" class="rating-star w-5 h-5 text-slate-600 hover:text-amber-400 transition-colors" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`).join('')}</div></div>`;
                 }
             }
 
             return `
-            <div class="ticket-card glass-card p-3 rounded-xl fade-in-item active:scale-[0.99] transition-transform mb-2 relative overflow-hidden group" style="animation-delay: ${index * 50}ms;" data-id="${data.id}">
+            <div class="ticket-card glass-card p-3 rounded-xl fade-in-item active:scale-[0.99] transition-transform mb-2 relative overflow-hidden group hover:bg-white/5" style="animation-delay: ${index * 50}ms;" data-id="${data.id}">
                 <div class="absolute top-0 right-0 w-1 h-full ${statusDetails.colorClass}"></div>
                 <div class="flex justify-between items-start mb-1 pl-1">
                     <h4 class="font-bold text-sm text-white truncate max-w-[60%]">${data.subject}</h4>
-                    <span class="flex items-center text-[9px] px-2 py-0.5 rounded-full border border-white/5 ${statusDetails.bgClass}">${statusDetails.text}</span>
+                    <!-- Status Badge with Pulse -->
+                    <span class="flex items-center text-[9px] px-2 py-0.5 rounded-full border border-white/5 ${statusDetails.bgClass}">
+                        <span class="flex h-1.5 w-1.5 relative ml-1.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full ${statusDetails.colorClass} opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 ${statusDetails.colorClass}"></span>
+                        </span>
+                        ${statusDetails.text}
+                    </span>
                 </div>
                 <div class="flex justify-between items-end text-[10px] text-slate-400 mt-1">
-                    <div class="flex flex-col gap-0.5">
-                        <span>${departmentName}</span>
-                        <span>${creationDate}</span>
+                    <div class="flex flex-col gap-0.5 opacity-80">
+                        <span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg> ${departmentName}</span>
+                        <span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> ${creationDate}</span>
                     </div>
                     ${deleteButton}
                 </div>
@@ -613,18 +692,25 @@
 
             let content = '';
             if (data.type === 'image_placeholder') {
-                content = `<div class="flex items-center gap-1 italic opacity-80"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg><span>تصویر</span></div>`;
+                content = `<div class="flex items-center gap-1 italic opacity-90"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg><span>تصویر ارسال شد</span></div>`;
             } else {
-                if (data.text) content += `<p class="whitespace-pre-wrap">${data.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-200 underline">$1</a>')}</p>`;
-                if (data.imageUrl) content += `<a href="${data.imageUrl}" target="_blank" class="block mt-2"><img src="${data.imageUrl}" class="rounded-lg max-w-full border border-white/10"></a>`;
+                if (data.text) content += `<p class="whitespace-pre-wrap leading-relaxed">${data.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-brand-primary underline decoration-dotted underline-offset-2">$1</a>')}</p>`;
+                if (data.imageUrl) content += `<a href="${data.imageUrl}" target="_blank" class="block mt-2"><img src="${data.imageUrl}" class="rounded-lg max-w-full border border-white/10" loading="lazy"></a>`;
             }
             
             let aiBtn = '';
             if (isAI) {
-                aiBtn = `<div class="mt-2 pt-2 border-t border-white/10"><button class="request-human-btn w-full text-[10px] py-1.5 px-2 rounded bg-white/5 active:bg-white/10 text-white flex justify-center" data-ticket-id="${currentTicketId}">اتصال به اپراتور</button></div>`;
+                // Updated AI button style
+                aiBtn = `
+                <div class="mt-2 pt-2 border-t border-white/10 w-full">
+                    <button class="request-human-btn w-full text-[10px] py-2 px-2 rounded-lg bg-white/5 hover:bg-white/10 active:bg-white/15 text-white flex justify-center items-center gap-1 transition-colors border border-white/5" data-ticket-id="${currentTicketId}">
+                        <svg class="w-3 h-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+                        اتصال به اپراتور انسانی
+                    </button>
+                </div>`;
             }
 
-            return `<div class="flex flex-col ${containerClass} max-w-[85%] group"><span class="text-[9px] text-slate-500 mb-0.5 px-1">${senderName}</span><div class="message-bubble ${messageClass}">${content}${aiBtn}</div><span class="text-[9px] text-slate-500 mt-0.5 px-1 opacity-70">${time}</span></div>`;
+            return `<div class="flex flex-col ${containerClass} max-w-[85%] group animate-fade-in-up"><span class="text-[9px] text-slate-500 mb-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity">${senderName}</span><div class="message-bubble ${messageClass}">${content}${aiBtn}</div><span class="text-[9px] text-slate-500 mt-1 px-1 opacity-70">${time}</span></div>`;
         }
         
         function appendMessageToUI(messageData) {
@@ -635,10 +721,11 @@
         function openConversation(ticketId) {
             currentTicketId = ticketId;
             currentTicketData = allTicketsData.find(t => t.id === ticketId);
-            if (!currentTicketData) return showNotification("یافت نشد", false);
+            if (!currentTicketData) return showNotification("اطلاعات تیکت یافت نشد.", false);
             
             conversationView.classList.remove('hidden');
-            setTimeout(() => { conversationView.classList.add('is-open'); }, 10);
+            // Small delay for display:flex to apply before transition
+            setTimeout(() => { conversationView.classList.add('is-open'); }, 50);
             conversationHeader.textContent = currentTicketData.subject;
             listenToMessages(ticketId);
             updateConversationViewUI();
@@ -662,11 +749,12 @@
                 const result = await response.json();
                 if (result.success && result.data) {
                     const isBottom = conversationContainer.scrollHeight - conversationContainer.clientHeight <= conversationContainer.scrollTop + 150;
+                    // Smart update: only replace content
                     conversationContainer.innerHTML = Object.values(result.data).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(renderMessage).join('');
                     attachHumanRequestListeners();
                     if(isBottom) conversationContainer.scrollTop = conversationContainer.scrollHeight;
                 }
-            } catch (error) {}
+            } catch (error) { console.error("Error fetching messages:", error); }
         }
 
         function attachHumanRequestListeners() {
@@ -676,16 +764,18 @@
                 button.addEventListener('click', async (e) => {
                     const btn = e.currentTarget;
                     btn.disabled = true;
-                    btn.innerText = '...';
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = `<svg class="animate-spin h-3 w-3 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> در حال پردازش...`;
                     try {
                         const response = await fetch(`${WORKER_URL}/tickets/${btn.dataset.ticketId}/request-human`, { method: 'POST' });
                         if (!response.ok) throw new Error();
-                        showNotification('درخواست ثبت شد');
-                        btn.innerText = '✓';
+                        showNotification('درخواست اتصال به اپراتور ثبت شد.');
+                        btn.innerHTML = '✓ درخواست ثبت شد';
+                        btn.classList.add('opacity-50', 'cursor-not-allowed');
                     } catch (error) {
-                        showNotification('خطا', false);
+                        showNotification('خطا در ثبت درخواست', false);
                         btn.disabled = false;
-                        btn.innerText = 'اتصال به اپراتور';
+                        btn.innerHTML = originalText;
                     }
                 });
             });
@@ -710,6 +800,7 @@
         async function sendTextMessage(text) {
              if (!currentTicketId || !text) return;
              const payload = { ticket_id: currentTicketId, sender: 'user', text: text };
+             // Optimistic UI update
              appendMessageToUI({ ...payload, created_at: new Date().toISOString() });
              replyMessageInput.value = '';
              replyMessageInput.style.height = 'auto';
@@ -717,13 +808,13 @@
              try {
                  await fetch(`${WORKER_URL}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                  fetchMessages(currentTicketId);
-             } catch (error) { showNotification('خطا در ارسال', false); }
+             } catch (error) { showNotification('خطا در ارسال پیام', false); }
         }
         
         async function handleImageUpload(file) {
             if (!file) return;
-            if (file.size > 50 * 1024 * 1024) return showNotification("حجم زیاد", false);
-            showNotification("ارسال تصویر...", true);
+            if (file.size > 50 * 1024 * 1024) return showNotification("حجم فایل بیش از حد مجاز است (۵۰ مگابایت).", false);
+            showNotification("در حال ارسال تصویر...", true);
             try {
                 const formData = new FormData();
                 formData.append('ticket_id', currentTicketId);
@@ -731,9 +822,10 @@
                 formData.append('image', file, file.name);
                 const res = await fetch(`${WORKER_URL}/messages`, { method: 'POST', body: formData });
                 if (!res.ok) throw new Error();
+                // Optimistic UI update for image placeholder
                 appendMessageToUI({ ticket_id: currentTicketId, sender: 'user', type: 'image_placeholder', created_at: new Date().toISOString() });
-                showNotification("ارسال شد", true);
-            } catch (error) { showNotification('خطا', false); }
+                showNotification("تصویر با موفقیت ارسال شد.", true);
+            } catch (error) { showNotification('خطا در ارسال تصویر', false); }
             fileUploadInput.value = '';
         }
 
@@ -743,20 +835,20 @@
             const message = document.getElementById('message').value.trim();
             const department = document.getElementById('department').value;
             
-            if (!subject || !message) return showNotification("لطفا پر کنید", false);
+            if (!subject || !message) return showNotification("لطفا موضوع و متن پیام را وارد کنید.", false);
             
             isSubmitting = true;
             submitNewTicketBtn.disabled = true;
-            submitNewTicketBtn.innerText = '...';
+            submitNewTicketBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-slate-900" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
             
             try {
                 const res = await fetch(`${WORKER_URL}/tickets`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ telegram_id: telegramUserId, user_name: telegramUserName, subject, department, message }) });
                 if (!res.ok) throw new Error();
                 newTicketForm.reset();
-                showNotification('ثبت شد');
+                showNotification('تیکت شما با موفقیت ثبت شد.');
                 fetchTickets();
                 setTimeout(() => showView('ticketsList'), 500);
-            } catch (error) { showNotification('خطا', false); }
+            } catch (error) { showNotification('خطا در ثبت تیکت', false); }
             finally {
                 isSubmitting = false;
                 submitNewTicketBtn.disabled = false;
@@ -782,7 +874,7 @@
         replyMessageInput.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 80) + 'px'; });
 
         navButtons.ticketsList.addEventListener('click', () => showView('ticketsList'));
-        navButtons.newTicket.addEventListener('click', () => { hasOpenTicket ? showModal('تیکت باز دارید', 'لطفا صبر کنید', true) : (infoModal.classList.remove('hidden'), infoModal.classList.add('flex')); });
+        navButtons.newTicket.addEventListener('click', () => { hasOpenTicket ? showModal('تیکت باز دارید', 'شما یک تیکت در حال بررسی دارید. لطفاً تا تعیین تکلیف آن منتظر بمانید.', true) : (infoModal.classList.remove('hidden'), infoModal.classList.add('flex')); });
 
         backToTicketsBtn.addEventListener('click', closeConversation);
         newTicketForm.addEventListener('submit', (e) => { e.preventDefault(); handleNewTicketSubmit(); });

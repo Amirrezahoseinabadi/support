@@ -18,12 +18,12 @@
                         brand: {
                             bg: '#f0f4f8',       
                             surface: '#ffffff',  
-                            primary: '#0ea5e9',  // Sky 500
+                            primary: '#0ea5e9',  
                             primaryHover: '#0284c7', 
-                            secondary: '#84cc16', // Lime
-                            text: '#1e293b',     // Slate 800
+                            secondary: '#84cc16', 
+                            text: '#1e293b',     
                             muted: '#64748b',
-                            ai: '#8b5cf6',       // Violet
+                            ai: '#8b5cf6',       
                         }
                     },
                     fontFamily: {
@@ -32,7 +32,8 @@
                     animation: {
                         'float': 'float 3s ease-in-out infinite',
                         'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'fade-in-text': 'fadeInText 1s ease-out forwards',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'blob': 'blob 7s infinite',
                     },
                     keyframes: {
                         float: {
@@ -43,9 +44,15 @@
                             '0%, 100%': { opacity: 1, boxShadow: '0 0 10px rgba(14, 165, 233, 0.3)' },
                             '50%': { opacity: .9, boxShadow: '0 0 20px rgba(14, 165, 233, 0.1)' },
                         },
-                        fadeInText: {
-                            '0%': { opacity: 0, transform: 'translateX(-5px)' },
-                            '100%': { opacity: 1, transform: 'translateX(0)' },
+                        fadeIn: {
+                            '0%': { opacity: 0 },
+                            '100%': { opacity: 1 }
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
                         }
                     }
                 }
@@ -55,7 +62,6 @@
     <style>
         body {
             background-color: #f0f4f8;
-            /* Subtle blueish dots */
             background-image: radial-gradient(#bae6fd 1px, transparent 1px);
             background-size: 24px 24px; 
             color: #1e293b;
@@ -66,20 +72,26 @@
 
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         
-        /* --- SOFT BLUE GLASS EFFECT --- */
+        /* Standard Glass */
         .glass-blue {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 
-                0 4px 6px -1px rgba(14, 165, 233, 0.05), 
-                0 10px 15px -3px rgba(14, 165, 233, 0.1),
-                inset 0 0 20px rgba(224, 242, 254, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.05);
+        }
+        
+        /* New Animated Glass for Smart Card */
+        .glass-animated {
+            background: rgba(255, 255, 255, 0.2); /* More transparent to show colors */
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
         }
         
         .glass-nav-blue {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(25px);
             border-top: 1px solid rgba(255, 255, 255, 0.8);
             box-shadow: 0 -4px 20px rgba(14, 165, 233, 0.08);
@@ -119,7 +131,7 @@
         }
 
         #conversation-container {
-            background-color: #e0f2fe;
+            background-color: #e0f2fe; 
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230ea5e9' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
         
@@ -171,6 +183,10 @@
             backdrop-filter: blur(8px);
             background-color: rgba(15, 23, 42, 0.3);
         }
+        
+        /* Blob Animation Utility */
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
     </style>
 </head>
 <body class="flex flex-col h-screen font-sans overflow-hidden text-sm bg-brand-bg text-brand-text">
@@ -190,15 +206,14 @@
     <div id="main-app-container" class="hidden h-full flex-col relative w-full">
         
         <!-- Header -->
-        <header class="glass-blue sticky top-0 z-20 px-4 h-16 flex items-center justify-center pt-safe shadow-sm transition-shadow">
+        <header class="glass-blue sticky top-0 z-20 px-4 h-16 flex items-center justify-between pt-safe shadow-sm transition-shadow">
+            <div class="w-20"></div>
             <h1 id="header-title" class="text-slate-800 text-lg font-bold tracking-tight">تیکت‌های من</h1>
             
             <!-- Online Admin Status -->
-            <div class="absolute right-5 top-1/2 -translate-y-1/2 pt-safe flex items-center gap-2">
-                 <span id="admin-status-text" class="text-[10px] font-bold text-brand-secondary opacity-0 animate-fade-in-text hidden xs:block">
-                     <!-- Populated by JS -->
-                 </span>
-                 <span class="flex h-2.5 w-2.5 relative">
+            <div class="w-20 flex justify-end items-center gap-2">
+                 <span id="admin-count" class="text-[10px] font-bold text-brand-secondary opacity-0 animate-fade-in whitespace-nowrap"></span>
+                 <span class="flex h-2.5 w-2.5 relative flex-shrink-0">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-secondary opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-secondary"></span>
                   </span>
@@ -210,20 +225,27 @@
             
             <!-- Tickets List -->
             <div id="tickets-list-view" class="p-5 w-full max-w-lg mx-auto">
-                <!-- Smart Card -->
-                <div id="smart-card" class="glass-blue p-5 rounded-3xl mb-6 fade-in-item relative overflow-hidden group hover:shadow-lg transition-shadow duration-300">
-                    <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-sky-400 to-blue-500"></div>
+                <!-- Smart Card with Animated Floating Colors -->
+                <div id="smart-card" class="glass-animated p-5 rounded-3xl mb-6 fade-in-item relative overflow-hidden group hover:shadow-lg transition-shadow duration-300">
                     
-                    <div class="flex items-center justify-between mb-3 relative z-10">
-                        <h3 id="smart-card-greeting" class="text-lg font-bold text-slate-800">سلام کاربر عزیز! 👋</h3>
-                    </div>
+                    <!-- Floating Color Blobs (Background) -->
+                    <div class="absolute top-0 -left-4 w-48 h-48 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-blob"></div>
+                    <div class="absolute top-0 -right-4 w-48 h-48 bg-yellow-200 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-blob animation-delay-2000"></div>
+                    <div class="absolute -bottom-8 left-20 w-48 h-48 bg-pink-200 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-blob animation-delay-4000"></div>
                     
-                    <div class="p-4 rounded-2xl bg-white/50 text-xs mb-5 border border-white/60 leading-relaxed relative z-10 text-slate-700">
-                        <p><span class="text-lg align-middle ml-1">💡</span> <span class="font-bold text-brand-secondary">نکته امروز:</span> آیا میدانستید با مراجعه به <span class="font-bold text-brand-primary">پایـگاه دانــش</span>، پاسخ 90% سوالات خود را پیدا می‌کنید؟</p>
+                    <!-- Content (Foreground) -->
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 id="smart-card-greeting" class="text-lg font-bold text-slate-800">سلام کاربر عزیز! 👋</h3>
+                        </div>
+                        
+                        <div class="p-4 rounded-2xl bg-white/60 text-xs mb-5 border border-white/40 leading-relaxed text-slate-700 shadow-sm backdrop-blur-sm">
+                            <p><span class="text-lg align-middle ml-1">💡</span> <span class="font-bold text-brand-secondary">نکته امروز:</span> آیا میدانستید با مراجعه به <span class="font-bold text-brand-primary">پایـگاه دانــش</span>، پاسخ 90% سوالات خود را پیدا می‌کنید؟</p>
+                        </div>
+                        <button id="faq-button" class="w-full bg-brand-primary/90 hover:bg-brand-primary text-white text-sm font-bold py-3.5 rounded-xl shadow-lg shadow-sky-500/20 transition-all active:scale-[0.98] backdrop-blur-md">
+                            مشاهده سوالات متداول
+                        </button>
                     </div>
-                    <button id="faq-button" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-white text-sm font-bold py-3.5 rounded-xl shadow-lg shadow-sky-500/30 transition-all active:scale-[0.98] relative z-10">
-                        مشاهده سوالات متداول
-                    </button>
                 </div>
 
                 <div id="tickets-container" class="space-y-4"></div>
@@ -394,7 +416,7 @@
         </div>
     </div>
 
-    <!-- Info Modal -->
+    <!-- Info Modal with Original Content -->
     <div id="info-modal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-5 transition-all duration-300">
         <div class="glass-blue p-6 rounded-3xl w-full max-w-md flex flex-col shadow-2xl animate-[slideInUp_0.3s_ease-out] max-h-[85vh]">
             <div class="text-center mb-5">
@@ -523,6 +545,29 @@
             closed: { text: 'بسته', colorClass: 'bg-slate-400', bgClass: 'bg-slate-100 text-slate-500 border border-slate-200' }
         };
         
+        // Admin Count Logic
+        const updateAdminCount = () => {
+            const STORAGE_KEY_COUNT = 'support_admin_count';
+            const STORAGE_KEY_TIME = 'support_admin_time';
+            const INTERVAL = 6 * 60 * 60 * 1000; // 6 hours
+
+            const now = Date.now();
+            let count = localStorage.getItem(STORAGE_KEY_COUNT);
+            let lastTime = localStorage.getItem(STORAGE_KEY_TIME);
+
+            if (!count || !lastTime || (now - lastTime > INTERVAL)) {
+                count = Math.floor(Math.random() * 4) + 1; // 1 to 4
+                localStorage.setItem(STORAGE_KEY_COUNT, count);
+                localStorage.setItem(STORAGE_KEY_TIME, now);
+            }
+
+            const countEl = document.getElementById('admin-count');
+            if(countEl) {
+                countEl.textContent = `${count} پشتیبان آنلاین`;
+                countEl.classList.remove('opacity-0');
+            }
+        };
+
         let activeToastTimeout = null;
         function showNotification(message, success = true, duration = 3000) {
             const toast = document.getElementById('notification-toast');
@@ -568,30 +613,10 @@
             mainAppContainer.classList.add('flex');
             showView('ticketsList');
             listenToTickets();
+            updateAdminCount();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Admin count logic
-            const STORAGE_KEY_COUNT = 'support_admin_count';
-            const STORAGE_KEY_TIME = 'support_admin_time';
-            const INTERVAL = 6 * 60 * 60 * 1000; // 6 hours
-
-            let count = localStorage.getItem(STORAGE_KEY_COUNT);
-            let lastTime = localStorage.getItem(STORAGE_KEY_TIME);
-            const now = Date.now();
-
-            if (!count || !lastTime || (now - lastTime > INTERVAL)) {
-                count = Math.floor(Math.random() * 4) + 1; // Random 1 to 4
-                localStorage.setItem(STORAGE_KEY_COUNT, count);
-                localStorage.setItem(STORAGE_KEY_TIME, now);
-            }
-
-            const statusText = document.getElementById('admin-status-text');
-            if(statusText) {
-                statusText.textContent = `${count} پشتیبان آنلاین`;
-                statusText.classList.remove('opacity-0');
-            }
-
             try {
                 const tg = window.Telegram ? window.Telegram.WebApp : null;
                 if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
